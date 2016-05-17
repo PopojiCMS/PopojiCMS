@@ -1,0 +1,32 @@
+<meta property="place:location:latitude" content="13.062616" /> <!-- Silahkan disesuaikan -->
+	<meta property="place:location:longitude" content="80.229508" /> <!-- Silahkan disesuaikan -->
+	<meta property="business:contact_data:street_address" content="Street Name" /> <!-- Silahkan disesuaikan -->
+	<meta property="business:contact_data:locality" content="City Name" /> <!-- Silahkan disesuaikan -->
+	<meta property="business:contact_data:postal_code" content="ZIP Code" /> <!-- Silahkan disesuaikan -->
+	<meta property="business:contact_data:country_name" content="Country" /> <!-- Silahkan disesuaikan -->
+	<meta property="business:contact_data:email" content="contact@mail.com" /> <!-- Silahkan disesuaikan -->
+	<meta property="business:contact_data:phone_number" content="+91 1234567890" /> <!-- Silahkan disesuaikan -->
+	<meta property="business:contact_data:website" content="<?=$this->e($social_url);?>" />
+
+	<meta property="og:type" content="article" /> <!-- Card type bisa di ganti article, website, blog dan profile -->
+	<meta property="profile:first_name" content="Facebook_First_Name" /> <!-- Silahkan disesuaikan -->
+	<meta property="profile:last_name" content="Facebook_Last_Name" /> <!-- Silahkan disesuaikan -->
+	<meta property="profile:username" content="Facebook_Username" /> <!-- Silahkan disesuaikan -->
+	<meta property="og:title" content="<?=$this->e($social_mod);?> - <?=$this->e($social_title);?>" />
+	<meta property="og:description" content="<?=$this->e($social_desc);?>" />
+	<meta property="og:image" content="<?=$this->e($social_img);?>" />
+	<meta property="og:url" content="<?=$this->e($social_url);?>" />
+	<meta property="og:site_name" content="<?=$this->e($social_name);?>" />
+	<meta property="fb:admins" content="Facebook_ID" /> <!-- Silahkan disesuaikan -->
+
+	<meta name="twitter:card" content="summary" />  <!-- Card type jangan di ganti -->
+	<meta name="twitter:site" content="<?=$this->e($social_name);?>" />
+	<meta name="twitter:title" content="<?=$this->e($social_mod);?> - <?=$this->e($social_title);?>" />
+	<meta name="twitter:description" content="<?=$this->e($social_desc);?>" />
+	<meta name="twitter:creator" content="Twitter_Username" /> <!-- Silahkan disesuaikan -->
+	<meta name="twitter:image:src" content="<?=$this->e($social_img);?>" />
+	<meta name="twitter:domain" content="<?=$this->e($social_url);?>" />
+
+	<meta itemprop="name" content="<?=$this->e($social_mod);?> - <?=$this->e($social_title);?>" />
+	<meta itemprop="description" content="<?=$this->e($social_desc);?>" />
+	<meta itemprop="image" content="<?=$this->e($social_img);?>" />
