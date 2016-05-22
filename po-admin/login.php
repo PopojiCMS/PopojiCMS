@@ -120,6 +120,7 @@ class Login extends PoCore
 		$user = $this->podb->from('users')
 			->where('username', $_POST['username'])
 			->where('block', 'N')
+			->where('level', array('1','2','3'))
 			->limit(1)
 			->fetch();
 		echo $user['locktype'];
@@ -150,6 +151,7 @@ class Login extends PoCore
 				->where('username', $_POST['username'])
 				->where('password', md5($_POST['password']))
 				->where('block', 'N')
+				->where('level', array('1','2','3'))
 				->count();
 			if ($count_user > 0) {
 				$user = $this->podb->from('users')
@@ -158,6 +160,7 @@ class Login extends PoCore
 					->where('username', $_POST['username'])
 					->where('password', md5($_POST['password']))
 					->where('block', 'N')
+					->where('users.level', array('1','2','3'))
 					->limit(1)
 					->fetch();
 				$timeout = new PoTimeout;

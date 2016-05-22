@@ -156,10 +156,12 @@ class User extends PoCore
 	public function addnew()
 	{
 		if (!$this->auth($_SESSION['leveluser'], 'user', 'create')) {
-			if ($_SESSION['leveluser'] != '1' || $_SESSION['leveluser'] != '2') {
-				echo $this->pohtml->error();
-				exit;
-			}
+			echo $this->pohtml->error();
+			exit;
+		}
+		if ($_SESSION['leveluser'] != '1' && $_SESSION['leveluser'] != '2') {
+			echo $this->pohtml->error();
+			exit;
 		}
 		if (!empty($_POST)) {
 			$this->poval->validation_rules(array(
@@ -490,10 +492,12 @@ class User extends PoCore
 	public function delete()
 	{
 		if (!$this->auth($_SESSION['leveluser'], 'user', 'delete')) {
-			if ($_SESSION['leveluser'] != '1' || $_SESSION['leveluser'] != '2') {
-				echo $this->pohtml->error();
-				exit;
-			}
+			echo $this->pohtml->error();
+			exit;
+		}
+		if ($_SESSION['leveluser'] != '1' && $_SESSION['leveluser'] != '2') {
+			echo $this->pohtml->error();
+			exit;
 		}
 		if (!empty($_POST)) {
 			$query = $this->podb->deleteFrom('users')->where('id_user', $this->postring->valid($_POST['id'], 'sql'));
@@ -511,10 +515,12 @@ class User extends PoCore
 	public function multidelete()
 	{
 		if (!$this->auth($_SESSION['leveluser'], 'user', 'delete')) {
-			if ($_SESSION['leveluser'] != '1' || $_SESSION['leveluser'] != '2') {
-				echo $this->pohtml->error();
-				exit;
-			}
+			echo $this->pohtml->error();
+			exit;
+		}
+		if ($_SESSION['leveluser'] != '1' && $_SESSION['leveluser'] != '2') {
+			echo $this->pohtml->error();
+			exit;
 		}
 		if (!empty($_POST)) {
 			$totaldata = $this->postring->valid($_POST['totaldata'], 'xss');
@@ -540,10 +546,12 @@ class User extends PoCore
 	public function userlevel()
 	{
 		if (!$this->auth($_SESSION['leveluser'], 'user', 'read')) {
-			if ($_SESSION['leveluser'] != '1' || $_SESSION['leveluser'] != '2') {
-				echo $this->pohtml->error();
-				exit;
-			}
+			echo $this->pohtml->error();
+			exit;
+		}
+		if ($_SESSION['leveluser'] != '1' && $_SESSION['leveluser'] != '2') {
+			echo $this->pohtml->error();
+			exit;
 		}
 		?>
 		<div class="block-content">
@@ -585,10 +593,12 @@ class User extends PoCore
 	public function datatable2()
 	{
 		if (!$this->auth($_SESSION['leveluser'], 'user', 'read')) {
-			if ($_SESSION['leveluser'] != '1' || $_SESSION['leveluser'] != '2') {
-				echo $this->pohtml->error();
-				exit;
-			}
+			echo $this->pohtml->error();
+			exit;
+		}
+		if ($_SESSION['leveluser'] != '1' && $_SESSION['leveluser'] != '2') {
+			echo $this->pohtml->error();
+			exit;
 		}
 		$table = 'user_level';
 		$primarykey = 'id_level';
@@ -635,10 +645,12 @@ class User extends PoCore
 	public function addnewuserlevel()
 	{
 		if (!$this->auth($_SESSION['leveluser'], 'user', 'create')) {
-			if ($_SESSION['leveluser'] != '1' || $_SESSION['leveluser'] != '2') {
-				echo $this->pohtml->error();
-				exit;
-			}
+			echo $this->pohtml->error();
+			exit;
+		}
+		if ($_SESSION['leveluser'] != '1' && $_SESSION['leveluser'] != '2') {
+			echo $this->pohtml->error();
+			exit;
 		}
 		if (!empty($_POST)) {
 			$this->poval->validation_rules(array(
@@ -766,10 +778,12 @@ class User extends PoCore
 	public function edituserlevel()
 	{
 		if (!$this->auth($_SESSION['leveluser'], 'user', 'update')) {
-			if ($_SESSION['leveluser'] != '1' || $_SESSION['leveluser'] != '2') {
-				echo $this->pohtml->error();
-				exit;
-			}
+			echo $this->pohtml->error();
+			exit;
+		}
+		if ($_SESSION['leveluser'] != '1' && $_SESSION['leveluser'] != '2') {
+			echo $this->pohtml->error();
+			exit;
 		}
 		if (!empty($_POST)) {
 			$this->poval->validation_rules(array(
@@ -947,10 +961,12 @@ class User extends PoCore
 	public function deleteuserlevel()
 	{
 		if (!$this->auth($_SESSION['leveluser'], 'user', 'delete')) {
-			if ($_SESSION['leveluser'] != '1' || $_SESSION['leveluser'] != '2') {
-				echo $this->pohtml->error();
-				exit;
-			}
+			echo $this->pohtml->error();
+			exit;
+		}
+		if ($_SESSION['leveluser'] != '1' && $_SESSION['leveluser'] != '2') {
+			echo $this->pohtml->error();
+			exit;
 		}
 		if (!empty($_POST)) {
 			$id = array('1','2','3','4');
