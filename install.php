@@ -119,8 +119,8 @@ EOS;
 		'name' => "Database host port number",
 		'ex' => "3306",
 		'desc' => "Leave 3306 for default or specify MySQL Database host port number.",
-		'def' => "3306",
-		'check' => 'return strlen($arg0) >= 1 ? true : false;'
+		'def' => "",
+		'check' => ''
 	);
 	$confDB['db_sock'] = array(
 		'name' => "Database socket path",
