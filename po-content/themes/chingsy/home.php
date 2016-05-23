@@ -30,7 +30,7 @@
 						<?php
 							$sliders_post = $this->post()->getPost('6', 'DESC', WEB_LANG_ID);
 							foreach($sliders_post as $slider_post){
-							$slider_category = $this->category()->getCategory($slider_post['id_post'], WEB_LANG_ID, false);
+							$slider_category = $this->category()->getCategory($slider_post['id_post'], WEB_LANG_ID);
 						?>
 							<div class="slide" data-thumb="<?=BASE_URL;?>/<?=DIR_CON;?>/thumbs/<?=$slider_post['picture'];?>">
 								<a href="<?=BASE_URL;?>/detailpost/<?=$slider_post['seotitle'];?>">
