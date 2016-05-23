@@ -84,11 +84,11 @@ if ($_SESSION['login'] == 0) {
 			<div class="navbar navbar-default" role="navigation">
 				<div class="container">
 					<div class="row-menu">
-						<div class="pull-left hidden-xs">
+						<div class="pull-left hidden-xs hidden-sm">
 							<button class="button-menu-mobile open-left"><i class="fa fa-navicon"></i></button>
 							<span class="clearfix"></span>
 						</div>
-						<div class="pull-left visible-xs">
+						<div class="pull-left visible-xs visible-sm">
 							<a href="admin.php?mod=home" class="button-menu-mobile"><i class="fa fa-home"></i></a>
 							<span class="clearfix"></span>
 						</div>
@@ -121,6 +121,7 @@ if ($_SESSION['login'] == 0) {
 									<li><a href="route.php?mod=home&act=logout"><i class="fa fa-ban"></i>&nbsp;&nbsp;<?=$_['logout'];?></a></li>
 								</ul>
 							</li>
+							<li class="menu-btn"><a href="javascript:void(0)"><i class="fa fa-bars"></i></a></li>
 						</ul>
 					</div>
 				</div>
@@ -142,6 +143,13 @@ if ($_SESSION['login'] == 0) {
 		</div>
         
 		<div class="content-page">
+			<nav class="dark-sidebar">
+				<?php
+					$instance2 = new DashboardMenu;
+					$menu2 = $instance2->menu($_SESSION['menuuser'], 'class="dark-sidebar-menu"', '', '');
+					echo $menu2;
+				?>
+			</nav>
 			<div class="content">
 				<div class="container">
 					<?php
