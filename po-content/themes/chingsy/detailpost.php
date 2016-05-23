@@ -87,13 +87,18 @@
 
 					<h4><?=$this->e($front_related_post);?></h4>
 					<div class="related-posts clearfix">
-						<div class="col_half nobottommargin col_last">
 						<?php
+							$norelated = 1;
 							$relateds = $this->post()->getRelated($post['id_post'], $post['tag'], '2', 'DESC', WEB_LANG_ID);
 							foreach($relateds as $related){
 						?>
+						<?php if ($norelated%2 == 0) { ?>
+						<div class="col_half nobottommargin col_last">
+						<?php } else { ?>
+						<div class="col_half nobottommargin">
+						<?php } ?>
 							<div class="mpost clearfix">
-								<div class="entry-image">
+								<div class="entry-image hidden-xs">
 									<a href="<?=BASE_URL;?>/detailpost/<?=$related['seotitle'];?>"><img src="<?=BASE_URL;?>/<?=DIR_CON;?>/uploads/medium/medium_<?=$related['picture'];?>" alt="<?=$related['title'];?>"></a>
 								</div>
 								<div class="entry-c">
@@ -107,8 +112,8 @@
 									<div class="entry-content"><?=$this->pocore()->call->postring->cuthighlight('post', $related['content'], '70');?>...</div>
 								</div>
 							</div>
-						<?php } ?>
 						</div>
+						<?php $norelated++;} ?>
 					</div>
 
 					<?php if ($post['comment'] == 'Y') { ?>
