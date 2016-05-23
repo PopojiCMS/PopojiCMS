@@ -350,7 +350,9 @@ EOF;
 
 function StartInstall() {
 	global $aConf;
-	$ifmodrewrite = (in_array(mod_rewrite, apache_get_modules()) ? '<span class="text-success">ON</span>' : '<span class="text-danger">OFF</span>');
+	if (strpos($_SERVER['SERVER_SOFTWARE'], 'Apache') !== false) {
+		$ifmodrewrite = (in_array(mod_rewrite, apache_get_modules()) ? '<span class="text-success">ON</span>' : '<span class="text-danger">OFF</span>');
+	}
 	$ifshorttag = (ini_get('short_open_tag') == '1' ? '<span class="text-success">ON</span>' : '<span class="text-danger">OFF</span>');
 	$ifphpcurl = (extension_loaded('curl') ? '<span class="text-success">ON</span>' : '<span class="text-danger">OFF</span>');
 	$ifphpgd2 = (extension_loaded('gd') ? '<span class="text-success">ON</span>' : '<span class="text-danger">OFF</span>');
@@ -359,7 +361,7 @@ function StartInstall() {
 	$ifphppdomysql = (extension_loaded('pdo_mysql') ? '<span class="text-success">ON</span>' : '<span class="text-danger">OFF</span>');
 	$iffoldercorewrite = (is_writable('po-includes/core') ? '<span class="text-success">YES</span>' : '<span class="text-danger">NO</span>');
 
-	return <<<EOF
+	$startinstallc = <<<EOF
 <div class="tab-content">
 	<div class="tab-pane fade in active" id="Getting Started">
 		<h3 class="head text-center">PopojiCMS {$aConf['ver']}.{$aConf['build']}</h3>
@@ -380,6 +382,9 @@ function StartInstall() {
 						</tr>
 					</thead>
 					<tbody>
+EOF;
+	if (strpos($_SERVER['SERVER_SOFTWARE'], 'Apache') !== false) {
+	$startinstallc .= <<<EOF
 						<tr>
 							<td class="text-center" colspan="3">Apache</td>
 						</tr>
@@ -388,6 +393,9 @@ function StartInstall() {
 							<td class="text-center">{$ifmodrewrite}</td>
 							<td class="text-center"><span class="text-success">ON</span></td>
 						</tr>
+EOF;
+	}
+	$startinstallc .= <<<EOF
 						<tr>
 							<td class="text-center" colspan="3">PHP Setting</td>
 						</tr>
@@ -470,6 +478,8 @@ THE SOFTWARE.
 	</div>
 </div>
 EOF;
+
+	return $startinstallc;
 }
 
 function genPathCheckingConfig($errorMessage = '') {
