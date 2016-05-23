@@ -385,7 +385,7 @@ class Component extends PoCore
 		for($v = sizeof($lngh)-1; ($v >= 0)&&(($no = $dif/$lngh[$v])<=1); $v--); if($v < 0) $v = 0; $_tm = $cur_tm-($dif%$lngh[$v]);
 
 		$no = floor($no); if($no <> 1) $pds[$v] .='s';
-		$x=sprintf(_(sprintf('%%d %s ago', $pds[$v])), $no);
+		$x=sprintf(sprintf('%%d %s ago', $pds[$v]), $no);
 		if(($rcs == 1)&&($v >= 1)&&(($cur_tm-$_tm) > 0)) $x .= time_ago($_tm);
 		return $x;
 	}
