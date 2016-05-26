@@ -228,11 +228,11 @@ if ($_SESSION['login'] == 0) {
 					"advlist autolink link image lists charmap print preview hr anchor pagebreak",
 					"searchreplace wordcount visualblocks visualchars insertdatetime media nonbreaking",
 					"table contextmenu directionality emoticons paste textcolor responsivefilemanager",
-					"code fullscreen youtube"
+					"code fullscreen youtube codemirror codesample"
 				],
 				menubar : false,
 				toolbar1: "undo redo | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist | outdent indent table",
-				toolbar2: "| fontsizeselect | styleselect | link unlink anchor | responsivefilemanager image media youtube | forecolor backcolor | fullscreen ",
+				toolbar2: "| fontsizeselect | styleselect | link unlink anchor | responsivefilemanager image media youtube | forecolor backcolor | code codesample fullscreen ",
 				image_advtab: true,
 				fontsize_formats: "8px 10px 12px 14px 18px 24px 36px",
 				relative_urls: false,
@@ -241,6 +241,10 @@ if ($_SESSION['login'] == 0) {
 				filemanager_title: "File Manager",
 				external_plugins: {
 					"filemanager" : "<?=WEB_URL.DIR_INC;?>/js/filemanager/plugin.min.js"
+				},
+				codemirror: {
+					indentOnInit: true,
+					path: "<?=WEB_URL.DIR_INC;?>/js/codemirror"
 				}
 			});
 		}
@@ -258,11 +262,11 @@ if ($_SESSION['login'] == 0) {
 				"advlist autolink link image lists charmap print preview hr anchor pagebreak",
 				"searchreplace wordcount visualblocks visualchars insertdatetime media nonbreaking",
 				"table contextmenu directionality emoticons paste textcolor responsivefilemanager",
-				"code fullscreen youtube autoresize"
+				"code fullscreen youtube autoresize codemirror codesample"
 			],
 			menubar : false,
 			toolbar1: "undo redo | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist | outdent indent table",
-			toolbar2: "| fontsizeselect | styleselect | link unlink anchor | responsivefilemanager image media youtube | forecolor backcolor | fullscreen ",
+			toolbar2: "| fontsizeselect | styleselect | link unlink anchor | responsivefilemanager image media youtube | forecolor backcolor | code codesample fullscreen ",
 			image_advtab: true,
 			fontsize_formats: "8px 10px 12px 14px 18px 24px 36px",
 			relative_urls: false,
@@ -271,6 +275,10 @@ if ($_SESSION['login'] == 0) {
 			filemanager_title: "File Manager",
 			external_plugins: {
 				"filemanager" : "<?=WEB_URL.DIR_INC;?>/js/filemanager/plugin.min.js"
+			},
+			codemirror: {
+				indentOnInit: true,
+				path: "<?=WEB_URL.DIR_INC;?>/js/codemirror"
 			}
 		});
 	</script>

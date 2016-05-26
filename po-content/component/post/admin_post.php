@@ -142,7 +142,7 @@ class Post extends PoCore
 					} else {
 						$headline = "<i class='fa fa-star'></i> {$GLOBALS['_']['post_not_headline']}";
 					}
-					return "".$d."<br /><i><a href='".WEB_URL."detailpost/".$this->postring->seo_title($d)."' target='_blank'>".WEB_URL."detailpost/".$this->postring->seo_title($d)."</a></i><br /><br />
+					return "".$d."<br /><i><a href='".WEB_URL."detailpost/".$row['seotitle']."' target='_blank'>".WEB_URL."detailpost/".$row['seotitle']."</a></i><br /><br />
 					<div class='btn-group btn-group-xs'>
                         <a class='btn btn-xs btn-default' style='font-size:11px;'><i class='fa fa-user'></i> {$GLOBALS['_']['post_by']} ".$row['nama_lengkap']."</a>
 						<a class='btn btn-xs btn-default tbl-subscribe' id='".$row['id_post']."' style='font-size:11px;'><i class='fa fa-rss'></i> {$GLOBALS['_']['post_subscribe']}</a>
@@ -165,6 +165,7 @@ class Post extends PoCore
 					</div>\n";
 				}
 			),
+			array('db' => 'p.seotitle', 'dt' => '', 'field' => 'seotitle'),
 			array('db' => 'p.headline', 'dt' => '', 'field' => 'headline'),
 			array('db' => 'u.nama_lengkap', 'dt' => '', 'field' => 'nama_lengkap')
 		);

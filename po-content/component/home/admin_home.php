@@ -218,7 +218,7 @@ class Home extends PoCore
 						<div class="widget-title">
 							<h3 class="text-uppercase"><?=$GLOBALS['_']['home_stats'];?></h3>
 							<span><?=$GLOBALS['_']['home_stats_desc'];?></span>
-							<div class="text-right"><span><i class="fa fa-circle" style="color:#97BBCD;"></i> visitor</span> <span><i class="fa fa-circle" style="color:#DCDCDC;"></i> hits</span></div>
+							<div class="text-right"><span><i class="fa fa-circle" style="color:#DCDCDC;"></i> visitor</span> <span><i class="fa fa-circle" style="color:#97BBCD;"></i> hits</span></div>
 						</div>
 					</div>
 					<div class="stats-desc">
