@@ -611,7 +611,7 @@ function genInstallationProcessPage($errorMessage = '') {
 	
 	if ('done' ==  $resRunSQL) {
 		$sForm = '
-		<form action="'.$_SERVER['PHP_SELF'].'" method="post" role="form">
+		<form action="./" method="post" role="form">
 			<div class="text-center" style="margin:0 auto;">
 				<input type="hidden" name="action" value="step5" />
 				<button type="submit" class="btn btn-success btn-outline-rounded green">Goto Web</button>

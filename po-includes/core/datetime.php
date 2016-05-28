@@ -42,6 +42,7 @@ class PoDateTime
 
 	function __construct()
 	{
+		date_default_timezone_set('UTC');
 		$this->week = array("Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu");
 		$this->day = date("w");
 		$this->today = $this->week[$this->day];
