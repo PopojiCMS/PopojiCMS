@@ -472,6 +472,7 @@ class VQModLog {
 	 * @description Object instantiation method
 	 */
 	public function __construct() {
+		date_default_timezone_set('UTC');
 		$this->_sep = str_repeat('-', 70);
 	}
 
