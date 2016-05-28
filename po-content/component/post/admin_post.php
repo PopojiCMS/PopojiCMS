@@ -927,7 +927,7 @@ class Post extends PoCore
 			exit;
 		}
 		if (!empty($_POST)) {
-			$upload = new upload($_FILES['file']);
+			$upload = new PoUpload($_FILES['file']);
 			if ($upload->uploaded) {
 				$id_post = $this->postring->valid($_POST['id_post'], 'sql');
 				$file_name = reset((explode('.', $this->postring->valid($_FILES['file']['name'], 'xss'))));
@@ -935,7 +935,7 @@ class Post extends PoCore
 				$upload->image_convert = 'jpg';
 				$upload->process('../'.DIR_CON.'/uploads/');
 				if ($upload->processed) {
-					$upload_med = new upload($_FILES['file']);
+					$upload_med = new PoUpload($_FILES['file']);
 					$upload_med->file_new_name_body = 'medium_'.$file_name;
 					$upload_med->image_convert = 'jpg';
 					$upload_med->image_resize = true;

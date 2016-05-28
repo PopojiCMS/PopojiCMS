@@ -632,7 +632,7 @@ class Setting extends PoCore
 				if (file_exists('../'.DIR_INC.'/images/favicon.png')){
 					unlink('../'.DIR_INC.'/images/favicon.png');
 				}
-				$upload = new upload($_FILES['picture']);
+				$upload = new PoUpload($_FILES['picture']);
 				if ($upload->uploaded) {
 					$upload->file_new_name_body = 'favicon';
 					$upload->image_convert = 'png';
@@ -676,7 +676,7 @@ class Setting extends PoCore
 				if (file_exists('../'.DIR_INC.'/images/logo.png')){
 					unlink('../'.DIR_INC.'/images/logo.png');
 				}
-				$upload = new upload($_FILES['picture']);
+				$upload = new PoUpload($_FILES['picture']);
 				if ($upload->uploaded) {
 					$upload->file_new_name_body = 'logo';
 					$upload->image_convert = 'png';

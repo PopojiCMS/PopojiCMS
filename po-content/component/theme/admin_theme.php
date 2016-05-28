@@ -121,7 +121,7 @@ class Theme extends PoCore
 						unlink('../'.DIR_CON.'/uploads/'.$themeName);
 						$this->poflash->error($GLOBALS['_']['theme_message_4'], 'admin.php?mod=theme');
 					} else {
-						$archive = new PclZip('../'.DIR_CON.'/uploads/'.$themeName);
+						$archive = new PoPclZip('../'.DIR_CON.'/uploads/'.$themeName);
 						if ($archive->extract(PCLZIP_OPT_PATH, '../'.DIR_CON.'/themes/'.$this->postring->valid($_POST['folder'], 'xss')) == 0) {
 							unlink('../'.DIR_CON.'/uploads/'.$themeName);
 							$this->poflash->error($GLOBALS['_']['theme_message_4'], 'admin.php?mod=theme');
@@ -147,7 +147,7 @@ class Theme extends PoCore
 				if (file_exists('../'.DIR_CON.'/themes/'.$this->postring->valid($_POST['folder'], 'xss'))) {
 					$this->poflash->error($GLOBALS['_']['theme_message_4'], 'admin.php?mod=theme');
 				} else {
-					$archive = new PclZip('../'.DIR_CON.'/component/theme/blank-theme.zip');
+					$archive = new PoPclZip('../'.DIR_CON.'/component/theme/blank-theme.zip');
 					if ($archive->extract(PCLZIP_OPT_PATH, '../'.DIR_CON.'/themes/'.$this->postring->valid($_POST['folder'], 'xss')) == 0) {
 						$this->poflash->error($GLOBALS['_']['theme_message_4'], 'admin.php?mod=theme');
 					}

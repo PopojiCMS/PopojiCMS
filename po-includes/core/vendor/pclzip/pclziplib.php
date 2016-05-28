@@ -167,13 +167,13 @@ define('PCLZIP_TEMPORARY_DIR', realpath(dirname(__FILE__).'/cache/').'/');
   // Attributes :
   //   Attributes must not be accessed directly.
   // Methods :
-  //   PclZip() : Object creator
+  //   PoPclZip() : Object creator
   //   create() : Creates the Zip archive
   //   listContent() : List the content of the Zip archive
   //   extract() : Extract the content of the archive
   //   properties() : List the properties of the archive
   // --------------------------------------------------------------------------------
-  class PclZip
+  class PoPclZip
   {
     // ----- Filename of the zip file
     var $zipname = '';
@@ -191,7 +191,7 @@ define('PCLZIP_TEMPORARY_DIR', realpath(dirname(__FILE__).'/cache/').'/');
     var $magic_quotes_status;
 
   // --------------------------------------------------------------------------------
-  // Function : PclZip()
+  // Function : PoPclZip()
   // Description :
   //   Creates a PclZip object and set the name of the associated Zip archive
   //   filename.

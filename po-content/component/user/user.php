@@ -56,7 +56,7 @@ $router->match('GET|POST', '/member/user/edit', function() use ($core, $template
 							if (file_exists($file_exists)){
 								unlink(DIR_CON.'/uploads/user-'.$_SESSION['iduser_member']);
 							}
-							$upload = new upload($_FILES['picture']);
+							$upload = new PoUpload($_FILES['picture']);
 							if ($upload->uploaded) {
 								$upload->file_new_name_body = 'user-'.$_SESSION['iduser_member'];
 								$upload->image_convert = 'jpg';

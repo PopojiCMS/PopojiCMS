@@ -106,7 +106,7 @@ if (file_exists('install.php')) {
 		 * Visitor statistic
 		 *
 		*/
-		$browser = new Browser();
+		$browser = new PoBrowser();
 		$ip_stat = $_SERVER['REMOTE_ADDR'];
 		$date_stat = date("Ymd");
 		$time_stat = time();

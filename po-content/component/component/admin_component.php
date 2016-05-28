@@ -191,7 +191,7 @@ class Component extends PoCore
 						unlink('../'.DIR_CON.'/uploads/'.$componentName);
 						$this->poflash->error($GLOBALS['_']['component_message_3'], 'admin.php?mod=component');
 					} else {
-						$archive = new PclZip('../'.DIR_CON.'/uploads/'.$componentName);
+						$archive = new PoPclZip('../'.DIR_CON.'/uploads/'.$componentName);
 						if ($archive->extract(PCLZIP_OPT_PATH, '../'.DIR_CON.'/'.$folderinstall.'/'.strtolower($this->postring->valid($_POST['component'], 'xss'))) == 0) {
 							unlink('../'.DIR_CON.'/uploads/'.$componentName);
 							$this->poflash->error($GLOBALS['_']['component_message_3'], 'admin.php?mod=component');

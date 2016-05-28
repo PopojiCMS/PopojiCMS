@@ -302,7 +302,7 @@ class User extends PoCore
 					if (file_exists($file_exists)){
 						unlink('../'.DIR_CON.'/uploads/user-'.$_POST['id_user']);
 					}
-					$upload = new upload($_FILES['picture']);
+					$upload = new PoUpload($_FILES['picture']);
 					if ($upload->uploaded) {
 						$upload->file_new_name_body = 'user-'.$_POST['id_user'];
 						$upload->image_convert = 'jpg';

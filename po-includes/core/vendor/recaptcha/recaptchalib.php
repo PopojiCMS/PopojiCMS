@@ -39,7 +39,7 @@ class ReCaptchaResponse
     public $errorCodes;
 }
 
-class ReCaptcha
+class PoReCaptcha
 {
     private static $_signupUrl = "https://www.google.com/recaptcha/admin";
     private static $_siteVerifyUrl =

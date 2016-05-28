@@ -23,7 +23,7 @@
  *
  * Typical Usage:
  *
- *   $browser = new Browser();
+ *   $browser = new PoBrowser();
  *   if( $browser->getBrowser() == Browser::BROWSER_FIREFOX && $browser->getVersion() >= 2 ) {
  *    echo 'You have FireFox version 2 or greater';
  *   }
@@ -35,7 +35,7 @@
  *
  */
 
-class Browser
+class PoBrowser
 {
     private $_agent = '';
     private $_browser_name = '';

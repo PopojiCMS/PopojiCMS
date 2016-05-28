@@ -36,7 +36,7 @@ $router->match('GET|POST', '/detailpost/([a-z0-9_-]+)', function($seotitle) use 
 		if (!empty($_POST)) {
 			require_once(DIR_INC.'/core/vendor/recaptcha/recaptchalib.php');
 			$secret = $core->posetting[22]['value'];
-			$recaptcha = new ReCaptcha($secret);
+			$recaptcha = new PoReCaptcha($secret);
 			if (!empty($_POST["g-recaptcha-response"])) {
 				$resp = $recaptcha->verifyResponse(
 					$_SERVER["REMOTE_ADDR"],
@@ -157,7 +157,7 @@ $router->match('GET|POST', '/detailpost/([a-z0-9_-]+)/page/(\d+)', function($seo
 		if (!empty($_POST)) {
 			require_once(DIR_INC.'/core/vendor/recaptcha/recaptchalib.php');
 			$secret = $core->posetting[22]['value'];
-			$recaptcha = new ReCaptcha($secret);
+			$recaptcha = new PoReCaptcha($secret);
 			if (!empty($_POST["g-recaptcha-response"])) {
 				$resp = $recaptcha->verifyResponse(
 					$_SERVER["REMOTE_ADDR"],
@@ -566,7 +566,7 @@ $router->match('GET|POST', '/member/post/addnew', function() use ($core, $templa
 								'picture' => $picture_name.'.jpg'
 							);
 						} else {
-							$upload = new upload($_FILES['picture']);
+							$upload = new PoUpload($_FILES['picture']);
 							if ($upload->uploaded) {
 								$upload->file_new_name_body = $picture_name;
 								$upload->image_convert = 'jpg';
@@ -579,7 +579,7 @@ $router->match('GET|POST', '/member/post/addnew', function() use ($core, $templa
 									$datapic = array(
 										'picture' => $upload->file_dst_name
 									);
-									$upload_medium = new upload($_FILES['picture']);
+									$upload_medium = new PoUpload($_FILES['picture']);
 									if ($upload_medium->uploaded) {
 										$upload_medium->file_new_name_body = 'medium_'.$picture_name;
 										$upload_medium->image_convert = 'jpg';
@@ -589,7 +589,7 @@ $router->match('GET|POST', '/member/post/addnew', function() use ($core, $templa
 										$upload_medium->image_ratio = true;
 										$upload_medium->process(DIR_CON.'/uploads/medium/');
 										if ($upload_medium->processed) {
-											$upload_thumb = new upload($_FILES['picture']);
+											$upload_thumb = new PoUpload($_FILES['picture']);
 											if ($upload_thumb->uploaded) {
 												$upload_thumb->file_new_name_body = $picture_name;
 												$upload_thumb->image_convert = 'jpg';
@@ -724,7 +724,7 @@ $router->match('GET|POST', '/member/post/edit/(\d+)', function($id_post) use ($c
 									'picture' => $picture_name.'.jpg'
 								);
 							} else {
-								$upload = new upload($_FILES['picture']);
+								$upload = new PoUpload($_FILES['picture']);
 								if ($upload->uploaded) {
 									$upload->file_new_name_body = $picture_name;
 									$upload->image_convert = 'jpg';
@@ -737,7 +737,7 @@ $router->match('GET|POST', '/member/post/edit/(\d+)', function($id_post) use ($c
 										$datapic = array(
 											'picture' => $upload->file_dst_name
 										);
-										$upload_medium = new upload($_FILES['picture']);
+										$upload_medium = new PoUpload($_FILES['picture']);
 										if ($upload_medium->uploaded) {
 											$upload_medium->file_new_name_body = 'medium_'.$picture_name;
 											$upload_medium->image_convert = 'jpg';
@@ -747,7 +747,7 @@ $router->match('GET|POST', '/member/post/edit/(\d+)', function($id_post) use ($c
 											$upload_medium->image_ratio = true;
 											$upload_medium->process(DIR_CON.'/uploads/medium/');
 											if ($upload_medium->processed) {
-												$upload_thumb = new upload($_FILES['picture']);
+												$upload_thumb = new PoUpload($_FILES['picture']);
 												if ($upload_thumb->uploaded) {
 													$upload_thumb->file_new_name_body = $picture_name;
 													$upload_thumb->image_convert = 'jpg';

@@ -25,7 +25,7 @@ $router->match('GET|POST', '/comment', function() use ($core, $templates) {
 	if (!empty($_POST)) {
 		require_once(DIR_INC.'/core/vendor/recaptcha/recaptchalib.php');
 		$secret = $core->posetting[22]['value'];
-		$recaptcha = new ReCaptcha($secret);
+		$recaptcha = new PoReCaptcha($secret);
 		if (!empty($_POST["g-recaptcha-response"])) {
 			$resp = $recaptcha->verifyResponse(
 				$_SERVER["REMOTE_ADDR"],
