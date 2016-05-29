@@ -113,15 +113,19 @@
 					"advlist autolink link image lists charmap print preview hr anchor pagebreak",
 					"searchreplace wordcount visualblocks visualchars insertdatetime media nonbreaking",
 					"table contextmenu directionality emoticons paste textcolor",
-					"code fullscreen youtube"
+					"code fullscreen youtube codemirror codesample"
 				],
 				menubar : false,
 				toolbar1: "undo redo | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist | outdent indent table",
-				toolbar2: "| fontsizeselect | styleselect | link unlink anchor image media youtube | forecolor backcolor | fullscreen ",
+				toolbar2: "| fontsizeselect | styleselect | link unlink anchor image media youtube | forecolor backcolor | code codesample fullscreen ",
 				image_advtab: true,
 				fontsize_formats: "8px 10px 12px 14px 18px 24px 36px",
 				relative_urls: false,
-				remove_script_host: false
+				remove_script_host: false,
+				codemirror: {
+					indentOnInit: true,
+					path: "<?=BASE_URL.'/'.DIR_INC;?>/js/codemirror"
+				}
 			});
 		}
 	</script>
@@ -136,15 +140,19 @@
 				"advlist autolink link image lists charmap print preview hr anchor pagebreak",
 				"searchreplace wordcount visualblocks visualchars insertdatetime media nonbreaking",
 				"table contextmenu directionality emoticons paste textcolor",
-				"code fullscreen youtube autoresize"
+				"code fullscreen youtube autoresize codemirror codesample"
 			],
 			menubar : false,
 			toolbar1: "undo redo | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist | outdent indent table",
-			toolbar2: "| fontsizeselect | styleselect | link unlink anchor image media youtube | forecolor backcolor | fullscreen ",
+			toolbar2: "| fontsizeselect | styleselect | link unlink anchor image media youtube | forecolor backcolor | code codesample fullscreen ",
 			image_advtab: true,
 			fontsize_formats: "8px 10px 12px 14px 18px 24px 36px",
 			relative_urls: false,
-			remove_script_host: false
+			remove_script_host: false,
+			codemirror: {
+				indentOnInit: true,
+				path: "<?=BASE_URL.'/'.DIR_INC;?>/js/codemirror"
+			}
 		});
 	</script>
 </body>

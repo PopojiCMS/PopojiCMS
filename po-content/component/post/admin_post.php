@@ -520,6 +520,15 @@ class Post extends PoCore
 											->where('post_description.id_post', $current_post['id_post'])
 											->where('post_description.id_language', $lang['id_language'])
 											->fetch();
+											$content_before = html_entity_decode($paglang['content']);
+											$content_after = preg_replace_callback(
+												'/(?:\<code*\>([^\<]*)\<\/code\>)/',
+												create_function(
+												   '$matches',
+													'return \'<code>\'.stripslashes(htmlspecialchars($matches[1],ENT_QUOTES)).\'</code>\';'
+												),
+												$content_before
+											);
 										?>
 										<?=$this->pohtml->inputHidden(array('name' => 'post['.$lang['id_language'].'][id]', 'value' => $paglang['id_post_description']));?>
 										<?=$this->pohtml->inputText(array('type' => 'text', 'label' => $GLOBALS['_']['post_title_2'], 'name' => 'post['.$lang['id_language'].'][title]', 'id' => 'title-'.$lang['id_language'], 'value' => $paglang['title'], 'mandatory' => true, 'options' => 'required'));?>
@@ -537,7 +546,7 @@ class Post extends PoCore
 													</div>
 												</div>
 											</div>
-											<textarea class="form-control" id="po-wysiwyg-<?=$lang['id_language'];?>" name="post[<?=$lang['id_language'];?>][content]" style="height:600px;"><?=html_entity_decode($paglang['content']);?></textarea>
+											<textarea class="form-control" id="po-wysiwyg-<?=$lang['id_language'];?>" name="post[<?=$lang['id_language'];?>][content]" style="height:600px;"><?=$content_after;?></textarea>
 										</div>
 									</div>
 									<?php $noctab++;} ?>
