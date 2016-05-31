@@ -102,7 +102,7 @@
 					<?php
 						$comments_side = $this->post()->getComment('5', 'DESC');
 						foreach($comments_side as $comment_side){
-						$comment_post = $this->post()->getPostById($comment_side['id_post'], $comment_side['id_post'], WEB_LANG_ID);
+						$comment_post = $this->post()->getPostById($comment_side['id_post'], WEB_LANG_ID);
 					?>
 						<div class="spost clearfix">
 							<div class="entry-image">

@@ -66,6 +66,20 @@ class Gallery implements ExtensionInterface
     }
 
 	/**
+	 * Fungsi ini digunakan untuk mengambil daftar semua galeri.
+	 *
+	 * This function use to get all list of gallery.
+	 *
+	 * $order = string
+	 * $limit = integer
+	*/
+	public function getAllGallery($order = 'id_gallery DESC', $limit)
+    {
+		$gallery = $this->core->podb->from('gallery')->orderBy($order)->limit($limit)->fetchAll();
+        return $gallery;
+    }
+
+	/**
 	 * Fungsi ini digunakan untuk mengambil daftar album.
 	 *
 	 * This function use to get list of album.

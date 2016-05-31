@@ -322,7 +322,7 @@ class Post implements ExtensionInterface
 			->where('id_parent', '0')
 			->where('active', 'Y')
 			->orderBy('id_comment '.$order.'')
-			->limit($offset.','.$page)
+			->limit($offset.','.$limit)
 			->fetchAll();
         return $comment;
     }
@@ -460,19 +460,23 @@ class Post implements ExtensionInterface
 	 *
 	 * This function use to get all list of tag.
 	 *
+	 * $order = string
 	 * $limit = integer
 	 * $sep = string separator
 	 * $link = boolean
+	 * $opentag = string
+	 * $closetag = string
+	 * $class = string
 	*/
-	public function getAllTag($order = 'id_tag DESC', $limit, $sep = ', ', $link = true)
+	public function getAllTag($order = 'id_tag DESC', $limit, $sep = ', ', $link = true, $opentag = '', $closetag = '', $class = '')
     {
 		$tagsep = '';
 		$tags = $this->core->podb->from('tag')->orderBy($order)->limit($limit)->fetchAll();
 		foreach($tags as $tag){
 			if ($link) {
-				$tagsep .= '<a href="'.WEB_URL.'tag/'.$tag['tag_seo'].'">'.ucfirst($tag['title']).'</a>'.$sep;
+				$tagsep .= $opentag.'<a class="'.$class.'" href="'.WEB_URL.'tag/'.$tag['tag_seo'].'">'.ucfirst($tag['title']).'</a>'.$closetag.$sep;
 			} else {
-				$tagsep .= $tag['title'].$sep;
+				$tagsep .= $opentag.$tag['title'].$closetag.$sep;
 			}
 		}
         return rtrim($tagsep, $sep);
