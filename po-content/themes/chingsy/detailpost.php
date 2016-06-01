@@ -67,7 +67,7 @@
 						<?php
 							$editor = $this->post()->getAuthor($post['editor']);
 							if ($editor['picture'] != '') {
-								$editor_avatar = BASE_URL.'/'.DIR_CON.'/uploads/user-'.$editor['picture'];
+								$editor_avatar = BASE_URL.'/'.DIR_CON.'/uploads/'.$editor['picture'];
 							} else {
 								$editor_avatar = BASE_URL.'/'.DIR_CON.'/uploads/user-editor.jpg';
 							}

@@ -47,30 +47,22 @@ if (empty($_SESSION['namauser']) AND empty($_SESSION['passuser']) AND empty($_SE
 	<section id="login">
 		<div class="container">
 			<div class="row">
-				<div class="col-md-12 text-center">
-					<img src="../<?=DIR_INC;?>/images/logo.png" class="logo" width="100" />
-				</div>
-			</div>
-			<div class="row">
 				<div class="col-md-12">
 					<div class="form-wrap">
+						<div class="col-md-12 text-center">
+							<img src="../<?=DIR_INC;?>/images/logo.png" class="logo" width="100" />
+						</div>
 						<?php
 							include_once VQMod::modCheck("route.php");
 						?>
+						<div class="col-md-12 text-center" id="footer">
+							<p><?=CONF_STRUCTURE;?> &copy; 2013-2016. MIT License</p>
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 	</section>
-	<footer id="footer">
-		<div class="container">
-			<div class="row">
-				<div class="col-md-12">
-					<p><?=CONF_STRUCTURE;?> &copy; 2013-2016. MIT License</p>
-				</div>
-			</div>
-		</div>
-	</footer>
 	<script type="text/javascript" src="../<?=DIR_INC;?>/js/patternlock/patternLock.js"></script>
 	<script type="text/javascript" src="../<?=DIR_INC;?>/js/login-core.js"></script>
 </body>
