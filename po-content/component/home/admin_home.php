@@ -225,6 +225,13 @@ class Home extends PoCore
 						<canvas id="canvas-stats"></canvas>
 					</div>
 					<?php
+						$visitor1 = $this->podb->from('traffic')->where('date', date('Y-m-d', strtotime('-6 days')))->groupBy('ip')->fetchAll();
+						$visitor2 = $this->podb->from('traffic')->where('date', date('Y-m-d', strtotime('-5 days')))->groupBy('ip')->fetchAll();
+						$visitor3 = $this->podb->from('traffic')->where('date', date('Y-m-d', strtotime('-4 days')))->groupBy('ip')->fetchAll();
+						$visitor4 = $this->podb->from('traffic')->where('date', date('Y-m-d', strtotime('-3 days')))->groupBy('ip')->fetchAll();
+						$visitor5 = $this->podb->from('traffic')->where('date', date('Y-m-d', strtotime('-2 days')))->groupBy('ip')->fetchAll();
+						$visitor6 = $this->podb->from('traffic')->where('date', date('Y-m-d', strtotime('-1 days')))->groupBy('ip')->fetchAll();
+						$visitor7 = $this->podb->from('traffic')->where('date', date('Y-m-d'))->groupBy('ip')->fetchAll();
 						$hits1 = $this->podb->from('traffic')->select('SUM(hits) as hitstoday')->where('date', date('Y-m-d', strtotime('-6 days')))->groupBy('date')->fetch();
 						$hits2 = $this->podb->from('traffic')->select('SUM(hits) as hitstoday')->where('date', date('Y-m-d', strtotime('-5 days')))->groupBy('date')->fetch();
 						$hits3 = $this->podb->from('traffic')->select('SUM(hits) as hitstoday')->where('date', date('Y-m-d', strtotime('-4 days')))->groupBy('date')->fetch();
@@ -246,13 +253,13 @@ class Home extends PoCore
 									pointHighlightFill: "#fff",
 									pointHighlightStroke: "rgba(220,220,220,1)",
 									data: [
-										<?=$this->podb->from('traffic')->where('date', date('Y-m-d', strtotime('-6 days')))->groupBy('ip')->count();?>,
-										<?=$this->podb->from('traffic')->where('date', date('Y-m-d', strtotime('-5 days')))->groupBy('ip')->count();?>,
-										<?=$this->podb->from('traffic')->where('date', date('Y-m-d', strtotime('-4 days')))->groupBy('ip')->count();?>,
-										<?=$this->podb->from('traffic')->where('date', date('Y-m-d', strtotime('-3 days')))->groupBy('ip')->count();?>,
-										<?=$this->podb->from('traffic')->where('date', date('Y-m-d', strtotime('-2 days')))->groupBy('ip')->count();?>,
-										<?=$this->podb->from('traffic')->where('date', date('Y-m-d', strtotime('-1 days')))->groupBy('ip')->count();?>,
-										<?=$this->podb->from('traffic')->where('date', date('Y-m-d'))->groupBy('ip')->count();?>
+										<?=(empty($visitor1) ? '0' : count($visitor1));?>,
+										<?=(empty($visitor2) ? '0' : count($visitor2));?>,
+										<?=(empty($visitor3) ? '0' : count($visitor3));?>,
+										<?=(empty($visitor4) ? '0' : count($visitor4));?>,
+										<?=(empty($visitor5) ? '0' : count($visitor5));?>,
+										<?=(empty($visitor6) ? '0' : count($visitor6));?>,
+										<?=(empty($visitor7) ? '0' : count($visitor7));?>
 									]
 								},
 								{
