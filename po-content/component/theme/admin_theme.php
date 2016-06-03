@@ -247,7 +247,7 @@ class Theme extends PoCore
 									if ($theme_file != 'index.html' && $theme_file != 'preview.jpg') {
 										if (!is_dir('../'.DIR_CON.'/themes/'.$this->postring->valid($_GET['folder'], 'xss').'/'.$theme_file)) {
 							?>
-								<li><a href="admin.php?mod=theme&act=edit&folder=chingsy&id=<?=$theme_file;?>"><i class="fa fa-file-o"></i>&nbsp;&nbsp;<?=$theme_file;?></a></li>
+								<li><a href="admin.php?mod=theme&act=edit&folder=<?=$this->postring->valid($_GET['folder'], 'xss');?>&id=<?=$theme_file;?>"><i class="fa fa-file-o"></i>&nbsp;&nbsp;<?=$theme_file;?></a></li>
 							<?php }}} ?>
 							</ul>
 						</div>
