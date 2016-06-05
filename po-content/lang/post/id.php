@@ -52,6 +52,13 @@ $_['post_oauth_message_2'] = 'Kesalahan memperbarui status twitter';
 $_['post_oauth_message_3'] = 'Status facebook telah berhasil diperbarui';
 $_['post_oauth_message_4'] = 'Kesalahan memperbarui status facebook';
 $_['post_subscribe_message_1'] = 'Post telah berhasil terkirim ke pengguna yang berlangganan';
+$_['post_import'] = 'Import dari WP dan PopojiCMS Lama';
+$_['post_import_from'] = 'Dari';
+$_['post_back_to_post'] = 'Kembali Ke Post';
+$_['post_file'] = 'Unggah File';
+$_['post_import_help'] = 'Script ini menerima ukuran file max. 10 MB. Jika Anda tidak dapat mengunggah harap verifikasi konfigurasi server Anda untuk menerima ukuran file Anda.';
+$_['post_message_7'] = 'Kesalahan mengimport data post';
+$_['post_message_8'] = 'Post telah berhasil diimportkan';
 
 $_['front_post_title'] = 'Post';
 $_['front_post_not_found'] = 'Post Tidak Ditemukan';

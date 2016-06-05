@@ -66,7 +66,12 @@ class Post extends PoCore
 		<div class="block-content">
 			<div class="row">
 				<div class="col-md-12">
-					<?=$this->pohtml->headTitle($GLOBALS['_']['component_name']);?>
+					<?=$this->pohtml->headTitle($GLOBALS['_']['component_name'], '
+						<div class="btn-title pull-right">
+							<a href="admin.php?mod=post&act=addnew" class="btn btn-success btn-sm"><i class="fa fa-plus"></i> '.$GLOBALS['_']['addnew'].'</a>
+							<a href="admin.php?mod=post&act=import" class="btn btn-info btn-sm"><i class="fa fa-download"></i> '.$GLOBALS['_']['post_import'].'</a>
+						</div>
+					');?>
 				</div>
 			</div>
 			<div class="row">
@@ -735,6 +740,363 @@ class Post extends PoCore
 	}
 
 	/**
+	 * Fungsi ini digunakan untuk menampilkan halaman import.
+	 *
+	 * This function is used to display import page.
+	 *
+	*/
+	public function import()
+	{
+		if (!$this->auth($_SESSION['leveluser'], 'post', 'create')) {
+			echo $this->pohtml->error();
+			exit;
+		}
+		?>
+		<div class="block-content">
+			<div class="row">
+				<div class="col-md-12">
+					<?=$this->pohtml->headTitle($GLOBALS['_']['post_import']);?>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<?=$this->pohtml->formStart(array('method' => 'post', 'action' => 'admin.php?mod=post&act=processimport', 'enctype' => true, 'autocomplete' => 'off'));?>
+						<div class="row">
+							<div class="col-md-12">
+								<?php
+									$item = array(
+										array('value' => 'popojicms', 'title' => 'PopojiCMS'),
+										array('value' => 'wordpress', 'title' => 'WordPress')
+									);
+								?>
+								<?=$this->pohtml->inputSelect(array('id' => 'from', 'label' => $GLOBALS['_']['post_import_from'], 'name' => 'from', 'mandatory' => true), $item);?>
+								<div class="form-group">
+									<label><?=$GLOBALS['_']['post_file'];?> <i>(.xml)</i> <span class="text-danger">*</span></label>
+									<input name="fupload" id="fupload" type="file" /><br />
+									<p><i><span class="text-danger">*</span> <?=$GLOBALS['_']['post_import_help'];?></i></p>
+								</div>
+								<?=$this->pohtml->formAction();?>
+							</div>
+						</div>
+					<?=$this->pohtml->formEnd();?>
+				</div>
+			</div>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Fungsi ini digunakan untuk memproses halaman import.
+	 *
+	 * This function is used to process import page.
+	 *
+	*/
+	public function processimport()
+	{
+		if (!$this->auth($_SESSION['leveluser'], 'post', 'create')) {
+			echo $this->pohtml->error();
+			exit;
+		}
+		if (!empty($_POST)) {
+			?>
+			<div class="block-content">
+				<div class="row">
+					<div class="col-md-12">
+						<?=$this->pohtml->headTitle($GLOBALS['_']['post_import'], '
+							<div class="btn-title pull-right">
+								<a href="admin.php?mod=post" class="btn btn-success btn-sm"><i class="fa fa-book"></i> '.$GLOBALS['_']['post_back_to_post'].'</a>
+								<a href="admin.php?mod=post&act=import" class="btn btn-info btn-sm"><i class="fa fa-download"></i> '.$GLOBALS['_']['post_import'].'</a>
+							</div>
+						');?>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-12">
+						<?php
+						if (!empty($_FILES['fupload']['tmp_name'])) {
+							$exp = explode('.', $_FILES['fupload']['name']);
+							$xmlfile = $this->postring->seo_title($exp[0]).'-'.rand(000000,999999).'-popoji.'.end($exp);
+							if (($_FILES["fupload"]["size"] < 10000000) && in_array(end($exp), array('xml'))) {
+								if (file_exists('../'.DIR_CON.'/uploads/'.$xmlfile)) {
+									echo '<div class="alert alert-danger" role="alert">'.$GLOBALS['_']['post_message_7'].'</div>';
+								} else {
+									move_uploaded_file($_FILES['fupload']['tmp_name'], '../'.DIR_CON.'/uploads/'.$xmlfile);
+									$importfile = simplexml_load_file('../'.DIR_CON.'/uploads/'.$xmlfile);		
+									$xi=0;
+									$total_xml = count($importfile->channel->item);
+									?>
+									<script>
+										$(document).ready(function() {
+											$.ajax({
+												type: "POST",
+												url: "route.php?mod=post&act=progressbar",
+												cache: false,
+												success: function(data){
+													$('#progress_bar').attr('aria-valuenow', data);
+													$('#progress_bar').css('width', data+'%');
+													$('#progress_bar').html(data+'%');
+												}
+											});
+										});
+									</script>
+									<div class="progress" style="height: 20px;">
+										<div id="progress_bar" class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="<?=$total_xml;?>" style="width: 0%; line-height: 20px;"></div>
+									</div>
+									<?php
+									if ($this->postring->valid($_POST['from'], 'xss') == 'popojicms') {
+										foreach ($importfile->channel->item as $item) {
+											$current_seotitle = $this->podb->from('post')
+												->where('seotitle', $item->seotitle)
+												->count();
+											if ($current_seotitle < 1) {
+												$imageurl = $item->picture;
+												if ($imageurl != 'none') {
+													$namefile = explode('/', $imageurl);
+													file_put_contents('../'.DIR_CON.'/uploads/'.end($namefile), file_get_contents($imageurl));
+													$original = new PoSimpleImage('../'.DIR_CON.'/uploads/'.end($namefile));
+													$original->resize(900, 600)->save();
+													$medium = new PoSimpleImage('../'.DIR_CON.'/uploads/'.end($namefile));
+													$medium->resize(640, 426)->save('../'.DIR_CON.'/uploads/medium/medium_'.end($namefile));
+													$thumb = new PoSimpleImage('../'.DIR_CON.'/uploads/'.end($namefile));
+													$thumb->resize(122, 91)->save('../'.DIR_CON.'/thumbs/'.end($namefile));
+													$datapic = array(
+														'picture' => end($namefile)
+													);
+												} else {
+													$datapic = array();
+												}
+
+												$data = array(
+													'seotitle' => $item->seotitle,
+													'tag' => $item->tag,
+													'date' => $item->date,
+													'time' => $item->time,
+													'publishdate' => $item->date.' '.$item->time,
+													'editor' => $_SESSION['iduser'],
+													'active' => $item->active
+												);
+												$datafinal = array_merge($data, $datapic);
+												$query_post = $this->podb->insertInto('post')->values($datafinal);
+												$query_post->execute();
+
+												$expl = explode(",", $item->tag);
+												$total = count($expl);
+												for($i=0; $i<$total; $i++){
+													$last_tag = $this->podb->from('tag')
+														->where('tag_seo', $expl[$i])
+														->limit(1)
+														->fetch();
+													if ($last_tag > 0) {
+														$query_tag = $this->podb->update('tag')
+															->set(array('count' => $last_tag['count']+1))
+															->where('tag_seo', $expl[$i]);
+														$query_tag->execute();
+													} else {
+														$query_tag = $this->podb->insertInto('tag')->values(
+															array(
+																'title' => str_replace('-', ' ', $expl[$i]),
+																'tag_seo' => $expl[$i],
+																'count' => '1'
+															)
+														);
+														$query_tag->execute();
+													}
+												}
+
+												$last_post = $this->podb->from('post')
+													->orderBy('id_post DESC')
+													->limit(1)
+													->fetch();
+
+												$count_cat_seotitle = $this->podb->from('category')
+													->where('seotitle', $this->postring->seo_title($item->category))
+													->count();
+												if ($count_cat_seotitle > 0) {
+													$current_cat_seotitle = $this->podb->from('category')
+														->where('seotitle', $this->postring->seo_title($item->category))
+														->limit(1)
+														->fetch();
+													$id_category = $current_cat_seotitle['id_category'];
+												} else {
+													$category = array(
+														'id_parent' => '0',
+														'seotitle' => $this->postring->seo_title($item->category),
+														'active' => 'Y'
+													);
+													$query_category = $this->podb->insertInto('category')->values($category);
+													$query_category->execute();
+													$last_category = $this->podb->from('category')
+														->orderBy('id_category DESC')
+														->limit(1)
+														->fetch();
+													$category_description = array(
+														'id_category' => $last_category['id_category'],
+														'id_language' => '1',
+														'title' =>  $this->postring->valid($item->category[0], 'xss'),
+													);
+													$query_category_description = $this->podb->insertInto('category_description')->values($category_description);
+													$query_category_description->execute();
+													$id_category = $last_category['id_category'];
+												}
+
+												$post_category = array(
+													'id_post' => $last_post['id_post'],
+													'id_category' => $id_category,
+												);
+												$query_post_category = $this->podb->insertInto('post_category')->values($post_category);
+												$query_post_category->execute();
+
+												$post_description = array(
+													'id_post' => $last_post['id_post'],
+													'id_language' => '1',
+													'title' => $this->postring->valid($item->title, 'xss'),
+													'content' => $item->content
+												);
+												$query_post_description = $this->podb->insertInto('post_description')->values($post_description);
+												$query_post_description->execute();
+											}
+											$xi++;
+											$progress_bar = ($xi / $total_xml) * 100;
+											$_SESSION['progress_bar'] = floor($progress_bar);
+										}
+									} elseif ($this->postring->valid($_POST['from'], 'xss') == 'wordpress') {
+										foreach ($importfile->channel->item as $item) {
+											if ($item->children('wp', true)->post_type == 'post') {
+												$current_seotitle = $this->podb->from('post')
+													->where('seotitle', $this->postring->seo_title($item->title))
+													->count();
+												if ($current_seotitle < 1) {
+													$imageurl = $this->search_attachment_wp('../'.DIR_CON.'/uploads/'.$xmlfile, $item->children('wp', true)->post_id);
+													if ($imageurl != 'none') {
+														$namefile = explode('/', $imageurl);
+														file_put_contents('../'.DIR_CON.'/uploads/'.end($namefile), file_get_contents($imageurl));
+														$original = new PoSimpleImage('../'.DIR_CON.'/uploads/'.end($namefile));
+														$original->resize(900, 600)->save();
+														$medium = new PoSimpleImage('../'.DIR_CON.'/uploads/'.end($namefile));
+														$medium->resize(640, 426)->save('../'.DIR_CON.'/uploads/medium/medium_'.end($namefile));
+														$thumb = new PoSimpleImage('../'.DIR_CON.'/uploads/'.end($namefile));
+														$thumb->resize(122, 91)->save('../'.DIR_CON.'/thumbs/'.end($namefile));
+														$datapic = array(
+															'picture' => end($namefile)
+														);
+													} else {
+														$datapic = array();
+													}
+
+													$wpdatetime = explode(' ', $item->children('wp', true)->post_date);
+													$data = array(
+														'seotitle' => $this->postring->seo_title($item->title),
+														'date' => $wpdatetime[0],
+														'time' => $wpdatetime[1],
+														'publishdate' => $wpdatetime[0].' '.$wpdatetime[1],
+														'editor' => $_SESSION['iduser'],
+														'comment' => ($item->children('wp', true)->comment_status == 'open' ? 'Y' : 'N'),
+														'active' => ($item->children('wp', true)->status == 'publish' ? 'Y' : 'N')
+													);
+													$datafinal = array_merge($data, $datapic);
+													$query_post = $this->podb->insertInto('post')->values($datafinal);
+													$query_post->execute();
+
+													$last_post = $this->podb->from('post')
+														->orderBy('id_post DESC')
+														->limit(1)
+														->fetch();
+
+													$count_cat_seotitle = $this->podb->from('category')
+														->where('seotitle', $this->postring->seo_title($item->category[0]))
+														->count();
+													if ($count_cat_seotitle > 0) {
+														$current_cat_seotitle = $this->podb->from('category')
+															->where('seotitle', $this->postring->seo_title($item->category[0]))
+															->limit(1)
+															->fetch();
+														$id_category = $current_cat_seotitle['id_category'];
+													} else {
+														$category = array(
+															'id_parent' => '0',
+															'seotitle' => $this->postring->seo_title($item->category[0]),
+															'active' => 'Y'
+														);
+														$query_category = $this->podb->insertInto('category')->values($category);
+														$query_category->execute();
+														$last_category = $this->podb->from('category')
+															->orderBy('id_category DESC')
+															->limit(1)
+															->fetch();
+														$category_description = array(
+															'id_category' => $last_category['id_category'],
+															'id_language' => '1',
+															'title' =>  $this->postring->valid($item->category[0], 'xss'),
+														);
+														$query_category_description = $this->podb->insertInto('category_description')->values($category_description);
+														$query_category_description->execute();
+														$id_category = $last_category['id_category'];
+													}
+
+													$post_category = array(
+														'id_post' => $last_post['id_post'],
+														'id_category' => $id_category,
+													);
+													$query_post_category = $this->podb->insertInto('post_category')->values($post_category);
+													$query_post_category->execute();
+
+													$post_description = array(
+														'id_post' => $last_post['id_post'],
+														'id_language' => '1',
+														'title' => $this->postring->valid($item->title, 'xss'),
+														'content' => stripslashes(htmlspecialchars($item->children("content", true),ENT_QUOTES))
+													);
+													$query_post_description = $this->podb->insertInto('post_description')->values($post_description);
+													$query_post_description->execute();
+												}
+											}
+											$xi++;
+											$progress_bar = ($xi / $total_xml) * 100;
+											$_SESSION['progress_bar'] = floor($progress_bar);
+										}
+									} else {
+										echo '<div class="alert alert-danger" role="alert">'.$GLOBALS['_']['post_message_7'].'</div>';
+									}
+									unlink('../'.DIR_CON.'/uploads/'.$xmlfile);
+								}
+							} else {
+								echo '<div class="alert alert-danger" role="alert">'.$GLOBALS['_']['post_message_7'].'</div>';
+							}
+						} else {
+							echo '<div class="alert alert-danger" role="alert">'.$GLOBALS['_']['post_message_7'].'</div>';
+						}
+						?>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-12">
+						<?=$this->pohtml->formStart(array('method' => 'post', 'action' => 'admin.php?mod=post&act=processimport', 'enctype' => true, 'autocomplete' => 'off'));?>
+							<div class="row">
+								<div class="col-md-12">
+									<?php
+										$item = array(
+											array('value' => 'popojicms', 'title' => 'PopojiCMS'),
+											array('value' => 'wordpress', 'title' => 'WordPress')
+										);
+									?>
+									<?=$this->pohtml->inputSelect(array('id' => 'from', 'label' => $GLOBALS['_']['post_import_from'], 'name' => 'from', 'mandatory' => true), $item);?>
+									<div class="form-group">
+										<label><?=$GLOBALS['_']['post_file'];?> <i>(.xml)</i> <span class="text-danger">*</span></label>
+										<input name="fupload" id="fupload" type="file" /><br />
+										<p><i><span class="text-danger">*</span> <?=$GLOBALS['_']['post_import_help'];?></i></p>
+									</div>
+									<?=$this->pohtml->formAction();?>
+								</div>
+							</div>
+						<?=$this->pohtml->formEnd();?>
+					</div>
+				</div>
+			</div>
+			<?php
+		}
+	}
+
+	/**
 	 * Fungsi ini digunakan untuk memproses headline post.
 	 *
 	 * This function is used to process headline post.
@@ -1316,6 +1678,43 @@ class Post extends PoCore
 			return $html;
 		} else {
 			return false;
+		}
+	}
+
+	/**
+	 * Fungsi ini digunakan untuk mencari attachment gambar wordpress.
+	 *
+	 * This function use for searching image attachment in wordpress.
+	 *
+	*/
+	public function search_attachment_wp($xml, $id)
+	{
+		$dom = new DOMDocument();
+		$dom->loadXML(file_get_contents($xml));
+		$xpath = new DOMXpath($dom);
+		$xpath->registerNamespace('wp', 'http://wordpress.org/export/1.2/');
+		$attachment_url = 'none';
+		foreach($xpath->evaluate('//item') as $item) {
+			if ($xpath->evaluate('number(.//wp:post_parent["'.$id.'"])', $item) == $id) {
+				$attachment_url = $xpath->evaluate('string(.//wp:post_parent["'.$id.'"]/../wp:attachment_url)', $item);
+			}
+		}
+		return $attachment_url;
+	}
+
+	/**
+	 * Fungsi ini digunakan untuk membuat progres bar.
+	 *
+	 * This function use for create progress bar.
+	 *
+	*/
+	public function progressbar()
+	{
+		if ($_SESSION['progress_bar'] < 95) {
+			echo $_SESSION['progress_bar'];
+		} else {
+			echo "100";
+			unset($_SESSION['progress_bar']);
 		}
 	}
 

@@ -52,6 +52,13 @@ $_['post_oauth_message_2'] = 'Error updated twitter status';
 $_['post_oauth_message_3'] = 'Facebook status has been successfully updated';
 $_['post_oauth_message_4'] = 'Error updated facebook status';
 $_['post_subscribe_message_1'] = 'Post has been successfully send to subscriber';
+$_['post_import'] = 'Import from WP and Old PopojiCMS';
+$_['post_import_from'] = 'From';
+$_['post_back_to_post'] = 'Back To Post';
+$_['post_file'] = 'Upload File';
+$_['post_import_help'] = 'This script accepts file size max. 10 MB. If you can\'t upload please verify your server configurations to accepted the size of your file.';
+$_['post_message_7'] = 'Error imported post data';
+$_['post_message_8'] = 'Post has been successfully imported';
 
 $_['front_post_title'] = 'Post';
 $_['front_post_not_found'] = 'Post Not Found';

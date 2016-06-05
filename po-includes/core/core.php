@@ -21,6 +21,7 @@
  *
 */
 include_once "config.php";
+include_once "cookie.php";
 include_once "datetime.php";
 include_once "directory.php";
 include_once "email.php";
@@ -28,10 +29,9 @@ include_once "error.php";
 include_once "html.php";
 include_once "paging.php";
 include_once "request.php";
-include_once "cookie.php";
+include_once "sitemap.php";
 include_once "string.php";
 include_once "timeout.php";
-include_once "sitemap.php";
 
 /**
  * Memasukkan library dari vendor pihak ketiga
@@ -39,20 +39,21 @@ include_once "sitemap.php";
  * Include vendor library
  *
 */
+include_once "vendor/abeautifulsite/SimpleImage.php";
 include_once "vendor/bramus/Router.php";
-include_once "vendor/plates/autoload.php";
+include_once "vendor/browser/Browser.php";
+include_once "vendor/datatables/datatables.class.php";
 include_once "vendor/dynamicmenu/dashboard_menu.php";
 include_once "vendor/dynamicmenu/front_menu.php";
 include_once "vendor/fluentpdo/FluentPDO.php";
 include_once "vendor/gump/gump.class.php";
-include_once "vendor/phpmailer/PHPMailerAutoload.php";
 include_once "vendor/pclzip/pclziplib.php";
+include_once "vendor/phpmailer/PHPMailerAutoload.php";
+include_once "vendor/plasticbrain/FlashMessages.php";
+include_once "vendor/plates/autoload.php";
 include_once "vendor/recaptcha/recaptchalib.php";
 include_once "vendor/timeago/timeago.inc.php";
-include_once "vendor/datatables/datatables.class.php";
 include_once "vendor/verot/class.upload.php";
-include_once "vendor/plasticbrain/FlashMessages.php";
-include_once "vendor/browser/Browser.php";
 
 /**
  * Menginisialisasi semua class dari popojicms dan vendor
