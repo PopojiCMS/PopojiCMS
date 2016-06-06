@@ -351,7 +351,11 @@ EOF;
 function StartInstall() {
 	global $aConf;
 	if (strpos($_SERVER['SERVER_SOFTWARE'], 'Apache') !== false) {
-		$ifmodrewrite = (in_array(mod_rewrite, apache_get_modules()) ? '<span class="text-success">ON</span>' : '<span class="text-danger">OFF</span>');
+		if (function_exists('apache_get_modules')) {
+			$ifmodrewrite = (in_array(mod_rewrite, apache_get_modules()) ? '<span class="text-success">ON</span>' : '<span class="text-danger">OFF</span>');
+		} else {
+			$ifmodrewrite = '<span class="text-success">ON</span>';
+		}
 	}
 	$ifshorttag = (ini_get('short_open_tag') == '1' ? '<span class="text-success">ON</span>' : '<span class="text-danger">OFF</span>');
 	$ifphpcurl = (extension_loaded('curl') ? '<span class="text-success">ON</span>' : '<span class="text-danger">OFF</span>');
