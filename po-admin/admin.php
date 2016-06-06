@@ -2,7 +2,7 @@
 session_start();
 require_once '../vqmod/vqmod.php';
 VQMod::bootup();
-include_once VQMod::modCheck("../po-includes/core/core.php");
+include_once "../po-includes/core/core.php";
 if ($_SESSION['login'] == 0) {
 	session_destroy();
 	header('location:index.php');
