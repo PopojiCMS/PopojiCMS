@@ -662,7 +662,7 @@ function genInstallationProcessPage($errorMessage = '') {
 	<div class="tab-pane fade in active" id="Congratulations">
 		<h3 class="head text-center">Congratulations</h3>
 		<p class="narrow text-center">
-			Installation process has finished.<br />Please delete or rename file install.php after click Goto Web button.
+			Installation process has finished.<br />Please delete or rename file install.php before or after click Goto Web button.
 		</p>
 		<p>&nbsp;</p>
 		{$sForm}

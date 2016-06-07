@@ -41,7 +41,20 @@ define('BASE_URL', $base_url);
 require_once 'vqmod/vqmod.php';
 VQMod::bootup();
 
+/**
+ * Jika terjadi error undefined variable silahkan nonaktifkan baris code ini, dengan comment '//'
+ *
+ *
+*/
 include_once VQMod::modCheck('po-includes/core/core.php');
+
+/**
+ * Jika terjadi error undefined variable silahkan aktifkan baris code ini, uncomment '//'
+ *
+ * If an error occurs undefined variable please activate this line of code, uncomment '//'
+ *
+*/
+//include_once 'po-includes/core/core.php';
 
 /**
  * Memfilter jika engine belum di install
