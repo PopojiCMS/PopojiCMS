@@ -44,6 +44,7 @@ VQMod::bootup();
 /**
  * Jika terjadi error undefined variable silahkan nonaktifkan baris code ini, dengan comment '//'
  *
+ * If an error occurs undefined variable please deactivate this line of code, with comment '//'
  *
 */
 include_once VQMod::modCheck('po-includes/core/core.php');
