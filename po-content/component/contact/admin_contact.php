@@ -244,12 +244,18 @@ class contact extends PoCore
 		}
 		if (!empty($_POST)) {
 			if ($this->posetting[23]['value'] != 'SMTP') {
-				$email = new PoEmail;
-				$send = $email
-					->to($this->postring->valid($_POST['name'], 'xss')." <".$this->postring->valid($_POST['email'], 'xss').">")
+				$from = $this->posetting[5]['value'];
+				$poemail = new PoEmail;
+				$send = $poemail
+					->setOption(
+						array(
+							messageType => 'html'
+						)
+					)
+					->to($this->postring->valid($_POST['email'], 'xss'))
 					->subject($this->postring->valid($_POST['subject'], 'xss'))
 					->message($this->postring->valid($_POST['message'], 'xss'))
-					->from($this->posetting[5]['value'], $this->posetting[0]['value'])
+					->from($from)
 					->mail();
 				if ($send) {
 					$this->poflash->success($GLOBALS['_']['contact_message_1'], 'admin.php?mod=contact');
@@ -263,6 +269,8 @@ class contact extends PoCore
 				$this->pomail->Host = $this->posetting[24]['value'];
 				$this->pomail->Port = $this->posetting[27]['value'];
 				$this->pomail->SMTPAuth = true;
+				$this->pomail->SMTPSecure = 'ssl';
+				$this->pomail->IsHTML(true);
 				$this->pomail->Username = $this->posetting[25]['value'];;
 				$this->pomail->Password = $this->posetting[26]['value'];
 				$this->pomail->setFrom($this->posetting[5]['value'], $this->posetting[0]['value']);

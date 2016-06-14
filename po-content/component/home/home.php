@@ -332,6 +332,7 @@ $router->match('GET|POST', '/member/register', function() use ($core, $templates
 									$pass = $_POST['password'];
 									$passmd5 = md5($_POST['password']);
 									$subject = "Email Account Activation For $website_name";
+									$from = $core->posetting[5]['value'];
 									$message = "<html>
 										<body>
 											Indonesia :<br />
@@ -363,12 +364,17 @@ $router->match('GET|POST', '/member/register', function() use ($core, $templates
 										</body>
 									</html>";
 									if ($core->posetting[23]['value'] != 'SMTP') {
-										$email = new PoEmail;
-										$send = $email
-											->to("".ucfirst($username)." <".$email.">")
+										$poemail = new PoEmail;
+										$send = $poemail
+											->setOption(
+												array(
+													messageType => 'html'
+												)
+											)
+											->to($email)
 											->subject($subject)
 											->message($message)
-											->from($core->posetting[5]['value'], $core->posetting[0]['value'])
+											->from($from)
 											->mail();
 									} else {
 										$core->pomail->isSMTP();
@@ -377,6 +383,8 @@ $router->match('GET|POST', '/member/register', function() use ($core, $templates
 										$core->pomail->Host = $core->posetting[24]['value'];
 										$core->pomail->Port = $core->posetting[27]['value'];
 										$core->pomail->SMTPAuth = true;
+										$core->pomail->SMTPSecure = 'ssl';
+										$core->pomail->IsHTML(true);
 										$core->pomail->Username = $core->posetting[25]['value'];;
 										$core->pomail->Password = $core->posetting[26]['value'];
 										$core->pomail->setFrom($core->posetting[5]['value'], $core->posetting[0]['value']);
@@ -516,6 +524,7 @@ $router->match('GET|POST', '/member/forgot', function() use ($core, $templates) 
 						$username = $user['username'];
 						$nama_lengkap = $user['nama_lengkap'];
 						$subject = "Recovery Password For $website_name";
+						$from = $core->posetting[5]['value'];
 						$message = "<html>
 							<body>
 								Indonesia :<br />
@@ -541,12 +550,17 @@ $router->match('GET|POST', '/member/forgot', function() use ($core, $templates) 
 							</body>
 						</html>";
 						if ($core->posetting[23]['value'] != 'SMTP') {
-							$email = new PoEmail;
-							$send = $email
-								->to("$nama_lengkap <".$user['email'].">")
+							$poemail = new PoEmail;
+							$send = $poemail
+								->setOption(
+									array(
+										messageType => 'html'
+									)
+								)
+								->to($user['email'])
 								->subject($subject)
 								->message($message)
-								->from($core->posetting[5]['value'], $core->posetting[0]['value'])
+								->from($from)
 								->mail();
 						} else {
 							$core->pomail->isSMTP();
@@ -555,6 +569,8 @@ $router->match('GET|POST', '/member/forgot', function() use ($core, $templates) 
 							$core->pomail->Host = $core->posetting[24]['value'];
 							$core->pomail->Port = $core->posetting[27]['value'];
 							$core->pomail->SMTPAuth = true;
+							$core->pomail->SMTPSecure = 'ssl';
+							$core->pomail->IsHTML(true);
 							$core->pomail->Username = $core->posetting[25]['value'];;
 							$core->pomail->Password = $core->posetting[26]['value'];
 							$core->pomail->setFrom($core->posetting[5]['value'], $core->posetting[0]['value']);

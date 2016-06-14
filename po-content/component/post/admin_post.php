@@ -1523,6 +1523,7 @@ class Post extends PoCore
 				->where('post_description.id_language', '1')
 				->fetch();
 			$subscribes = $this->podb->from('subscribe')->fetchAll();
+			$from = $this->posetting[5]['value'];
 			foreach($subscribes as $subscribe){
 				$message = "<html>
 					<body>
@@ -1535,12 +1536,17 @@ class Post extends PoCore
 					</body>
 				</html>";
 				if ($this->posetting[23]['value'] != 'SMTP') {
-					$email = new PoEmail;
-					$send = $email
+					$poemail = new PoEmail;
+					$send = $poemail
+						->setOption(
+							array(
+								messageType => 'html'
+							)
+						)
 						->to($subscribe['email'])
 						->subject("Website Update - ".$paglang['title'])
 						->message($message)
-						->from($this->posetting[5]['value'], $this->posetting[0]['value'])
+						->from($from)
 						->mail();
 				} else {
 					$this->pomail->isSMTP();
@@ -1549,6 +1555,8 @@ class Post extends PoCore
 					$this->pomail->Host = $this->posetting[24]['value'];
 					$this->pomail->Port = $this->posetting[27]['value'];
 					$this->pomail->SMTPAuth = true;
+					$this->pomail->SMTPSecure = 'ssl';
+					$this->pomail->IsHTML(true);
 					$this->pomail->Username = $this->posetting[25]['value'];;
 					$this->pomail->Password = $this->posetting[26]['value'];
 					$this->pomail->setFrom($this->posetting[5]['value'], $this->posetting[0]['value']);

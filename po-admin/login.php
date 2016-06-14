@@ -223,6 +223,7 @@ class Login extends PoCore
 				$username = $user['username'];
 				$nama_lengkap = $user['nama_lengkap'];
 				$subject = "Recovery Password For $website_name";
+				$from = $this->posetting[5]['value'];
 				$message = "<html>
 					<body>
 						Indonesia :<br />
@@ -248,12 +249,17 @@ class Login extends PoCore
 					</body>
 				</html>";
 				if ($this->posetting[23]['value'] != 'SMTP') {
-					$email = new PoEmail;
-					$send = $email
-						->to("$nama_lengkap <".$user['email'].">")
+					$poemail = new PoEmail;
+					$send = $poemail
+						->setOption(
+							array(
+								messageType => 'html'
+							)
+						)
+						->to($user['email'])
 						->subject($subject)
 						->message($message)
-						->from($this->posetting[5]['value'], $this->posetting[0]['value'])
+						->from($from)
 						->mail();
 				} else {
 					$this->pomail->isSMTP();
@@ -262,6 +268,8 @@ class Login extends PoCore
 					$this->pomail->Host = $this->posetting[24]['value'];
 					$this->pomail->Port = $this->posetting[27]['value'];
 					$this->pomail->SMTPAuth = true;
+					$this->pomail->SMTPSecure = 'ssl';
+					$this->pomail->IsHTML(true);
 					$this->pomail->Username = $this->posetting[25]['value'];;
 					$this->pomail->Password = $this->posetting[26]['value'];
 					$this->pomail->setFrom($this->posetting[5]['value'], $this->posetting[0]['value']);

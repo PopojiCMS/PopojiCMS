@@ -552,7 +552,7 @@ INSERT INTO `setting` (`id_setting`, `groups`, `options`, `value`) VALUES
 (21, 'config', 'google_analytics', ''),
 (22, 'config', 'recaptcha_sitekey', '6LckEgETAAAAAPdqrQSY_boMDLZRL1vpkAatVqKf'),
 (23, 'config', 'recaptcha_secretkey', '6LckEgETAAAAAHqx4VFD4zNL96P9UEikD8BHfT28'),
-(24, 'mail', 'mail_protocol', 'SMTP'),
+(24, 'mail', 'mail_protocol', 'Mail'),
 (25, 'mail', 'mail_hostname', ''),
 (26, 'mail', 'mail_username', ''),
 (27, 'mail', 'mail_password', ''),
