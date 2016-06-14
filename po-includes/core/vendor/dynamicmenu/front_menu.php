@@ -41,7 +41,7 @@ class FrontMenu
 	 * @param string $attr, $attrs, $attrss
 	 * @return string
 	*/
-	public function menu($group_id, $attr = '', $attrs = '', $attrss = '')
+	public function menu($group_id, $attr = '', $attrs = '', $attrss = '', $wrapper = '<div>', $endwrapper = "</div>")
 	{
 		global $_;
 		$selectlang = (isset($_COOKIE['lang']) ? $_COOKIE['lang'] : 'id');
@@ -63,18 +63,18 @@ class FrontMenu
 			}
 			if ($row['parent_id'] == 0) {
 				if ($row['class'] != '') {
-					$label = '<a ' . $attrs . ' href="' . $menu_url . '" '.($row['target'] != 'none' ? 'target="' . $row['target'] . '"' : '').'>';
+					$label = '<a ' . $row['class'] . ' href="' . $menu_url . '" '.($row['target'] != 'none' ? 'target="' . $row['target'] . '"' : '').'>';
 				} else {
 					$label = '<a href="' . $menu_url . '" '.($row['target'] != 'none' ? 'target="' . $row['target'] . '"' : '').'>';
 				}
 			} else {
 				if ($row['class'] != '') {
-					$label = '<a ' . $attrs . ' href="' . $menu_url . '" '.($row['target'] != 'none' ? 'target="' . $row['target'] . '"' : '').'>';
+					$label = '<a ' . $row['class'] . ' href="' . $menu_url . '" '.($row['target'] != 'none' ? 'target="' . $row['target'] . '"' : '').'>';
 				} else {
 					$label = '<a href="' . $menu_url . '" '.($row['target'] != 'none' ? 'target="' . $row['target'] . '"' : '').'>';
 				}
 			}
-			$label .= '<div>'.$row['title'].'</div>';
+			$label .= $wrapper.$row['title'].$endwrapper;
 			$label .= '</a>';
 			$li_attr = '';
 			$tree->add_row($row['id'], $row['parent_id'], $li_attr, $label);
