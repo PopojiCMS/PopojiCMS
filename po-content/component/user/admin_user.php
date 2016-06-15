@@ -349,9 +349,11 @@ class User extends PoCore
 					->where('id_session', $this->postring->valid($_POST['id'], 'xss'))
 					->limit(1)
 					->fetch();
-				$timeout = new PoTimeout;
-				$timeout->rec_session($current_user);
-				$timeout->timer();
+				if ($current_user['username'] == $_SESSION['namauser']) {
+					$timeout = new PoTimeout;
+					$timeout->rec_session($current_user);
+					$timeout->timer();
+				}
 				$this->poflash->success($GLOBALS['_']['user_message_2'], 'admin.php?mod=user');
 			}
 		}
