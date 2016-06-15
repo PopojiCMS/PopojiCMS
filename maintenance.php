@@ -9,7 +9,7 @@ session_start();
 require_once 'vqmod/vqmod.php';
 VQMod::bootup();
 
-include_once VQMod::modCheck("po-includes/core/core.php");
+include_once "po-includes/core/core.php";
 $core = new PoCore();
 
 /**

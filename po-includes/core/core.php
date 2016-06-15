@@ -15,23 +15,31 @@
 */
 
 /**
+ * Mendeklarasi Core Path PopojiCMS
+ *
+ * Declaration Core Path PopojiCMS
+ *
+*/
+define('CORE_PATH', dirname(__FILE__));
+
+/**
  * Memasukkan library utama PopojiCMS
  *
  * Include PopojiCMS library
  *
 */
-include_once "config.php";
-include_once "cookie.php";
-include_once "datetime.php";
-include_once "directory.php";
-include_once "email.php";
-include_once "error.php";
-include_once "html.php";
-include_once "paging.php";
-include_once "request.php";
-include_once "sitemap.php";
-include_once "string.php";
-include_once "timeout.php";
+require_once CORE_PATH."/config.php";
+require_once CORE_PATH."/cookie.php";
+require_once CORE_PATH."/datetime.php";
+require_once CORE_PATH."/directory.php";
+require_once CORE_PATH."/email.php";
+require_once CORE_PATH."/error.php";
+require_once CORE_PATH."/html.php";
+require_once CORE_PATH."/paging.php";
+require_once CORE_PATH."/request.php";
+require_once CORE_PATH."/sitemap.php";
+require_once CORE_PATH."/string.php";
+require_once CORE_PATH."/timeout.php";
 
 /**
  * Memasukkan library dari vendor pihak ketiga
@@ -39,21 +47,21 @@ include_once "timeout.php";
  * Include vendor library
  *
 */
-include_once "vendor/abeautifulsite/SimpleImage.php";
-include_once "vendor/bramus/Router.php";
-include_once "vendor/browser/Browser.php";
-include_once "vendor/datatables/datatables.class.php";
-include_once "vendor/dynamicmenu/dashboard_menu.php";
-include_once "vendor/dynamicmenu/front_menu.php";
-include_once "vendor/fluentpdo/FluentPDO.php";
-include_once "vendor/gump/gump.class.php";
-include_once "vendor/pclzip/pclziplib.php";
-include_once "vendor/phpmailer/PHPMailerAutoload.php";
-include_once "vendor/plasticbrain/FlashMessages.php";
-include_once "vendor/plates/autoload.php";
-include_once "vendor/recaptcha/recaptchalib.php";
-include_once "vendor/timeago/timeago.inc.php";
-include_once "vendor/verot/class.upload.php";
+require_once CORE_PATH."/vendor/abeautifulsite/SimpleImage.php";
+require_once CORE_PATH."/vendor/bramus/Router.php";
+require_once CORE_PATH."/vendor/browser/Browser.php";
+require_once CORE_PATH."/vendor/datatables/datatables.class.php";
+require_once CORE_PATH."/vendor/dynamicmenu/dashboard_menu.php";
+require_once CORE_PATH."/vendor/dynamicmenu/front_menu.php";
+require_once CORE_PATH."/vendor/fluentpdo/FluentPDO.php";
+require_once CORE_PATH."/vendor/gump/gump.class.php";
+require_once CORE_PATH."/vendor/pclzip/pclziplib.php";
+require_once CORE_PATH."/vendor/phpmailer/PHPMailerAutoload.php";
+require_once CORE_PATH."/vendor/plasticbrain/FlashMessages.php";
+require_once CORE_PATH."/vendor/plates/autoload.php";
+require_once CORE_PATH."/vendor/recaptcha/recaptchalib.php";
+require_once CORE_PATH."/vendor/timeago/timeago.inc.php";
+require_once CORE_PATH."/vendor/verot/class.upload.php";
 
 /**
  * Menginisialisasi semua class dari popojicms dan vendor
