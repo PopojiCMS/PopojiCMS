@@ -3,7 +3,7 @@
  * - PopojiCMS Javascript
  *
  * - File : admin_javascript.js
- * - Version : 1.0
+ * - Version : 1.1
  * - Author : Jenuar Dalapang
  * - License : MIT License
  *
@@ -225,4 +225,16 @@ $(document).ready(function() {
 	$('#oauth_fb_app_secret').editable();
 	$('#oauth_tw_consumer_key').editable();
 	$('#oauth_tw_consumer_secret').editable();
+
+	$('#permalink').editable({
+        source: [
+			{value: 'slug/post-title', text: 'slug/post-title'},
+			{value: 'yyyy/mm/dd/post-title', text: 'yyyy/mm/dd/post-title'},
+			{value: 'yyyy/mm/post-title', text: 'yyyy/mm/post-title'},
+			{value: 'archives/post-id', text: 'archives/post-id'},
+			{value: 'slug-post-id-post-title', text: 'slug-post-id-post-title'},
+			{value: 'post-title', text: 'post-title'}
+		]
+	});
+	$('#slug_permalink').editable();
 });

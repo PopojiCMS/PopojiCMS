@@ -4,7 +4,7 @@
  * - PopojiCMS Setting Language
  *
  * - File : id.php
- * - Version : 1.0
+ * - Version : 1.1
  * - Author : Jenuar Dalapang
  * - License : MIT License
  *
@@ -87,3 +87,5 @@ $_['setting_oauth_message_1'] = 'OAuth telah berhasil diperbarui';
 $_['setting_oauth_message_2'] = 'OAuth telah berhasil dihapus';
 $_['setting_oauth_help_1'] = 'Silahkan masukan app id dan app secret sebelum menekan tombol Buat OAuth';
 $_['setting_oauth_help_2'] = 'Silahkan masukan consumer key dan consumer secret sebelum menekan tombol Buat OAuth';
+$_['setting_post_permalink'] = 'Post Permalink';
+$_['setting_slug_permalink'] = 'Default Slug Permalink';

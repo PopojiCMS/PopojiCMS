@@ -4,7 +4,7 @@
  * - PopojiCMS Front End File
  *
  * - File : user.php
- * - Version : 1.0
+ * - Version : 1.1
  * - Author : Jenuar Dalapang
  * - License : MIT License
  *
@@ -13,6 +13,75 @@
  * This is a php file for handling front end process for user page.
  *
 */
+
+/**
+ * Router untuk menampilkan request halaman profil pengguna.
+ *
+ * Router for display request in user profile page.
+ *
+ * $username = string [a-z0-9_-]
+ *
+ * Added in v.2.0.1
+*/
+$router->match('GET|POST', '/member/profile/([a-z0-9_-]+)', function($username) use ($core, $templates) {
+	$lang = $core->setlang('user', WEB_LANG);
+	$count_user = $core->podb->from('users')
+		->where('username', $username)
+		->where('block', 'N')
+		->count();
+	if ($count_user > 0) {
+		$user = $core->podb->from('users')
+			->where('username', $username)
+			->where('block', 'N')
+			->fetch();
+		$info = array(
+			'page_title' => $user['nama_lengkap'],
+			'page' => '1'
+		);
+		$adddata = array_merge($info, $lang);
+		$templates->addData(
+			$adddata
+		);
+		echo $templates->render('profile', compact('user','lang'));
+	} else {
+		header('location:'.BASE_URL.'/404.php');
+	}
+});
+
+/**
+ * Router untuk menampilkan request halaman profil pengguna dengan nomor halaman.
+ *
+ * Router for display request in user profile page with pagination.
+ *
+ * $username = string [a-z0-9_-]
+ * $page = integer
+ *
+ * Added in v.2.0.1
+*/
+$router->match('GET|POST', '/member/profile/([a-z0-9_-]+)/page/(\d+)', function($username, $page) use ($core, $templates) {
+	$lang = $core->setlang('user', WEB_LANG);
+	$count_user = $core->podb->from('users')
+		->where('username', $username)
+		->where('block', 'N')
+		->count();
+	if ($count_user > 0) {
+		$user = $core->podb->from('users')
+			->where('username', $username)
+			->where('block', 'N')
+			->fetch();
+		$info = array(
+			'page_title' => $user['nama_lengkap'].' - Page '.$page,
+			'page' => $page
+		);
+		$adddata = array_merge($info, $lang);
+		$templates->addData(
+			$adddata
+		);
+		echo $templates->render('profile', compact('user','lang'));
+	} else {
+		header('location:'.BASE_URL.'/404.php');
+	}
+});
 
 /**
  * Router untuk menampilkan request halaman edit pengguna.

@@ -76,7 +76,7 @@
 											<div class="form-group">
 												<label><?=$this->e($post_seotitle);?> <span class="text-danger">*</span></label>
 												<input class="form-control" type="text" id="seotitle" name="seotitle" value="<?=$this->e($post['seotitle']);?>" required />
-												<span class="help-block text-danger"><small><i>Permalink : <?=BASE_URL;?>/detailpost/<span id="permalink"><?=$this->e($post['seotitle']);?></span></i></small></span>
+												<span class="help-block text-danger"><small><i>Permalink : <?=BASE_URL;?>/<?=PERMALINK;?>/<span id="permalink"><?=$this->e($post['seotitle']);?></span></i></small></span>
 											</div>
 										</div>
 									</div>

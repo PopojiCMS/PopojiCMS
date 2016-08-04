@@ -5,8 +5,11 @@ namespace PoTemplate\Template;
 use PoTemplate\Engine;
 use LogicException;
 
-require_once 'vqmod/vqmod.php';
-\VQMod::bootup();
+include_once 'po-includes/core/config.php';
+if (VQMOD == TRUE) {
+	require_once 'vqmod/vqmod.php';
+	\VQMod::bootup();
+}
 
 /**
  * Container which holds template data and provides access to template functions.
@@ -117,7 +120,11 @@ class Template
             ob_start();
 
             if ($this->exists()) {
-                include \VQMod::modCheck($this->path());
+				if (VQMOD == TRUE) {
+					include \VQMod::modCheck($this->path());
+				} else {
+					include $this->path();
+				}
             } else {
                 throw new LogicException(
                     'The template "' . $this->name->getName() . '" could not be found at "' . $this->path() . '".'

@@ -18,6 +18,9 @@
     <meta name="rating" content="general" />
     <meta name="spiders" content="all" />
 
+	<!-- RSS Feed -->
+	<link rel="alternate" type="application/rss+xml" title="<?=$this->pocore()->call->posetting[0]['value'];?> Feed" href="<?=BASE_URL;?>/feed" />
+
 	<!-- Social Media Meta -->
 	<?php include_once DIR_CON."/component/setting/meta_social.txt";?>
 

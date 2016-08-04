@@ -37,6 +37,10 @@ spl_autoload_register(function ($class) {
 
     // if the file exists, require it
     if (file_exists($file)) {
-        require VQMod::modCheck($file);
+		if (VQMOD == TRUE) {
+			require VQMod::modCheck($file);
+		} else {
+			require $file;
+		}
     }
 });

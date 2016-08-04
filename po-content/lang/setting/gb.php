@@ -4,7 +4,7 @@
  * - PopojiCMS Setting Language
  *
  * - File : gb.php
- * - Version : 1.0
+ * - Version : 1.1
  * - Author : Jenuar Dalapang
  * - License : MIT License
  *
@@ -87,3 +87,5 @@ $_['setting_oauth_message_1'] = 'OAuth has been successfully updated';
 $_['setting_oauth_message_2'] = 'OAuth has been successfully deleted';
 $_['setting_oauth_help_1'] = 'Please insert app id and app secret before click Create OAuth button';
 $_['setting_oauth_help_2'] = 'Please insert consumer key and consumer secret before click Create OAuth button';
+$_['setting_post_permalink'] = 'Post Permalink';
+$_['setting_slug_permalink'] = 'Default Slug Permalink';

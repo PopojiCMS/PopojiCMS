@@ -4,7 +4,7 @@
  * - PopojiCMS Core
  *
  * - File : core.php
- * - Version : 1.0
+ * - Version : 1.1
  * - Author : Jenuar Dalapang
  * - License : MIT License
  *
@@ -18,6 +18,8 @@
  * Mendeklarasi Core Path PopojiCMS
  *
  * Declaration Core Path PopojiCMS
+ *
+ * Thanks to Mang Aay
  *
 */
 define('CORE_PATH', dirname(__FILE__));
@@ -89,7 +91,29 @@ class PoCore
 
 	public function __construct()
 	{
-		$this->pdo = new PDO("mysql:host=".DATABASE_HOST.";dbname=".DATABASE_NAME."", DATABASE_USER, DATABASE_PASS, array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"));
+		/**
+		 * Menyamakan perbedaan waktu sistem dan database
+		 *
+		 * Synchronize different system time and database
+		 *
+		*/
+		date_default_timezone_set(TIMEZONE);
+		$timenow = new DateTime();
+		$timemins = $timenow->getOffset() / 60;
+		$timesgn = ($timemins < 0 ? -1 : 1);
+		$timemins = abs($timemins);
+		$timehrs = floor($timemins / 60);
+		$timemins -= $timehrs * 60;
+		$timeoffset = sprintf('%+d:%02d', $timehrs*$timesgn, $timemins);
+
+		/**
+		 * Menginisialisasi semua class dari popojicms dan vendor ke variabel
+		 *
+		 * Initialize all class from popojicms and vendor to variabel
+		 *
+		*/
+		$this->pdo = new PDO(DATABASE_DRIVER.":host=".DATABASE_HOST.";dbname=".DATABASE_NAME."", DATABASE_USER, DATABASE_PASS, array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"));
+		$this->pdo->exec("SET time_zone='$timeoffset';");
 		$this->podb = new FluentPDO($this->pdo);
 		$this->poconnect = array('user' => DATABASE_USER, 'pass' => DATABASE_PASS, 'db' => DATABASE_NAME, 'host' => DATABASE_HOST);
 		$this->porequest = new PoRequest();
@@ -102,7 +126,6 @@ class PoCore
 		$this->popaging = new PoPaging();
 		$this->posetting = $this->podb->from('setting')->fetchAll();
 		$this->potheme = $this->podb->from('theme')->where('active', 'Y')->limit(1)->fetch();
-		date_default_timezone_set(''.$this->posetting[15]['value'].'');
 	}
 
 	/**
@@ -142,11 +165,25 @@ class PoCore
 	public function setlang($component, $lang)
 	{
 		if (file_exists("po-content/lang/".$component."/".$lang.".php")) {
-			include_once VQMod::modCheck("po-content/lang/main/".$lang.".php");
-			include_once VQMod::modCheck("po-content/lang/".$component."/".$lang.".php");
-			return $_;
+			if (VQMOD == TRUE) {
+				include_once VQMod::modCheck("po-content/lang/main/".$lang.".php");
+				include_once VQMod::modCheck("po-content/lang/".$component."/".$lang.".php");
+				return $_;
+			} else {
+				include_once "po-content/lang/main/".$lang.".php";
+				include_once "po-content/lang/".$component."/".$lang.".php";
+				return $_;
+			}
 		} else {
-			return false;
+			if (VQMOD == TRUE) {
+				include_once VQMod::modCheck("po-content/lang/main/id.php");
+				include_once VQMod::modCheck("po-content/lang/".$component."/id.php");
+				return $_;
+			} else {
+				include_once "po-content/lang/main/id.php";
+				include_once "po-content/lang/".$component."/id.php";
+				return $_;
+			}
 		}
 	}
 

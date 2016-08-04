@@ -122,6 +122,13 @@ CREATE TABLE IF NOT EXISTS `comment` (
   PRIMARY KEY (`id_comment`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 ;
 
+--
+-- Dumping data for table `comment`
+--
+
+INSERT INTO `comment` (`id_comment`, `id_parent`, `id_post`, `name`, `email`, `url`, `comment`, `date`, `time`, `active`, `status`) VALUES
+(1, 0, 8, 'Jenuar Dalapang', 'djenuar@gmail.com', '', 'Edukasi keuangan terhadap anak memang penting sejak dini', '2016-07-28', '12:40:24', 'Y', 'Y');
+
 -- --------------------------------------------------------
 
 --
@@ -556,7 +563,9 @@ INSERT INTO `setting` (`id_setting`, `groups`, `options`, `value`) VALUES
 (25, 'mail', 'mail_hostname', ''),
 (26, 'mail', 'mail_username', ''),
 (27, 'mail', 'mail_password', ''),
-(28, 'mail', 'mail_port', '');
+(28, 'mail', 'mail_port', ''),
+(29, 'config', 'permalink', 'slug/post-title'),
+(30, 'config', 'slug_permalink', 'detailpost');
 
 -- --------------------------------------------------------
 
@@ -647,6 +656,8 @@ CREATE TABLE IF NOT EXISTS `traffic` (
   `browser` varchar(255) NOT NULL,
   `os` varchar(255) NOT NULL,
   `platform` varchar(255) NOT NULL,
+  `country` varchar(255) NOT NULL,
+  `city` varchar(255) NOT NULL,
   `date` date NOT NULL,
   `hits` int(10) NOT NULL DEFAULT '1',
   `online` varchar(255) NOT NULL

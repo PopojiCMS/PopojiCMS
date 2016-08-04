@@ -38,7 +38,7 @@
 							<div class="spost clearfix">
 								<div class="entry-c">
 									<div class="entry-title">
-										<h4><a href="<?=BASE_URL;?>/detailpost/<?=$popular['seotitle'];?>"><?=$popular['title'];?></a></h4>
+										<h4><a href="<?=$this->pocore()->call->postring->permalink(rtrim(BASE_URL, '/'), $popular);?>"><?=$popular['title'];?></a></h4>
 									</div>
 									<ul class="entry-meta">
 										<li><?=$this->pocore()->call->podatetime->tgl_indo($popular['date']);?></li>

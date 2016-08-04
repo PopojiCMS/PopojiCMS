@@ -4,7 +4,7 @@
  * - PopojiCMS Widget File
  *
  * - File : menu.php
- * - Version : 1.0
+ * - Version : 1.1
  * - Author : Jenuar Dalapang
  * - License : MIT License
  *
@@ -75,14 +75,16 @@ class Menu implements ExtensionInterface
 	 * $attr = id or class in list (ex: <ul>)
 	 * $attrs = id or class in child list (ex: <li>)
 	 * $attrss = id or class in link (ex: <a>)
+	 * $wrapper = html tag (ex: <div>)
+	 * $endwrapper = end html tag (ex: </div>)
 	*/
-    public function getFrontMenu($set_lang, $attr = '', $attrs = '', $attrss = '')
+    public function getFrontMenu($set_lang, $attr = '', $attrs = '', $attrss = '', $wrapper = '<div>', $endwrapper = '</div>')
     {
 		$group_id = $this->core->podb->from('menu_group')
 			->where('title', $set_lang)
 			->limit(1)
 			->fetch();
-		$front_menu = $this->frontmenu->menu($group_id['id'], $attr, $attrs, $attrss);
+		$front_menu = $this->frontmenu->menu($group_id['id'], $attr, $attrs, $attrss, $wrapper, $endwrapper);
         return $front_menu;
     }
 

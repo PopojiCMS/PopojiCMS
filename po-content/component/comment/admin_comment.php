@@ -4,7 +4,7 @@
  * - PopojiCMS Admin File
  *
  * - File : admin_comment.php
- * - Version : 1.0
+ * - Version : 1.1
  * - Author : Jenuar Dalapang
  * - License : MIT License
  *
@@ -157,7 +157,7 @@ class Comment extends PoCore
 				'formatter' => function($d, $row, $i){
 					return $d."<br />\n
 						<span style='font-size:12px;'>".$row['email']." - <a href='".$this->postring->addhttp($row['url'])."' target='_blank'>Website</a></span><br />\n
-						Post : <a href='".WEB_URL."detailpost/".$row['seotitle']."' target='_blank'>".$row['title']."</a>\n
+						Post : <a href='".$this->postring->permalink(rtrim(WEB_URL, '/'), array('id_post' => $row['id_post'], 'seotitle' => $row['seotitle'], 'date' => $row['date']))."' target='_blank'>".$row['title']."</a>\n
 					\n";
 				}
 			),
@@ -204,6 +204,7 @@ class Comment extends PoCore
 			array('db' => 'c.time', 'dt' => '', 'field' => 'time'),
 			array('db' => 'c.status', 'dt' => '', 'field' => 'status'),
 			array('db' => 'p.seotitle', 'dt' => '', 'field' => 'seotitle'),
+			array('db' => 'p.date', 'dt' => '', 'field' => 'date'),
 			array('db' => 'pd.title', 'dt' => '', 'field' => 'title')
 		);
 		$joinquery = "FROM comment AS c JOIN post AS p ON (p.id_post = c.id_post) JOIN post_description AS pd ON (pd.id_post = c.id_post AND pd.id_language = '1')";

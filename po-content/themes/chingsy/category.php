@@ -25,20 +25,20 @@
 						</div>
 						<div class="entry-c">
 							<div class="entry-title">
-								<h2><a href="<?=BASE_URL;?>/detailpost/<?=$post['seotitle'];?>"><?=$post['title'];?></a></h2>
+								<h2><a href="<?=$this->pocore()->call->postring->permalink(rtrim(BASE_URL, '/'), $post);?>"><?=$post['title'];?></a></h2>
 							</div>
 							<ul class="entry-meta clearfix">
 								<li><i class="icon-calendar3"></i> <?=$this->pocore()->call->podatetime->tgl_indo($post['date']);?></li>
-								<li><a href="javascript:void(0)"><i class="icon-user"></i> <?=$this->post()->getAuthorName($post['editor']);?></a></li>
+								<li><a href="<?=BASE_URL;?>/member/profile/<?=$this->post()->getAuthor($post['editor'])['username'];?>" target="_blank"><i class="icon-user"></i> <?=$this->post()->getAuthorName($post['editor']);?></a></li>
 								<li><i class="icon-eye"></i> <?=$post['hits'];?></li>
-								<li><a href="<?=BASE_URL;?>/detailpost/<?=$post['seotitle'];?>#comments"><i class="icon-comments"></i> <?=$this->post()->getCountComment($post['id_post']);?></a></li>
+								<li><a href="<?=$this->pocore()->call->postring->permalink(rtrim(BASE_URL, '/'), $post);?>#comments"><i class="icon-comments"></i> <?=$this->post()->getCountComment($post['id_post']);?></a></li>
 							</ul>
 							<ul class="entry-meta clearfix">
 								<li><i class="icon-folder-open"></i> <?=$this->post()->getPostTag($post['tag']);?></li>
 							</ul>
 							<div class="entry-content">
 								<p><?=$this->pocore()->call->postring->cuthighlight('post', $post['content'], '200');?>...</p>
-								<a href="<?=BASE_URL;?>/detailpost/<?=$post['seotitle'];?>"class="more-link"><?=$this->e($front_readmore);?></a>
+								<a href="<?=$this->pocore()->call->postring->permalink(rtrim(BASE_URL, '/'), $post);?>" class="more-link"><?=$this->e($front_readmore);?></a>
 							</div>
 						</div>
 					</div>

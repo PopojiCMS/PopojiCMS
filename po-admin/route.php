@@ -4,7 +4,7 @@
  * - PopojiCMS Admin File
  *
  * - File : route.php
- * - Version : 1.0
+ * - Version : 1.1
  * - Author : Jenuar Dalapang
  * - License : MIT License
  *
@@ -17,9 +17,14 @@
 /**
  * Include PopojiCMS main core
 */
-require_once '../vqmod/vqmod.php';
-VQMod::bootup();
-include_once "../po-includes/core/core.php";
+include_once '../po-includes/core/config.php';
+if (VQMOD == TRUE) {
+	require_once '../vqmod/vqmod.php';
+	VQMod::bootup();
+	include_once VQMod::modCheck('../po-includes/core/core.php');
+} else {
+	include_once '../po-includes/core/core.php';
+}
 /**
  * Call class PoRequest for filtering get request
 */
@@ -43,7 +48,11 @@ switch(basename($_SERVER['PHP_SELF'])) {
 	 *
 	*/
 	case "index.php":
-		include_once VQMod::modCheck("login.php");
+		if (VQMOD == TRUE) {
+			include_once VQMod::modCheck("login.php");
+		} else {
+			include_once "login.php";
+		}
 		if (class_exists($mod)) {
 			$slug = new $mod();
 			if (method_exists($slug, $act)) {
@@ -65,13 +74,25 @@ switch(basename($_SERVER['PHP_SELF'])) {
 	*/
 	case "admin.php":
 		if (file_exists("../".DIR_CON."/component/".strtolower($mod)."/admin_".strtolower($mod).".php")) {
-			include_once VQMod::modCheck("../".DIR_CON."/component/".strtolower($mod)."/admin_".strtolower($mod).".php");
+			if (VQMOD == TRUE) {
+				include_once VQMod::modCheck("../".DIR_CON."/component/".strtolower($mod)."/admin_".strtolower($mod).".php");
+			} else {
+				include_once "../".DIR_CON."/component/".strtolower($mod)."/admin_".strtolower($mod).".php";
+			}
 			if (class_exists($mod)) {
 				if (file_exists("../".DIR_CON."/lang/".strtolower($mod)."/".$selectlang.".php")) {
-					include_once VQMod::modCheck("../".DIR_CON."/lang/".strtolower($mod)."/".$selectlang.".php");
+					if (VQMOD == TRUE) {
+						include_once VQMod::modCheck("../".DIR_CON."/lang/".strtolower($mod)."/".$selectlang.".php");
+					} else {
+						include_once "../".DIR_CON."/lang/".strtolower($mod)."/".$selectlang.".php";
+					}
 				} else {
 					if (file_exists("../".DIR_CON."/lang/".strtolower($mod)."/id.php")) {
-						include_once VQMod::modCheck("../".DIR_CON."/lang/".strtolower($mod)."/id.php");
+						if (VQMOD == TRUE) {
+							include_once VQMod::modCheck("../".DIR_CON."/lang/".strtolower($mod)."/id.php");
+						} else {
+							include_once "../".DIR_CON."/lang/".strtolower($mod)."/id.php";
+						}
 					}
 				}
 				$slug = new $mod();
@@ -81,12 +102,20 @@ switch(basename($_SERVER['PHP_SELF'])) {
 					$slug->index();
 				}
 			} else {
-				include_once VQMod::modCheck("../".DIR_CON."/component/home/admin_home.php");
+				if (VQMOD == TRUE) {
+					include_once VQMod::modCheck("../".DIR_CON."/component/home/admin_home.php");
+				} else {
+					include_once "../".DIR_CON."/component/home/admin_home.php";
+				}
 				$slug = new Home();
 				$slug->index();
 			}
 		} else {
-			include_once VQMod::modCheck("../".DIR_CON."/component/home/admin_home.php");
+			if (VQMOD == TRUE) {
+				include_once VQMod::modCheck("../".DIR_CON."/component/home/admin_home.php");
+			} else {
+				include_once "../".DIR_CON."/component/home/admin_home.php";
+			}
 			$slug = new Home();
 			$slug->error();
 		}
@@ -101,7 +130,11 @@ switch(basename($_SERVER['PHP_SELF'])) {
 	case "route.php":
 		if ($mod == 'Login') {
 			session_start();
-			include_once VQMod::modCheck("login.php");
+			if (VQMOD == TRUE) {
+				include_once VQMod::modCheck("login.php");
+			} else {
+				include_once "login.php";
+			}
 			if (class_exists($mod)) {
 				$slug = new $mod();
 				if (method_exists($slug, $act)) {
@@ -116,15 +149,31 @@ switch(basename($_SERVER['PHP_SELF'])) {
 		} else {
 			if (file_exists("../".DIR_CON."/component/".strtolower($mod)."/admin_".strtolower($mod).".php")) {
 				session_start();
-				include_once VQMod::modCheck("../".DIR_CON."/component/".strtolower($mod)."/admin_".strtolower($mod).".php");
+				if (VQMOD == TRUE) {
+					include_once VQMod::modCheck("../".DIR_CON."/component/".strtolower($mod)."/admin_".strtolower($mod).".php");
+				} else {
+					include_once "../".DIR_CON."/component/".strtolower($mod)."/admin_".strtolower($mod).".php";
+				}
 				if (class_exists($mod)) {
 					$selectlang = (isset($_COOKIE['lang']) ? $_COOKIE['lang'] : 'id');
-					include_once VQMod::modCheck("../".DIR_CON."/lang/main/".$selectlang.".php");
+					if (VQMOD == TRUE) {
+						include_once VQMod::modCheck("../".DIR_CON."/lang/main/".$selectlang.".php");
+					} else {
+						include_once "../".DIR_CON."/lang/main/".$selectlang.".php";
+					}
 					if (file_exists("../".DIR_CON."/lang/".strtolower($mod)."/".$selectlang.".php")) {
-						include_once VQMod::modCheck("../".DIR_CON."/lang/".strtolower($mod)."/".$selectlang.".php");
+						if (VQMOD == TRUE) {
+							include_once VQMod::modCheck("../".DIR_CON."/lang/".strtolower($mod)."/".$selectlang.".php");
+						} else {
+							include_once "../".DIR_CON."/lang/".strtolower($mod)."/".$selectlang.".php";
+						}
 					} else {
 						if (file_exists("../".DIR_CON."/lang/".strtolower($mod)."/id.php")) {
-							include_once VQMod::modCheck("../".DIR_CON."/lang/".strtolower($mod)."/id.php");
+							if (VQMOD == TRUE) {
+								include_once VQMod::modCheck("../".DIR_CON."/lang/".strtolower($mod)."/id.php");
+							} else {
+								include_once "../".DIR_CON."/lang/".strtolower($mod)."/id.php";
+							}
 						}
 					}
 					$slug = new $mod();

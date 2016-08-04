@@ -16,7 +16,6 @@
 html {
 	position: relative;
 	min-height: 100%;
-	background: #ffffff;
 }
 body {
     background: #ffffff;
@@ -237,7 +236,15 @@ select.input-sm {
 
 .login-page {
 	margin: 20px auto;
-	padding: 20px 150px;
+	padding: 40px;
+	max-width: 500px;
+	box-shadow: 0 .125rem .25rem rgba(50,70,75,.2);
+	display: block;
+	margin: 100px auto;
+	width: 100%;
+	background-color: #fff;
+	position: relative;
+	font-weight: 200 !important;
 }
 @media only screen and (max-width: 480px) {
 	.login-page {
@@ -250,8 +257,8 @@ select.input-sm {
 }
 .login-page .login-or {
 	position: relative;
-	font-size: 18px;
-	color: #aaa;
+	font-size: 16px;
+	color: #59595A;
 	margin-top: 10px;
 	margin-bottom: 10px;
 	padding-top: 10px;
@@ -268,7 +275,7 @@ select.input-sm {
 	text-align: center;
 }
 .login-page .hr-or {
-	background-color: #cdcdcd;
+	border-top: .0625rem solid #e4e4e4;
 	height: 1px;
 	margin-top: 0px !important;
 	margin-bottom: 0px !important;
@@ -914,4 +921,127 @@ footer {
 	border-top: 1px solid #e0e0e0;
 	margin: 20px auto;
 	padding: 20px 20px 0px;
+}
+
+
+.no-bg, .no-bg:focus {
+    background-color: transparent !important;
+	color: #59595A;
+	outline: none;
+}
+.no-bg:hover {
+	color: #59595A;
+}
+.login-input {
+	border-color: #e4e4e4;
+	border-radius: 0;
+	background-color: #fff;
+	border: 1px solid #ccc;
+}
+.login-page h4 {
+	color: #59595A;
+}
+.btn-full {
+	width: 100%;
+	border-radius: 0;
+}
+.btn-flat {
+	border-radius: 0;
+}
+
+
+.profile-page {
+	margin: 20px auto;
+	max-width: 900px;
+}
+.profile-page .panel-body {
+    background:#fff;
+}
+.cover-photo {
+    position: relative;
+}
+.fb-timeline-img img {
+    width: 100%;
+    border-radius: 4px 4px 0 0;
+    -webkit-border-radius: 4px 4px 0 0;
+}
+.profile-thumb img {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    -webkit-border-radius: 50%;
+    margin-top: -90px;
+    border: 3px solid #fff;
+	margin-right: 20px;
+	margin-bottom: 10px;
+}
+.profile-info .panel-footer ul li a {
+    color: #7a7a7a;
+}
+.profile-thumb {
+    float: left;
+    position: relative;
+}
+.fb-user-mail {
+    margin: 5px 0 0 0px;
+}
+@media(max-width:320px) {
+	.fb-user-mail {
+		margin: 10px 0 0 22px;
+	}
+}
+.fb-user-bio {
+    margin: 10px 0 0 22px;
+}
+.fb-name  {
+    bottom: 5px;
+    left: 175px;
+    position: absolute;
+}
+.fb-name h2 a {
+    color: #FFFFFF;
+    text-rendering: optimizelegibility;
+    text-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
+    font-size: 25px;
+}
+.fb-user-thumb {
+    float: left;
+    width: 70px;
+    margin-right:15px;
+}
+.fb-user-thumb img {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    -webkit-border-radius: 50%;
+}
+.fb-user-details h3 {
+    margin: 15px 0 0;
+    font-size: 18px;
+    font-weight: 300;
+}
+.fb-user-details p {
+    color: #c3c3c3;
+}
+.fb-user-status {
+    padding: 10px 0;
+    line-height: 20px;
+}
+.fb-time-action {
+    padding: 15px 0;
+}
+.fb-border {
+    border-top:1px solid #ebeef5;
+}
+.fb-time-action span, .fb-time-action a {
+    margin-right: 5px;
+}
+.fb-time-action a {
+    color: #2972a1;
+}
+.fb-time-action a:hover {
+    text-decoration: underline;
+}
+.fb-time-action span {
+    color: #5a5a5a;
 }

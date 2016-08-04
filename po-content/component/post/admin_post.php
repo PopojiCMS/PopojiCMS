@@ -4,7 +4,7 @@
  * - PopojiCMS Admin File
  *
  * - File : admin_post.php
- * - Version : 1.0
+ * - Version : 1.1
  * - Author : Jenuar Dalapang
  * - License : MIT License
  *
@@ -137,23 +137,19 @@ class Post extends PoCore
 			),
 			array('db' => 'pd.title', 'dt' => '3', 'field' => 'title',
 				'formatter' => function($d, $row, $i){
-					if ($row['active'] == 'Y') {
-						$sactive = "<i class='fa fa-eye'></i> {$GLOBALS['_']['post_active']}";
-					} else {
-						$sactive = "<i class='fa fa-eye-slash'></i> {$GLOBALS['_']['post_not_active']}";
-					}
 					if ($row['headline'] == 'Y') {
 						$headline = "<i class='fa fa-star text-warning'></i> {$GLOBALS['_']['post_headline']}";
 					} else {
 						$headline = "<i class='fa fa-star'></i> {$GLOBALS['_']['post_not_headline']}";
 					}
-					return "".$d."<br /><i><a href='".WEB_URL."detailpost/".$row['seotitle']."' target='_blank'>".WEB_URL."detailpost/".$row['seotitle']."</a></i><br /><br />
+					return "".$d."<br /><i><a href='".$this->postring->permalink(rtrim(WEB_URL, '/'), array('id_post' => $row['id_post'], 'seotitle' => $row['seotitle'], 'date' => $row['date']))."' target='_blank'>".$this->postring->permalink(rtrim(WEB_URL, '/'), array('id_post' => $row['id_post'], 'seotitle' => $row['seotitle'], 'date' => $row['date']))."</a></i><br /><br />
 					<div class='btn-group btn-group-xs'>
-                        <a class='btn btn-xs btn-default' style='font-size:11px;'><i class='fa fa-user'></i> {$GLOBALS['_']['post_by']} ".$row['nama_lengkap']."</a>
+                        <a class='btn btn-xs btn-default' style='font-size:11px;'><i class='fa fa-user'></i> ".$row['nama_lengkap']."</a>
+						<a class='btn btn-xs btn-default' style='font-size:11px;'><i class='fa fa-calendar'></i> ".date('d M y', strtotime($row['date']))."</a>
 						<a class='btn btn-xs btn-default tbl-subscribe' id='".$row['id_post']."' style='font-size:11px;'><i class='fa fa-rss'></i> {$GLOBALS['_']['post_subscribe']}</a>
 						<a class='btn btn-xs btn-default' href='route.php?mod=post&act=facebook&id=".$row['id_post']."' style='font-size:11px;'><i class='fa fa-facebook'></i> {$GLOBALS['_']['post_share']}</a>
 						<a class='btn btn-xs btn-default' href='route.php?mod=post&act=twitter&id=".$row['id_post']."' style='font-size:11px;'><i class='fa fa-twitter'></i> {$GLOBALS['_']['post_share']}</a>
-                        <a class='btn btn-xs btn-default' style='font-size:11px;'>".$sactive."</a>
+						<a class='btn btn-xs btn-default' style='font-size:11px;'><i class='fa fa-eye'></i> ".$row['hits']."</a>
 						<a class='btn btn-xs btn-default' id='seth".$row['id_post']."' data-headline='".$row['headline']."' style='font-size:11px;'>".$headline."</a>
 					</div>";
 				}
@@ -170,8 +166,10 @@ class Post extends PoCore
 					</div>\n";
 				}
 			),
+			array('db' => 'p.date', 'dt' => '', 'field' => 'date'),
 			array('db' => 'p.seotitle', 'dt' => '', 'field' => 'seotitle'),
 			array('db' => 'p.headline', 'dt' => '', 'field' => 'headline'),
+			array('db' => 'p.hits', 'dt' => '', 'field' => 'hits'),
 			array('db' => 'u.nama_lengkap', 'dt' => '', 'field' => 'nama_lengkap')
 		);
 		$joinquery = "FROM post AS p JOIN post_description AS pd ON (pd.id_post = p.id_post) JOIN users AS u ON (u.id_user = p.editor)";
@@ -313,7 +311,7 @@ class Post extends PoCore
 					<div class="col-md-4" id="right-post">
 						<div class="row">
 							<div class="col-md-12">
-								<?=$this->pohtml->inputText(array('type' => 'text', 'label' => $GLOBALS['_']['post_seotitle'], 'name' => 'seotitle', 'id' => 'seotitle', 'mandatory' => true, 'options' => 'required', 'help' => 'Permalink : '.WEB_URL.'detailpost/<span id="permalink"></span>'));?>
+								<?=$this->pohtml->inputText(array('type' => 'text', 'label' => $GLOBALS['_']['post_seotitle'], 'name' => 'seotitle', 'id' => 'seotitle', 'mandatory' => true, 'options' => 'required', 'help' => 'Permalink : '.WEB_URL.PERMALINK.'/<span id="permalink"></span>'));?>
 							</div>
 						</div>
 						<div class="row">
@@ -562,7 +560,7 @@ class Post extends PoCore
 					<div class="col-md-4" id="right-post">
 						<div class="row">
 							<div class="col-md-12">
-								<?=$this->pohtml->inputText(array('type' => 'text', 'label' => $GLOBALS['_']['post_seotitle'], 'name' => 'seotitle', 'id' => 'seotitle', 'value' => $current_post['seotitle'], 'mandatory' => true, 'options' => 'required', 'help' => 'Permalink : '.WEB_URL.'detailpost/<span id="permalink">'.$current_post['seotitle'].'</span>'));?>
+								<?=$this->pohtml->inputText(array('type' => 'text', 'label' => $GLOBALS['_']['post_seotitle'], 'name' => 'seotitle', 'id' => 'seotitle', 'value' => $current_post['seotitle'], 'mandatory' => true, 'options' => 'required', 'help' => 'Permalink : '.WEB_URL.PERMALINK.'/<span id="permalink">'.$current_post['seotitle'].'</span>'));?>
 							</div>
 						</div>
 						<div class="row">
@@ -1415,7 +1413,7 @@ class Post extends PoCore
 					$response = $fb->post('/me/feed',
 						[
 							"message" => $paglang['title'],
-							"link" => WEB_URL."detailpost/".$current_post['seotitle'],
+							"link" => $this->postring->permalink(rtrim(WEB_URL, '/'), $current_post),
 							"picture" => "http://www.example.net/images/example.png",
 							"name" => $paglang['title'],
 							"caption" => trim(trim(WEB_URL, "http://"), "/"),
@@ -1427,7 +1425,7 @@ class Post extends PoCore
 					$response = $fb->post('/'.$idOauthfb.'/feed',
 						[
 							"message" => $paglang['title'],
-							"link" => WEB_URL."detailpost/".$current_post['seotitle'],
+							"link" => $this->postring->permalink(rtrim(WEB_URL, '/'), $current_post),
 							"picture" => "http://www.example.net/images/example.png",
 							"name" => $paglang['title'],
 							"caption" => trim(trim(WEB_URL, "http://"), "/"),
@@ -1486,7 +1484,7 @@ class Post extends PoCore
 				->fetch();
 
 			$params = array(
-				"status" => $paglang['title'].", Link : ".WEB_URL."detailpost/".$current_post['seotitle']
+				"status" => $paglang['title'].", Link : ".$this->postring->permalink(rtrim(WEB_URL, '/'), $current_post)
 			);
 			$status = $connection->post('statuses/update', $params);
 			if (200 == $connection->http_code) {
@@ -1530,7 +1528,7 @@ class Post extends PoCore
 						Hi ".$subscribe['email']."<br />
 						We have the latest updates for you!<br />
 						Please click on the link below to begin reading :<br />
-						<a href='".WEB_URL."/detailpost/".$current_post['seotitle']."'>".$paglang['title']."</a><br /><br />
+						<a href='".$this->postring->permalink(rtrim(WEB_URL, '/'), $current_post)."'>".$paglang['title']."</a><br /><br />
 						Thank you for subscribing,<br />
 						".$this->posetting[0]['value']."
 					</body>

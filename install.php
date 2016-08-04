@@ -4,7 +4,7 @@
  * - PopojiCMS Installation
  *
  * - File : install.php
- * - Version : 1.0
+ * - Version : 1.1
  * - Author : Jenuar Dalapang
  * - License : MIT License
  *
@@ -20,9 +20,9 @@ else
 
 $aConf = array();
 $aConf['structure']	= 'PopojiCMS';
-$aConf['release'] = '07 Juni 2016';
+$aConf['release'] = '07 Juli 2016';
 $aConf['ver'] = '2.0';
-$aConf['build'] = '0';
+$aConf['build'] = '1';
 $aConf['header_inc_file'] = 'po-includes/core/config.php';
 $aConf['dir_inc'] = 'po-includes/core/';	
 $aConf['headerTempl'] = <<<EOS
@@ -49,6 +49,7 @@ define('DIR_CON', \$site['con']);
 define('DIR_INC', \$site['inc']);
 
 \$db['host'] = "%db_host%";
+\$db['driver'] = "mysql";
 \$db['sock'] = "%db_sock%";
 \$db['port'] = "%db_port%";
 \$db['user'] = "%db_user%";
@@ -56,11 +57,22 @@ define('DIR_INC', \$site['inc']);
 \$db['db'] = "%db_name%";
 
 define('DATABASE_HOST', \$db['host']);
+define('DATABASE_DRIVER', \$db['driver']);
 define('DATABASE_SOCK', \$db['sock']);
 define('DATABASE_PORT', \$db['port']);
 define('DATABASE_USER', \$db['user']);
 define('DATABASE_PASS', \$db['passwd']);
 define('DATABASE_NAME', \$db['db']);
+
+\$site['vqmod'] = FALSE;
+\$site['timezone'] = "%site_timezone%";
+\$site['permalink'] = "slug/post-title";
+\$site['slug_permalink'] = "detailpost";
+
+define('VQMOD', \$site['vqmod']);
+define('TIMEZONE', \$site['timezone']);
+define('PERMALINK', \$site['permalink']);
+define('SLUG_PERMALINK', \$site['slug_permalink']);
 
 ?>
 EOS;
@@ -152,7 +164,7 @@ EOS;
 	$confGeneral['site_title'] = array(
 		'name' => "Site Title",
 		'ex' => "The Best Community",
-		'desc' => "The name of your site.",
+		'desc' => "Name of your site.",
 		'check' => 'return strlen($arg0) >= 1 ? true : false;'
 	);
 	$confGeneral['site_desc'] = array(
@@ -162,7 +174,7 @@ EOS;
 		'check' => 'return strlen($arg0) >= 1 ? true : false;'
 	);
 	$confGeneral['site_email'] = array(
-		'name' => "Site e-mail",
+		'name' => "Site E-mail",
 		'ex' => "your@email.here",
 		'desc' => "Your site e-mail.",
 		'check' => 'return strlen($arg0) > 0 AND strstr($arg0,"@") ? true : false;'
@@ -170,7 +182,7 @@ EOS;
 	$confGeneral['site_user'] = array(
 		'name' => "Site Username",
 		'ex' => "admin",
-		'desc' => "Username for login to administrator page, please just write letters and numbers.",
+		'desc' => "Username for login to administrator page, please just write letters and numbers (lowercase).",
 		'check' => 'return strlen($arg0) >= 1 ? true : false;'
 	);
 	$confGeneral['site_pass'] = array(
@@ -178,6 +190,12 @@ EOS;
 		'ex' => "admin123",
 		'desc' => "Password for login to administrator page, please enter character more than 6 characters.",
 		'check' => 'return strlen($arg0) >= 6 ? true : false;'
+	);
+	$confGeneral['site_timezone'] = array(
+		'name' => "Site Timezone",
+		'ex' => "Asia/Jakarta",
+		'desc' => "Timezone of your site.",
+		'check' => 'return strlen($arg0) >= 1 ? true : false;'
 	);
 
 	$aTemporalityWritableFolders = array(
@@ -322,7 +340,7 @@ function PageHeader($action = '', $error = '') {
 									</li>
 									<li {$activestep4}>
 										<a href="javascript:void(0);" data-toggle="tab" title="Installation Process">
-											<span class="round-tabs five"><i class="fa fa-cog fa-spin fa-fw"></i></span>
+											<span class="round-tabs five"><i class="fa fa-cog fa-fw"></i></span>
 										</a>
 									</li>
 								</ul>
@@ -363,6 +381,8 @@ function StartInstall() {
 	$ifphpmbstring = (extension_loaded('mbstring') ? '<span class="text-success">ON</span>' : '<span class="text-danger">OFF</span>');
 	$ifphpmysqli = (extension_loaded('mysqli') ? '<span class="text-success">ON</span>' : '<span class="text-danger">OFF</span>');
 	$ifphppdomysql = (extension_loaded('pdo_mysql') ? '<span class="text-success">ON</span>' : '<span class="text-danger">OFF</span>');
+	// Thanks to Ramadhan Sutejo
+	$ifphpfileinfo = (extension_loaded('fileinfo') ? '<span class="text-success">ON</span>' : '<span class="text-danger">OFF</span>');
 	$iffoldercorewrite = (is_writable('po-includes/core') ? '<span class="text-success">YES</span>' : '<span class="text-danger">NO</span>');
 
 	$startinstallc = <<<EOF
@@ -373,7 +393,7 @@ function StartInstall() {
 			Welcome to PopojiCMS instalation page, please read the license and click button at bottom if you agree and start instalation process.
 		</p>
 		<p class="narrow text-center text-info">
-			<i>Note : Please give permission to write into po-includes/core/ folder before start installation process.</i>
+			<i>Note : PopojiCMS requires minimal php version 5.4, but will be more stable in php version 5.5 - latest.</i>
 		</p>
 		<div class="license">
 			<div class="table-responsive">
@@ -434,6 +454,11 @@ EOF;
 						<tr>
 							<td class="text-center">php_pdo_mysql</td>
 							<td class="text-center">{$ifphppdomysql}</td>
+							<td class="text-center"><span class="text-success">ON</span></td>
+						</tr>
+						<tr>
+							<td class="text-center">php_fileinfo</td>
+							<td class="text-center">{$ifphpfileinfo}</td>
 							<td class="text-center"><span class="text-success">ON</span></td>
 						</tr>
 						<tr>
@@ -575,6 +600,7 @@ function genSiteGeneralConfig($errorMessage = '') {
 		unset($_POST['site_pass']);
 		unset($_POST['notify_email']);
 		unset($_POST['bug_report_email']);
+		unset($_POST['site_timezone']);
 	}
 
 	$oldDataParams = '';
@@ -731,21 +757,50 @@ function createTable($arr) {
 
 		$st_err = ($error_arr[$key] == 1) ? ' style="background-color:#ffdddd;" ' : '';
 
-		$ret .= <<<EOF
-		<div class="row">
-			<div class="col-md-4">{$value['name']} {$def_exp_text}</div>
-			<div class="col-md-8"><input {$st_err} name="{$key}" class="form-control input-sm" value="{$value['def']}" /></div>
-		</div>
-		<div class="row hidden-xs">
-			<div class="col-md-4">Description</div>
-			<div class="col-md-8">{$value['desc']}</div>
-		</div>
-		<div class="row hidden-xs">
-			<div class="col-md-4">Example</div>
-			<div class="col-md-8"><i>{$value['ex']}</i></div>
-		</div>
-		<p>&nbsp</p>
+		if ($key == 'site_timezone') {
+			$ret .= <<<EOF
+			<div class="row">
+				<div class="col-md-4">{$value['name']} {$def_exp_text}</div>
+				<div class="col-md-8">
+					<select {$st_err} name="{$key}" class="form-control input-sm">
 EOF;
+						$timezoneList = timezoneList();
+						foreach ($timezoneList as $tvalue => $tlabel) {
+							$ret .= <<<EOF
+							<option value='{$tvalue}'>{$tlabel}</option>
+EOF;
+						}
+					$ret .= <<<EOF
+					</select>
+				</div>
+			</div>
+			<div class="row hidden-xs">
+				<div class="col-md-4"><small>Description</small></div>
+				<div class="col-md-8"><small>{$value['desc']}</small></div>
+			</div>
+			<div class="row hidden-xs">
+				<div class="col-md-4"><small>Example</small></div>
+				<div class="col-md-8"><small><i>{$value['ex']}</i></small></div>
+			</div>
+			<p>&nbsp</p>
+EOF;
+		} else {
+			$ret .= <<<EOF
+			<div class="row">
+				<div class="col-md-4">{$value['name']} {$def_exp_text}</div>
+				<div class="col-md-8"><input {$st_err} name="{$key}" class="form-control input-sm" value="{$value['def']}" /></div>
+			</div>
+			<div class="row hidden-xs">
+				<div class="col-md-4"><small>Description</small></div>
+				<div class="col-md-8"><small>{$value['desc']}</small></div>
+			</div>
+			<div class="row hidden-xs">
+				<div class="col-md-4"><small>Example</small></div>
+				<div class="col-md-8"><small><i>{$value['ex']}</i></small></div>
+			</div>
+			<p>&nbsp</p>
+EOF;
+		}
 		$i ++;
 	}
 
@@ -832,10 +887,11 @@ function RunSQL() {
 	$siteDesc = DbEscape($vLink, $_POST['site_desc']);
 	$siteUser = DbEscape($vLink, $_POST['site_user']);
 	$sitePass = DbEscape($vLink, $_POST['site_pass']);
+	$siteTimezone = DbEscape($vLink, $_POST['site_timezone']);
 	$sitePassEnc = md5($sitePass);
 	$strUrlsim = rtrim("http://".$_SERVER['HTTP_HOST'], "/").$_SERVER['PHP_SELF'];
 	$siteUrlsim = rtrim(str_replace("install.php","",$strUrlsim), "/");
-	date_default_timezone_set('Asia/Jakarta');
+	date_default_timezone_set($siteTimezone);
 	$siteTgl = date("Ymd");
 	if ($siteEmail != '' && $siteTitle != '' && $siteUser != '' && $sitePass != '') {
 		if (!(mysqli_query($vLink, "UPDATE setting SET value = '{$siteTitle}' WHERE id_setting = '1'")))
@@ -845,6 +901,8 @@ function RunSQL() {
 		if (!(mysqli_query($vLink, "UPDATE setting SET value = '{$siteDesc}' WHERE id_setting = '3'")))
 			$ret .= "<font color='red'><i><b>Error</b>:</i> ".mysqli_error($vLink)."</font>";
 		if (!(mysqli_query($vLink, "UPDATE setting SET value = '{$siteEmail}' WHERE id_setting = '6'")))
+			$ret .= "<font color='red'><i><b>Error</b>:</i> ".mysqli_error($vLink)."</font>";
+		if (!(mysqli_query($vLink, "UPDATE setting SET value = '{$siteTimezone}' WHERE id_setting = '16'")))
 			$ret .= "<font color='red'><i><b>Error</b>:</i> ".mysqli_error($vLink)."</font>";
 		if (!(mysqli_query($vLink, "INSERT INTO `users` (`id_user`, `username`, `password`, `nama_lengkap`, `email`, `no_telp`, `bio`, `picture`, `level`, `block`, `id_session`, `tgl_daftar`) VALUES(1, '{$siteUser}', '{$sitePassEnc}', 'Super Administrator', '{$siteEmail}', '000-0000-0000', 'No matter how exciting or significant a person''s life is, a poorly written biography will make it seem like a snore. On the other hand, a good biographer can draw insight from an ordinary life-because they recognize that even the most exciting life is an ordinary life! After all, a biography isn''t supposed to be a collection of facts assembled in chronological order; it''s the biographer''s interpretation of how that life was different and important.', '', '1', 'N', '{$sitePassEnc}', '{$siteTgl}')")))
 			$ret .= "<font color='red'><i><b>Error</b>:</i> ".mysqli_error($vLink)."</font>";
@@ -887,6 +945,33 @@ function CheckSQLParams() {
 		return printInstallError($confDB['db'] . ': ' . mysqli_error($vLink));
 
 	mysqli_close($vLink);
+}
+
+function timezoneList(){
+    $timezoneIdentifiers = DateTimeZone::listIdentifiers();
+    $utcTime = new DateTime('now', new DateTimeZone('UTC'));
+    $tempTimezones = array();
+    foreach($timezoneIdentifiers as $timezoneIdentifier){
+        $currentTimezone = new DateTimeZone($timezoneIdentifier);
+        $tempTimezones[] = array(
+            'offset' => (int)$currentTimezone->getOffset($utcTime),
+            'identifier' => $timezoneIdentifier
+        );
+    }
+    function sort_list($a, $b){
+        return ($a['offset'] == $b['offset']) 
+            ? strcmp($a['identifier'], $b['identifier'])
+            : $a['offset'] - $b['offset'];
+    }
+    usort($tempTimezones, "sort_list");
+    $timezoneList = array();
+    foreach($tempTimezones as $tz){
+        $sign = ($tz['offset'] > 0) ? '+' : '-';
+        $offset = gmdate('H:i', abs($tz['offset']));
+        $timezoneList[$tz['identifier']] = '(UTC ' . $sign . $offset . ') ' .
+            $tz['identifier'];
+    }
+    return $timezoneList;
 }
 
 ?>

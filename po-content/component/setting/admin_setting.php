@@ -4,7 +4,7 @@
  * - PopojiCMS Admin File
  *
  * - File : admin_setting.php
- * - Version : 1.0
+ * - Version : 1.1
  * - Author : Jenuar Dalapang
  * - License : MIT License
  *
@@ -350,6 +350,18 @@ class Setting extends PoCore
 											<?=$this->pohtml->formEnd();?>
 										</td>
 									</tr>
+									<tr>
+										<td style="width:265px;"><?=$GLOBALS['_']['setting_post_permalink'];?></td>
+										<td class="link-setting">
+											<a href="javascript:void(0)" id="permalink" data-type="select" data-pk="29" data-url="route.php?mod=setting&act=edit" data-value="<?=(!empty($settings[28]['value']) ? $settings[28]['value'] : 'slug/post-title');?>" title="<?=$GLOBALS['_']['setting_edit_tooltip'];?>"><?=(!empty($settings[28]['value']) ? $settings[28]['value'] : 'slug/post-title');?></a>
+										</td>
+									</tr>
+									<tr>
+										<td style="width:265px;"><?=$GLOBALS['_']['setting_slug_permalink'];?></td>
+										<td class="link-setting">
+											<a href="javascript:void(0)" id="slug_permalink" data-type="text" data-pk="30" data-url="route.php?mod=setting&act=edit" title="<?=$GLOBALS['_']['setting_edit_tooltip'];?>"><?=(!empty($settings[29]['value']) ? $settings[29]['value'] : 'detailpost');?></a>
+										</td>
+									</tr>
 								</table>
 							</div><hr style="margin:0;" />
 							<div class="row" style="padding:10px;">
@@ -552,13 +564,78 @@ class Setting extends PoCore
 			exit;
 		}
 		if (!empty($_POST)) {
-			$setting = array(
-				'value' => $this->postring->valid($_POST['value'], 'xss')
-			);
-			$query_setting = $this->podb->update('setting')
-				->set($setting)
-				->where('id_setting', $this->postring->valid($_POST['pk'], 'sql'));
-			$query_setting->execute();
+			if ($_POST['pk'] == '16') {
+				$last_timezone = $this->podb->from('setting')->where('id_setting', '16')->limit(1)->fetch();
+				$file_path = "../".DIR_INC."/core/config.php";
+				$insert_marker = $last_timezone['value'];
+				$text = $this->postring->valid($_POST['value'], 'xss');
+				$num_bytes = $this->insert_into_file($file_path, $insert_marker, $text, 'replace');
+			}
+			if ($_POST['pk'] == '29') {
+				$ifsetting = $this->podb->from('setting')->where('id_setting', '29')->limit(1)->fetch();
+				if (!empty($ifsetting)) {
+					$setting = array(
+						'value' => $this->postring->valid($_POST['value'], 'xss')
+					);
+					$query_setting = $this->podb->update('setting')
+						->set($setting)
+						->where('id_setting', '29');
+					$query_setting->execute();
+					$file_path = "../".DIR_INC."/core/config.php";
+					$insert_marker = $ifsetting['value'];
+					$text = $this->postring->valid($_POST['value'], 'xss');
+					$num_bytes = $this->insert_into_file($file_path, $insert_marker, $text, 'replace');
+				} else {
+					$setting = array(
+						'id_setting' => '29',
+						'groups' => 'config',
+						'options' => 'permalink',
+						'value' => $this->postring->valid($_POST['value'], 'xss')
+					);
+					$query_setting = $this->podb->insertInto('setting')->values($setting);
+					$query_setting->execute();
+					$file_path = "../".DIR_INC."/core/config.php";
+					$insert_marker = 'slug/post-title';
+					$text = $this->postring->valid($_POST['value'], 'xss');
+					$num_bytes = $this->insert_into_file($file_path, $insert_marker, $text, 'replace');
+				}
+			} elseif ($_POST['pk'] == '30') {
+				$ifsetting = $this->podb->from('setting')->where('id_setting', '30')->limit(1)->fetch();
+				if (!empty($ifsetting)) {
+					$setting = array(
+						'value' => $this->postring->valid($_POST['value'], 'xss')
+					);
+					$query_setting = $this->podb->update('setting')
+						->set($setting)
+						->where('id_setting', '30');
+					$query_setting->execute();
+					$file_path = "../".DIR_INC."/core/config.php";
+					$insert_marker = $ifsetting['value'];
+					$text = $this->postring->valid($_POST['value'], 'xss');
+					$num_bytes = $this->insert_into_file($file_path, $insert_marker, $text, 'replace');
+				} else {
+					$setting = array(
+						'id_setting' => '30',
+						'groups' => 'config',
+						'options' => 'slug_permalink',
+						'value' => $this->postring->valid($_POST['value'], 'xss')
+					);
+					$query_setting = $this->podb->insertInto('setting')->values($setting);
+					$query_setting->execute();
+					$file_path = "../".DIR_INC."/core/config.php";
+					$insert_marker = 'detailpost';
+					$text = $this->postring->valid($_POST['value'], 'xss');
+					$num_bytes = $this->insert_into_file($file_path, $insert_marker, $text, 'replace');
+				}
+			} else {
+				$setting = array(
+					'value' => $this->postring->valid($_POST['value'], 'xss')
+				);
+				$query_setting = $this->podb->update('setting')
+					->set($setting)
+					->where('id_setting', $this->postring->valid($_POST['pk'], 'sql'));
+				$query_setting->execute();
+			}
 		}
 	}
 
@@ -963,7 +1040,9 @@ class Setting extends PoCore
 			}
 			$dataposts = $this->podb->from('post')->where('active', 'Y')->fetchAll();
 			foreach($dataposts as $dataposts){
-				$sitemap->addItem('/detailpost/'.$dataposts['seotitle'], $priority, $changefreq, $dataposts['date']);
+				$permalink = $this->postring->permalink(rtrim(WEB_URL, '/'), $dataposts);
+				$permalink = str_replace(WEB_URL, '' ,$permalink);
+				$sitemap->addItem($permalink, $priority, $changefreq, $dataposts['date']);
 			}
 			$sitemap->createSitemapIndex($this->posetting[1]['value'], 'Today');
 			$this->poflash->success($GLOBALS['_']['setting_sitemap_message'], 'admin.php?mod=setting#config');
@@ -1028,6 +1107,28 @@ class Setting extends PoCore
 			$timezoneList[$key]['text'] = '(UTC ' . $sign . $offset . ') ' . $tz['identifier'];
 		}
 		echo json_encode($timezoneList);
+	}
+
+	/**
+	 * Insert arbitrary text into any place inside a text file
+	 *
+	 * @param string $file_path - absolute path to the file
+	 * @param string $insert_marker - a marker inside the file to look for as a pattern match
+	 * @param string $text - text to be inserted
+	 * @param boolean $after - whether to insert text after (true) or before (false) the marker. By default, the text is inserted after the marker.
+	 * @return integer - the number of bytes written to the file
+	 * Added in v.2.0.1
+	*/
+	public function insert_into_file($file_path, $insert_marker, $text, $action) {
+		$contents = file_get_contents($file_path);
+		if ($action == 'after') {
+			$new_contents = preg_replace($insert_marker, '$0'.$text, $contents);
+		} elseif ($action == 'before') {
+			$new_contents = preg_replace($insert_marker, $text.'$0', $contents);
+		} else {
+			$new_contents = str_replace('"'.$insert_marker.'"', '"'.$text.'"', $contents);
+		}
+		return file_put_contents($file_path, $new_contents);
 	}
 
 }

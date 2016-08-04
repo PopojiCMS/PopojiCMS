@@ -4,7 +4,7 @@
  * - PopojiCMS Front End File
  *
  * - File : category.php
- * - Version : 1.0
+ * - Version : 1.1
  * - Author : Jenuar Dalapang
  * - License : MIT License
  *
@@ -41,13 +41,13 @@ $router->match('GET|POST', '/category/([a-z0-9_-]+)', function($seotitle) use ($
 	}
 	if ($category) {
 		$info = array(
-			'page_title' => $category['title'],
+			'page_title' => htmlspecialchars_decode($category['title']),
 			'page_desc' => $category['title'].' - '.$core->posetting[2]['value'],
 			'page_key' => $category['title'],
 			'social_mod' => $lang['front_category_title'],
 			'social_name' => $core->posetting[0]['value'],
 			'social_url' => $core->posetting[1]['value'].'/category/'.$category['seotitle'],
-			'social_title' => $category['title'],
+			'social_title' => htmlspecialchars_decode($category['title']),
 			'social_desc' => $category['title'].' - '.$core->posetting[2]['value'],
 			'social_img' => $core->posetting[1]['value'].'/'.DIR_CON.'/uploads/'.$category['picture'],
 			'page' => '1'
@@ -105,13 +105,13 @@ $router->match('GET|POST', '/category/([a-z0-9_-]+)/page/(\d+)', function($seoti
 	}
 	if ($category) {
 		$info = array(
-			'page_title' => $category['title'],
+			'page_title' => htmlspecialchars_decode($category['title']),
 			'page_desc' => $category['title'].' - '.$core->posetting[2]['value'],
 			'page_key' => $category['title'],
 			'social_mod' => $lang['front_category_title'],
 			'social_name' => $core->posetting[0]['value'],
 			'social_url' => $core->posetting[1]['value'].'/category/'.$category['seotitle'],
-			'social_title' => $category['title'],
+			'social_title' => htmlspecialchars_decode($category['title']),
 			'social_desc' => $category['title'].' - '.$core->posetting[2]['value'],
 			'social_img' => $core->posetting[1]['value'].'/'.DIR_CON.'/uploads/'.$category['picture'],
 			'page' => $page

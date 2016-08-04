@@ -3,7 +3,7 @@
  * - PopojiCMS Javascript
  *
  * - File : admin_javascript.js
- * - Version : 1.0
+ * - Version : 1.1
  * - Author : Jenuar Dalapang
  * - License : MIT License
  *
@@ -192,7 +192,7 @@ $(document).ready(function() {
 	});
 
 	$('#publishtime').datetimepicker({
-		format: 'hh:mm:ss'
+		format: 'HH:mm:ss'
 	});
 
 	$("#publishdate").mask("9999/99/99");

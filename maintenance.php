@@ -6,11 +6,17 @@ session_start();
  * Call main library
  *
 */
-require_once 'vqmod/vqmod.php';
-VQMod::bootup();
+include_once 'po-includes/core/config.php';
 
-include_once "po-includes/core/core.php";
-$core = new PoCore();
+if (VQMOD == TRUE) {
+	require_once 'vqmod/vqmod.php';
+	VQMod::bootup();
+	include_once VQMod::modCheck('po-includes/core/core.php');
+	$core = new PoCore();
+} else {
+	include_once 'po-includes/core/core.php';
+	$core = new PoCore();
+}
 
 /**
  * Alihkan ke index.php jika mode pemeliharaan tidak aktif

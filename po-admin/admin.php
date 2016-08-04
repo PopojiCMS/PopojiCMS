@@ -1,8 +1,13 @@
 <?php
 session_start();
-require_once '../vqmod/vqmod.php';
-VQMod::bootup();
-include_once "../po-includes/core/core.php";
+include_once '../po-includes/core/config.php';
+if (VQMOD == TRUE) {
+	require_once '../vqmod/vqmod.php';
+	VQMod::bootup();
+	include_once VQMod::modCheck('../po-includes/core/core.php');
+} else {
+	include_once '../po-includes/core/core.php';
+}
 if ($_SESSION['login'] == 0) {
 	session_destroy();
 	header('location:index.php');
@@ -15,7 +20,11 @@ if ($_SESSION['login'] == 0) {
 			$_SESSION['login'] = 0;
 		}
 		$selectlang = (isset($_COOKIE['lang']) ? $_COOKIE['lang'] : 'id');
-		include_once VQMod::modCheck("../".DIR_CON."/lang/main/".$selectlang.".php");
+		if (VQMOD == TRUE) {
+			include_once VQMod::modCheck("../".DIR_CON."/lang/main/".$selectlang.".php");
+		} else {
+			include_once "../".DIR_CON."/lang/main/".$selectlang.".php";
+		}
 		if(isset($_POST['language'])) {
 			setcookie('lang', $_POST['language'], 1719241200, '/');
 			$langcore = new PoCore();
@@ -155,7 +164,11 @@ if ($_SESSION['login'] == 0) {
 					<?php
 						$alertflash = new PoCore();
 						$alertflash->poflash->display();
-						include_once VQMod::modCheck("route.php");
+						if (VQMOD == TRUE) {
+							include_once VQMod::modCheck("route.php");
+						} else {
+							include_once "route.php";
+						}
 					?>
 				</div>
 			</div>

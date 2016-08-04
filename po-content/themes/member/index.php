@@ -41,7 +41,12 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
 </head>
-<body class="stretched no-transition">
+<?php if (empty($_SESSION['namauser_member']) AND empty($_SESSION['passuser_member']) AND empty($_SESSION['login_member'])) {
+	$bodycolor = "background-color: #f5f5f5;";
+} else {
+	$bodycolor = "";
+} ?>
+<body class="stretched no-transition" style="<?=$bodycolor;?>">
 	<div id="wrapper" class="clearfix">
 		<!-- Insert Header -->
 		<?php if (empty($_SESSION['namauser_member']) AND empty($_SESSION['passuser_member']) AND empty($_SESSION['login_member'])) { ?>

@@ -4,7 +4,7 @@
  * - PopojiCMS Front End File
  *
  * - File : index.php
- * - Version : 1.0
+ * - Version : 1.1
  * - Author : Jenuar Dalapang
  * - License : MIT License
  *
@@ -33,31 +33,6 @@ $base_url = preg_replace("/\/(index\.php$)/", "", $base_root);
 define('BASE_URL', $base_url);
 
 /**
- * Memanggil library utama
- *
- * Call main library
- *
-*/
-require_once 'vqmod/vqmod.php';
-VQMod::bootup();
-
-/**
- * Jika terjadi error undefined variable silahkan nonaktifkan baris code ini, dengan comment '//'
- *
- * If an error occurs undefined variable please deactivate this line of code, with comment '//'
- *
-*/
-include_once VQMod::modCheck('po-includes/core/core.php');
-
-/**
- * Jika terjadi error undefined variable silahkan aktifkan baris code ini, uncomment '//'
- *
- * If an error occurs undefined variable please activate this line of code, uncomment '//'
- *
-*/
-//include_once 'po-includes/core/core.php';
-
-/**
  * Memfilter jika engine belum di install
  *
  * Filtering if engine not installed
@@ -66,6 +41,22 @@ include_once VQMod::modCheck('po-includes/core/core.php');
 if (file_exists('install.php')) {
 	header('location:'.BASE_URL.'/install.php');
 } else {
+	/**
+	 * Memanggil library utama
+	 *
+	 * Call main library
+	 *
+	*/
+	include_once 'po-includes/core/config.php';
+
+	if (VQMOD == TRUE) {
+		require_once 'vqmod/vqmod.php';
+		VQMod::bootup();
+		include_once VQMod::modCheck('po-includes/core/core.php');
+	} else {
+		include_once 'po-includes/core/core.php';
+	}
+
 	/**
 	 * Memisahkan request ke bagian admin dan ke bagian depan
 	 *
@@ -127,14 +118,31 @@ if (file_exists('install.php')) {
 		$browser_stat = $browser->getBrowser();
 		$os_stat = $browser->getUserAgent();
 		$platform_stat = $browser->getPlatform();
+		if ($core->porequest->check_internet_connection()) {
+			$ip_data = json_decode(@file_get_contents("http://www.geoplugin.net/json.gp?ip=".$ip_stat));    
+			if ($ip_data && $ip_data->geoplugin_countryName != null) {
+				$country_stat = $ip_data->geoplugin_countryCode;
+				$city_stat = $ip_data->geoplugin_city;
+			} else {
+				$country_stat = '';
+				$city_stat = '';
+			}
+		} else {
+			$country_stat = '';
+			$city_stat = '';
+		}
 
 		$statistics = $core->podb->from('traffic')
 			->where('ip', $ip_stat)
+			->where('country', $country_stat)
+			->where('city', $city_stat)
 			->where('date', $date_stat)
 			->count();
 		if ($statistics > 0) {
 			$current_statistic = $core->podb->from('traffic')
 				->where('ip', $ip_stat)
+				->where('country', $country_stat)
+				->where('city', $city_stat)
 				->where('date', $date_stat)
 				->limit(1)
 				->fetch();
@@ -145,6 +153,8 @@ if (file_exists('install.php')) {
 			$query_stat = $core->podb->update('traffic')
 				->set($data_stat)
 				->where('ip', $ip_stat)
+				->where('country', $country_stat)
+				->where('city', $city_stat)
 				->where('date', $date_stat);
 			$query_stat->execute();
 		} else {
@@ -153,6 +163,8 @@ if (file_exists('install.php')) {
 				'browser' => $browser_stat,
 				'os' => $os_stat,
 				'platform' => $platform_stat,
+				'country' => $country_stat,
+				'city' => $city_stat,
 				'date' => $date_stat,
 				'hits' => 1,
 				'online' => $time_stat
@@ -177,7 +189,11 @@ if (file_exists('install.php')) {
 		*/
 		$router->set404(function() {
 			header('HTTP/1.1 404 Not Found');
-			include_once VQMod::modCheck('404.php');
+			if (VQMOD == TRUE) {
+				include_once VQMod::modCheck('404.php');
+			} else {
+				include_once '404.php';
+			}
 		});
 
 		/**
@@ -207,7 +223,11 @@ if (file_exists('install.php')) {
 		foreach($components as $component) {
 			if ($component != 'index.html') {
 				if (file_exists(DIR_CON.'/component/'.$component.'/'.$component.'.php')) {
-					include_once VQMod::modCheck(DIR_CON.'/component/'.$component.'/'.$component.'.php');
+					if (VQMOD == TRUE) {
+						include_once VQMod::modCheck(DIR_CON.'/component/'.$component.'/'.$component.'.php');
+					} else {
+						include_once DIR_CON.'/component/'.$component.'/'.$component.'.php';
+					}
 				}
 			}
 		}
@@ -223,7 +243,11 @@ if (file_exists('install.php')) {
 		foreach($widgets as $widget) {
 			if ($widget != 'index.html') {
 				if (file_exists(DIR_CON.'/widget/'.$widget.'/'.$widget.'.php')) {
-					include_once VQMod::modCheck(DIR_CON.'/widget/'.$widget.'/'.$widget.'.php');
+					if (VQMOD == TRUE) {
+						include_once VQMod::modCheck(DIR_CON.'/widget/'.$widget.'/'.$widget.'.php');
+					} else {
+						include_once DIR_CON.'/widget/'.$widget.'/'.$widget.'.php';
+					}
 					$widget_name = ucfirst($widget);
 					$templates->loadExtension(new $widget_name());
 				}

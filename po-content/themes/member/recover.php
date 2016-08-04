@@ -3,7 +3,7 @@
 <div class="container-fluid">
 	<div class="container login-page">
 		<div class="row">
-			<div class="col-md-6 col-md-offset-3">
+			<div class="col-md-12">
 			<?php if ($this->e($alertmsg) == '1') { ?>
 				<div class="alert alert-success alert-dismissable">
 					<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
@@ -12,7 +12,7 @@
 				</div>
 				<div class="row">
 					<div class="col-md-12">
-						<a href="<?=BASE_URL;?>/member/login" class="btn btn-info btn-block"><i class="fa fa-user"></i>&nbsp;&nbsp;<?=$this->e($front_member_login);?></a>
+						<a href="<?=BASE_URL;?>/member/login" class="btn no-bg btn-block"><i class="fa fa-user"></i>&nbsp;&nbsp;<?=$this->e($front_member_login);?></a>
 					</div>
 				</div>
 			<?php } else { ?>
@@ -23,7 +23,7 @@
 				</div>
 				<div class="row">
 					<div class="col-md-12">
-						<a href="<?=BASE_URL;?>/member/login" class="btn btn-info btn-block"><i class="fa fa-user"></i>&nbsp;&nbsp;<?=$this->e($front_member_login);?></a>
+						<a href="<?=BASE_URL;?>/member/login" class="btn no-bg btn-block"><i class="fa fa-user"></i>&nbsp;&nbsp;<?=$this->e($front_member_login);?></a>
 					</div>
 				</div>
 			<?php } ?>

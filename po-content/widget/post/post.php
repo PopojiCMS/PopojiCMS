@@ -4,7 +4,7 @@
  * - PopojiCMS Widget File
  *
  * - File : post.php
- * - Version : 1.0
+ * - Version : 1.1
  * - Author : Jenuar Dalapang
  * - License : MIT License
  *
@@ -76,7 +76,7 @@ class Post implements ExtensionInterface
 	*/
 	public function getPost($limit, $order, $lang)
     {
-		$popular = $this->core->podb->from('post')
+		$post = $this->core->podb->from('post')
 			->select(array('post_description.title', 'post_description.content'))
 			->leftJoin('post_description ON post_description.id_post = post.id_post')
 			->where('post_description.id_language', $lang)
@@ -85,7 +85,7 @@ class Post implements ExtensionInterface
 			->orderBy('post.id_post '.$order.'')
 			->limit($limit)
 			->fetchAll();
-        return $popular;
+        return $post;
     }
 
 	/**
@@ -158,6 +158,39 @@ class Post implements ExtensionInterface
 			->limit($limit)
 			->fetchAll();
         return $popular;
+    }
+
+	/**
+	 * Fungsi ini digunakan untuk mengambil daftar post populer pada kategori.
+	 *
+	 * This function use to get list of popular post in category.
+	 *
+	 * $category = integer
+	 * $limit = integer
+	 * $order = string ASC or DESC
+	 * $lang = WEB_LANG_ID
+	 *
+	 * Add in v.2.0.1
+	*/
+    public function getPopularInCategory($category, $limit, $order, $lang)
+    {
+		$post = array();
+		$categorys = $this->core->podb->from('post_category')
+			->where('id_category', $this->getCategoryParentTree($category))
+			->orderBy('id_post_category DESC')
+			->fetchAll();
+		foreach($categorys as $cat){
+			$if_post = $this->getPostById($cat['id_post'], $lang);
+			if (!empty($if_post['active'])) {
+				$post[] = $this->getPostById($cat['id_post'], $lang);
+			}
+		}
+		if ($order == 'ASC' || $order == 'asc') {
+			$popular = $this->arrayOrderBy($post, 'hits', SORT_ASC);
+		} else {
+			$popular = $this->arrayOrderBy($post, 'hits', SORT_DESC);
+		}
+        return array_slice($popular,0,$limit);
     }
 
 	/**
@@ -401,7 +434,9 @@ class Post implements ExtensionInterface
     {
 		$totaldata = $this->core->podb->from('comment')->where('id_post', $id_post)->where('id_parent', '0')->where('active', 'Y')->count();
 		$totalpage = $this->core->popaging->totalPage($totaldata, $limit);
-		$pagination = $this->core->popaging->navPage($page, $totalpage, BASE_URL, 'detailpost/'.$seotitle, 'page', $type, $prev, $next);
+		$postdata = $this->getPostById($id_post, WEB_LANG_ID);
+		$permalink = $this->core->postring->permalink(rtrim(BASE_URL, '/'), $postdata);
+		$pagination = $this->core->popaging->navPage($page, $totalpage, BASE_URL, str_replace(BASE_URL, '' ,$permalink), 'page', $type, $prev, $next);
 		return $pagination;
 	}
 
@@ -431,7 +466,7 @@ class Post implements ExtensionInterface
 	public function getAuthor($id_user)
     {
 		$author = $this->core->podb->from('users')
-			->select(array('nama_lengkap', 'email', 'no_telp', 'bio', 'picture'))
+			->select(array('username', 'nama_lengkap', 'email', 'no_telp', 'bio', 'picture'))
 			->where('id_user', $id_user)
 			->limit(1)
 			->fetch();
@@ -759,6 +794,65 @@ class Post implements ExtensionInterface
 			->fetchAll();
         return $post_gallery;
     }
+
+	/**
+	 * Fungsi ini digunakan untuk mengambil daftar post dari editor.
+	 *
+	 * This function use to get list of post from editor.
+	 *
+	 * $editor = editor
+	 * $limit = integer
+	 * $order = string ASC or DESC
+	 * $page = integer from get active page
+	 * $lang = WEB_LANG_ID
+	 *
+	 * Added in v.2.0.1
+	*/
+	public function getPostFromEditor($editor, $limit, $order, $page, $lang)
+    {
+		$post = $this->core->podb->from('post')
+			->select(array('post_description.title', 'post_description.content'))
+			->leftJoin('post_description ON post_description.id_post = post.id_post')
+			->where('post_description.id_language', $lang)
+			->where('post.active', 'Y')
+			->where('post.editor', $editor)
+			->where('post.publishdate < ?', date('Y-m-d H:i:s'))
+			->orderBy('post.id_post '.$order.'')
+			->limit($limit)
+			->fetchAll();
+        return $post;
+    }
+
+	/**
+	 * Fungsi ini digunakan untuk membuat nomor halaman pada halaman profile
+	 *
+	 * This function use to create pagination in profile page.
+	 *
+	 * $editor = editor
+	 * $username = username
+	 * $limit = integer
+	 * $page = integer from get active page
+	 * $lang = WEB_LANG_ID
+	 * $type = 0 or 1
+	 * $prev = string previous text
+	 * $next = string next text
+	 *
+	 * Added in v.2.0.1
+	*/
+	public function getPostFromEditorPaging($editor, $username, $limit, $page, $lang, $type, $prev, $next)
+    {
+		$totaldata = $this->core->podb->from('post')
+			->select(array('post_description.title', 'post_description.content'))
+			->leftJoin('post_description ON post_description.id_post = post.id_post')
+			->where('post_description.id_language', $lang)
+			->where('post.active', 'Y')
+			->where('post.editor', $editor)
+			->where('post.publishdate < ?', date('Y-m-d H:i:s'))
+			->count();
+		$totalpage = $this->core->popaging->totalPage($totaldata, $limit);
+		$pagination = $this->core->popaging->navPage($page, $totalpage, BASE_URL, 'member/profile/'.$username, 'page', $type, $prev, $next);
+		return $pagination;
+	}
 
 	/**
 	 * Fungsi ini digunakan untuk menggenerate checkbox kategori.

@@ -4,7 +4,7 @@
  * - PopojiCMS Admin File
  *
  * - File : admin_pages.php
- * - Version : 1.0
+ * - Version : 1.1
  * - Author : Jenuar Dalapang
  * - License : MIT License
  *
@@ -116,7 +116,7 @@ class Pages extends PoCore
 			array('db' => 'p.'.$primarykey, 'dt' => '1', 'field' => $primarykey),
 			array('db' => 'pd.title', 'dt' => '2', 'field' => 'title',
 				'formatter' => function($d, $row, $i){
-					return "".$d."<br /><i><a href='".WEB_URL."pages/".$this->postring->seo_title($d)."' target='_blank'>".WEB_URL."pages/".$this->postring->seo_title($d)."</a></i>";
+					return "".$d."<br /><i><a href='".WEB_URL."pages/".$row['seotitle']."' target='_blank'>".WEB_URL."pages/".$row['seotitle']."</a></i>";
 				}
 			),
 			array('db' => 'p.active', 'dt' => '3', 'field' => 'active'),
@@ -129,7 +129,8 @@ class Pages extends PoCore
 						</div>\n
 					</div>\n";
 				}
-			)
+			),
+			array('db' => 'p.seotitle', 'dt' => '', 'field' => 'seotitle')
 		);
 		$joinquery = "FROM pages AS p JOIN pages_description AS pd ON (pd.id_pages = p.id_pages)";
 		$extrawhere = "pd.id_language = '1'";

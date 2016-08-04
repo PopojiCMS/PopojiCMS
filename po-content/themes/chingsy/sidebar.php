@@ -59,11 +59,11 @@
 					?>
 						<div class="spost clearfix">
 							<div class="entry-image">
-								<a href="<?=BASE_URL;?>/detailpost/<?=$popular_side['seotitle'];?>" class="nobg"><img class="img-circle" src="<?=BASE_URL;?>/<?=DIR_CON;?>/thumbs/<?=$popular_side['picture'];?>" alt=""></a>
+								<a href="<?=$this->pocore()->call->postring->permalink(rtrim(BASE_URL, '/'), $popular_side);?>" class="nobg"><img class="img-circle" src="<?=BASE_URL;?>/<?=DIR_CON;?>/thumbs/<?=$popular_side['picture'];?>" alt=""></a>
 							</div>
 							<div class="entry-c">
 								<div class="entry-title">
-									<h4><a href="<?=BASE_URL;?>/detailpost/<?=$popular_side['seotitle'];?>"><?=$popular_side['title'];?></a></h4>
+									<h4><a href="<?=$this->pocore()->call->postring->permalink(rtrim(BASE_URL, '/'), $popular_side);?>"><?=$popular_side['title'];?></a></h4>
 								</div>
 								<ul class="entry-meta">
 									<li><i class="icon-comments-alt"></i> <?=$this->post()->getCountComment($popular_side['id_post']);?> <?=$this->e($front_comment);?></li>
@@ -82,11 +82,11 @@
 					?>
 						<div class="spost clearfix">
 							<div class="entry-image">
-								<a href="<?=BASE_URL;?>/detailpost/<?=$recent_side['seotitle'];?>" class="nobg"><img class="img-circle" src="<?=BASE_URL;?>/<?=DIR_CON;?>/thumbs/<?=$recent_side['picture'];?>" alt=""></a>
+								<a href="<?=$this->pocore()->call->postring->permalink(rtrim(BASE_URL, '/'), $recent_side);?>" class="nobg"><img class="img-circle" src="<?=BASE_URL;?>/<?=DIR_CON;?>/thumbs/<?=$recent_side['picture'];?>" alt=""></a>
 							</div>
 							<div class="entry-c">
 								<div class="entry-title">
-									<h4><a href="<?=BASE_URL;?>/detailpost/<?=$recent_side['seotitle'];?>"><?=$recent_side['title'];?></a></h4>
+									<h4><a href="<?=$this->pocore()->call->postring->permalink(rtrim(BASE_URL, '/'), $recent_side);?>"><?=$recent_side['title'];?></a></h4>
 								</div>
 								<ul class="entry-meta">
 									<li><?=$this->pocore()->call->podatetime->tgl_indo($recent_side['date']);?></li>
@@ -106,7 +106,7 @@
 					?>
 						<div class="spost clearfix">
 							<div class="entry-image">
-								<a href="<?=BASE_URL;?>/detailpost/<?=$comment_post['seotitle'];?>#comment" class="nobg"><img class="img-circle" src="<?=BASE_URL;?>/<?=DIR_CON;?>/uploads/medium/medium_avatar.jpg" alt=""></a>
+								<a href="<?=$this->pocore()->call->postring->permalink(rtrim(BASE_URL, '/'), $comment_post);?>#comment" class="nobg"><img class="img-circle" src="<?=BASE_URL;?>/<?=DIR_CON;?>/uploads/medium/medium_avatar.jpg" alt=""></a>
 							</div>
 							<div class="entry-c">
 								<strong><?=$comment_side['name'];?>:</strong> <?=$this->pocore()->call->postring->cuthighlight('post', $comment_side['comment'], '80');?>...

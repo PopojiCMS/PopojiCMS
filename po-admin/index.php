@@ -1,8 +1,13 @@
 <?php
 session_start();
-require_once '../vqmod/vqmod.php';
-VQMod::bootup();
-include_once "../po-includes/core/core.php";
+include_once '../po-includes/core/config.php';
+if (VQMOD == TRUE) {
+	require_once '../vqmod/vqmod.php';
+	VQMod::bootup();
+	include_once VQMod::modCheck('../po-includes/core/core.php');
+} else {
+	include_once '../po-includes/core/core.php';
+}
 if (empty($_SESSION['namauser']) AND empty($_SESSION['passuser']) AND empty($_SESSION['login'])) {
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -53,7 +58,11 @@ if (empty($_SESSION['namauser']) AND empty($_SESSION['passuser']) AND empty($_SE
 							<img src="../<?=DIR_INC;?>/images/logo.png" class="logo" width="100" />
 						</div>
 						<?php
-							include_once VQMod::modCheck("route.php");
+							if (VQMOD == TRUE) {
+								include_once VQMod::modCheck("route.php");
+							} else {
+								include_once "route.php";
+							}
 						?>
 						<div class="col-md-12 text-center" id="footer">
 							<p><?=CONF_STRUCTURE;?> &copy; 2013-2016. MIT License</p>

@@ -4,7 +4,7 @@
  * - PopojiCMS Core
  *
  * - File : string.php
- * - Version : 1.0
+ * - Version : 1.1
  * - Author : Jenuar Dalapang
  * - License : MIT License
  *
@@ -20,6 +20,8 @@
  * echo $string->seo_title("Example SEO Title");
  *
 */
+
+require_once dirname(__FILE__)."/config.php";
 
 class PoString
 {
@@ -177,6 +179,50 @@ class PoString
 			return false;
 		} else {
 			return true;
+		}
+	}
+
+	/**
+	 * Fungsi ini digunakan untuk membuat permalink post
+	 *
+	 * This function use for create permalink post
+	 *
+	 * $base_url = string
+	 * $post = array of post
+	 *
+	 * Added in v.2.0.1
+	*/
+	public function permalink($base_url, $post = array())
+	{
+		$link = '';
+		if (empty($post)){
+			$link = $base_url;
+			return $link;
+		} else {
+			if (PERMALINK == 'slug/post-title') {
+				$link = $base_url.'/'.SLUG_PERMALINK.'/'.$post['seotitle'];
+				return $link;
+			} elseif (PERMALINK == 'yyyy/mm/dd/post-title') {
+				$yyyy = substr($post['date'],0,4);
+				$mm = substr($post['date'],5,2);
+				$dd = substr($post['date'],8,2);
+				$link = $base_url.'/'.$yyyy.'/'.$mm.'/'.$dd.'/'.$post['seotitle'];
+				return $link;
+			} elseif (PERMALINK == 'yyyy/mm/post-title') {
+				$yyyy = substr($post['date'],0,4);
+				$mm = substr($post['date'],5,2);
+				$link = $base_url.'/'.$yyyy.'/'.$mm.'/'.$post['seotitle'];
+				return $link;
+			} elseif (PERMALINK == 'archives/post-id') {
+				$link = $base_url.'/archives/'.$post['id_post'];
+				return $link;
+			} elseif (PERMALINK == 'post-id-post-title') {
+				$link = $base_url.'/'.$post['id_post'].'-'.$post['seotitle'];
+				return $link;
+			} else {
+				$link = $base_url.'/'.$post['seotitle'];
+				return $link;
+			}
 		}
 	}
 

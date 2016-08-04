@@ -20,7 +20,7 @@
 
 						<ul class="entry-meta clearfix">
 							<li><i class="icon-calendar3"></i> <?=$this->pocore()->call->podatetime->tgl_indo($post['date']);?></li>
-							<li><a href="javascript:void(0)"><i class="icon-user"></i> <?=$this->post()->getAuthorName($post['editor']);?></a></li>
+							<li><a href="<?=BASE_URL;?>/member/profile/<?=$this->post()->getAuthor($post['editor'])['username'];?>" target="_blank"><i class="icon-user"></i> <?=$this->post()->getAuthorName($post['editor']);?></a></li>
 							<li><i class="icon-folder-open"></i> <?=$this->post()->getPostTag($post['tag']);?></li>
 							<li><i class="icon-eye"></i> <?=$post['hits'];?> <?=$this->e($front_hits);?></li>
 							<li><a href="#comments"><i class="icon-comments"></i> <?=$this->post()->getCountComment($post['id_post']);?> <?=$this->e($front_comment);?></a></li>
@@ -47,7 +47,7 @@
 							$prevpost = $this->post()->getPrevPost($post['id_post'], WEB_LANG_ID);
 							if ($prevpost) {
 						?>
-							<a href="<?=BASE_URL;?>/detailpost/<?=$prevpost['seotitle'];?>">&lArr; <?=$prevpost['title'];?></a>
+							<a href="<?=$this->pocore()->call->postring->permalink(rtrim(BASE_URL, '/'), $prevpost);?>">&lArr; <?=$prevpost['title'];?></a>
 						<?php } ?>
 						</div>
 
@@ -56,7 +56,7 @@
 							$nextpost = $this->post()->getNextPost($post['id_post'], WEB_LANG_ID);
 							if ($nextpost) {
 						?>
-							<a href="<?=BASE_URL;?>/detailpost/<?=$nextpost['seotitle'];?>"><?=$nextpost['title'];?> &rArr;</a>
+							<a href="<?=$this->pocore()->call->postring->permalink(rtrim(BASE_URL, '/'), $nextpost);?>"><?=$nextpost['title'];?> &rArr;</a>
 						<?php } ?>
 						</div>
 					</div>
@@ -99,15 +99,15 @@
 						<?php } ?>
 							<div class="mpost clearfix">
 								<div class="entry-image hidden-xs">
-									<a href="<?=BASE_URL;?>/detailpost/<?=$related['seotitle'];?>"><img src="<?=BASE_URL;?>/<?=DIR_CON;?>/uploads/medium/medium_<?=$related['picture'];?>" alt="<?=$related['title'];?>"></a>
+									<a href="<?=$this->pocore()->call->postring->permalink(rtrim(BASE_URL, '/'), $related);?>"><img src="<?=BASE_URL;?>/<?=DIR_CON;?>/uploads/medium/medium_<?=$related['picture'];?>" alt="<?=$related['title'];?>"></a>
 								</div>
 								<div class="entry-c">
 									<div class="entry-title">
-										<h4><a href="<?=BASE_URL;?>/detailpost/<?=$related['seotitle'];?>"><?=$this->pocore()->call->postring->cuthighlight('title', $related['title'], '30');?>...</a></h4>
+										<h4><a href="<?=$this->pocore()->call->postring->permalink(rtrim(BASE_URL, '/'), $related);?>"><?=$this->pocore()->call->postring->cuthighlight('title', $related['title'], '30');?>...</a></h4>
 									</div>
 									<ul class="entry-meta clearfix">
 										<li><i class="icon-calendar3"></i> <?=$this->pocore()->call->podatetime->tgl_indo($related['date']);?></li>
-										<li><a href="<?=BASE_URL;?>/detailpost/<?=$related['seotitle'];?>#comments"><i class="icon-comments"></i> <?=$this->post()->getCountComment($related['id_post']);?></a></li>
+										<li><a href="<?=$this->pocore()->call->postring->permalink(rtrim(BASE_URL, '/'), $related);?>#comments"><i class="icon-comments"></i> <?=$this->post()->getCountComment($related['id_post']);?></a></li>
 									</ul>
 									<div class="entry-content"><?=$this->pocore()->call->postring->cuthighlight('post', $related['content'], '70');?>...</div>
 								</div>
@@ -175,7 +175,7 @@
 						<div id="respond" class="clearfix">
 							<h3><?=$this->e($front_leave_comment);?></h3>
 							<?=$this->pocore()->call->poflash->display();?>
-							<form class="clearfix" action="<?=BASE_URL;?>/detailpost/<?=$post['seotitle'];?>#comments" method="post" id="commentform">
+							<form class="clearfix" action="<?=$this->pocore()->call->postring->permalink(rtrim(BASE_URL, '/'), $post);?>#comments" method="post" id="commentform">
 								<input type="hidden" name="id_parent" id="id_parent" value="0" />
 								<input type="hidden" name="id" name="id" value="<?=$post['id_post'];?>" />
 								<input type="hidden" name="seotitle" id="seotitle" value="<?=$post['seotitle'];?>" />
@@ -189,7 +189,7 @@
 								</div>
 								<div class="col_one_third col_last">
 									<label for="url"><?=$this->e($comment_website);?></label>
-									<input type="text" name="url" id="url" value="<?=(isset($_POST['url']) ? $_POST['url'] : '');?>" size="22" tabindex="3" class="sm-form-control" />
+									<input type="text" name="url" id="url" value="<?=(isset($_POST['url']) ? $_POST['url'] : '');?>" size="22" tabindex="3" class="sm-form-control" placeholder="http://" />
 								</div>
 								<div class="clear"></div>
 								<div class="col_full">

@@ -3,7 +3,14 @@ session_start();
 if (empty($_SESSION['namauser']) AND empty($_SESSION['passuser']) AND $_SESSION['login'] == 0) {
 	header('location:../index.html');
 } else {
-include_once "../../core/core.php";
+// Thanks to Ramadhan Sutejo
+if (isset($_GET['path'])) {
+	$addDir = '../';
+} else {
+	$addDir = '';
+}
+
+include_once "../../".$addDir."core/core.php";
 mb_internal_encoding('UTF-8');
 
 $pocore = new PoCore();

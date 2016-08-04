@@ -4,7 +4,7 @@
  * - PopojiCMS Core Vendor
  *
  * - File : front_menu.php
- * - Version : 1.0
+ * - Version : 1.1
  * - Author : Gawibowo edited by Jenuar Dalapang
  * - License : MIT License
  *
@@ -38,10 +38,10 @@ class FrontMenu
 	 * Get menu from database, and generate html nested list
 	 *
 	 * @param int $group_id
-	 * @param string $attr, $attrs, $attrss
+	 * @param string $attr, $attrs, $attrss, $wrapper, $endwrapper
 	 * @return string
 	*/
-	public function menu($group_id, $attr = '', $attrs = '', $attrss = '', $wrapper = '<div>', $endwrapper = "</div>")
+	public function menu($group_id, $attr = '', $attrs = '', $attrss = '', $wrapper = '<div>', $endwrapper = '</div>')
 	{
 		global $_;
 		$selectlang = (isset($_COOKIE['lang']) ? $_COOKIE['lang'] : 'id');

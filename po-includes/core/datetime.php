@@ -4,7 +4,7 @@
  * - PopojiCMS Core
  *
  * - File : datetime.php
- * - Version : 1.0
+ * - Version : 1.1
  * - Author : Jenuar Dalapang
  * - License : MIT License
  *
@@ -20,6 +20,8 @@
  * echo $datetime->date_now();
  *
 */
+
+require_once dirname(__FILE__)."/config.php";
 
 class PoDateTime
 {
@@ -42,7 +44,7 @@ class PoDateTime
 
 	function __construct()
 	{
-		date_default_timezone_set('UTC');
+		date_default_timezone_set(TIMEZONE);
 		$this->week = array("Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu");
 		$this->day = date("w");
 		$this->today = $this->week[$this->day];
