@@ -217,7 +217,7 @@ class PoString
 				$link = $base_url.'/archives/'.$post['id_post'];
 				return $link;
 			} elseif (PERMALINK == 'slug-post-id-post-title') {
-				$link = $base_url.'/'.SLUG_PERMALINK.'/'.$post['id_post'].'-'.$post['seotitle'];
+				$link = $base_url.'/'.SLUG_PERMALINK.'-'.$post['id_post'].'-'.$post['seotitle'];
 				return $link;
 			} else {
 				$link = $base_url.'/'.$post['seotitle'];
