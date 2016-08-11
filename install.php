@@ -849,10 +849,10 @@ function RunSQL() {
 	$vLink = @mysqli_connect($confDB['host'], $confDB['user'], $confDB['passwd']);
 
 	if( !$vLink )
-		return printInstallError( mysqli_error() );
+		return printInstallError( mysqli_error($vLink) );
 
 	if (!mysqli_select_db ($vLink, $confDB['db']))
-		return printInstallError( $confDB['db'] . ': ' . mysqli_error() );
+		return printInstallError( $confDB['db'] . ': ' . mysqli_error($vLink) );
 
     mysqli_query ($vLink, "SET sql_mode = ''");
 
@@ -875,7 +875,7 @@ function RunSQL() {
 
 		$res = mysqli_query($vLink, $s_sql);
 		if (!$res)
-			$errorMes .= 'Error while executing: ' . $s_sql . '<br />' . mysqli_error() . '<hr />';
+			$errorMes .= 'Error while executing: ' . $s_sql . '<br />' . mysqli_error($vLink) . '<hr />';
 
 		$s_sql = '';
 	}
@@ -939,7 +939,7 @@ function CheckSQLParams() {
 	$vLink = @mysqli_connect($confDB['host'], $confDB['user'], $confDB['passwd']);
 
 	if (!$vLink)
-		return printInstallError(mysqli_error());
+		return printInstallError(mysqli_error($vLink));
 
 	if (!mysqli_select_db ($vLink, $confDB['db']))
 		return printInstallError($confDB['db'] . ': ' . mysqli_error($vLink));
