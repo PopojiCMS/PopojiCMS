@@ -4,7 +4,7 @@
  * - PopojiCMS Admin File
  *
  * - File : admin_home.php
- * - Version : 1.1
+ * - Version : 1.2
  * - Author : Jenuar Dalapang
  * - License : MIT License
  *
@@ -461,10 +461,24 @@ class Home extends PoCore
 						<div class="mini-stats">
 							<a href="javascript:void(0)"><span class="bg-danger"><i class="fa fa-users"></i></span></a>
 							<p><?=$GLOBALS['_']['home_visitors'];?></p>
-							<?php if (isset($_GET['from']) && isset($_GET['to'])) { ?>
-							<h3><?=(empty($this->podb->from('traffic')->where('date BETWEEN "'.$_GET['from'].'" AND "'.$_GET['to'].'"')->groupBy('ip')->count()) ? '0' : $this->podb->from('traffic')->where('date BETWEEN "'.$_GET['from'].'" AND "'.$_GET['to'].'"')->groupBy('ip')->count());?></h3>
-							<?php } else { ?>
-							<h3><?=(empty($this->podb->from('traffic')->where('date', date('Y-m-d'))->groupBy('ip')->fetchAll()) ? '0' : count($this->podb->from('traffic')->where('date', date('Y-m-d'))->groupBy('ip')->fetchAll()));?></h3>
+							<?php
+								if (isset($_GET['from']) && isset($_GET['to'])) {
+									if (empty($this->podb->from('traffic')->where('date BETWEEN "'.$_GET['from'].'" AND "'.$_GET['to'].'"')->groupBy('ip')->count())) {
+										$counttotalvisitor = '0';
+									} else {
+										$counttotalvisitor = $this->podb->from('traffic')->where('date BETWEEN "'.$_GET['from'].'" AND "'.$_GET['to'].'"')->groupBy('ip')->count();
+									}
+							?>
+								<h3><?=$counttotalvisitor;?></h3>
+							<?php
+								} else {
+									if (empty($this->podb->from('traffic')->where('date', date('Y-m-d'))->groupBy('ip')->fetchAll())) {
+										$counttotalvisitor = '0';
+									} else {
+										$counttotalvisitor = count($this->podb->from('traffic')->where('date', date('Y-m-d'))->groupBy('ip')->fetchAll());
+									}
+							?>
+								<h3><?=$counttotalvisitor;?></h3>
 							<?php } ?>
 						</div>
 					</div>
@@ -474,10 +488,24 @@ class Home extends PoCore
 						<div class="mini-stats">
 							<a href="javascript:void(0)"><span class="bg-warning"><i class="fa fa-heart"></i></span></a>
 							<p><?=$GLOBALS['_']['home_hits'];?></p>
-							<?php if (isset($_GET['from']) && isset($_GET['to'])) { ?>
-							<h3><?=(empty($this->podb->from('traffic')->select('SUM(hits) as hitstoday')->where('date BETWEEN "'.$_GET['from'].'" AND "'.$_GET['to'].'"')->fetch()['hitstoday']) ? '0' : $this->podb->from('traffic')->select('SUM(hits) as hitstoday')->where('date BETWEEN "'.$_GET['from'].'" AND "'.$_GET['to'].'"')->fetch()['hitstoday']);?></h3>
-							<?php } else { ?>
-							<h3><?=(empty($this->podb->from('traffic')->select('SUM(hits) as hitstoday')->where('date', date('Y-m-d'))->fetch()['hitstoday']) ? '0' : $this->podb->from('traffic')->select('SUM(hits) as hitstoday')->where('date', date('Y-m-d'))->fetch()['hitstoday']);?></h3>
+							<?php
+								if (isset($_GET['from']) && isset($_GET['to'])) {
+									if (empty($this->podb->from('traffic')->select('SUM(hits) as hitstoday')->where('date BETWEEN "'.$_GET['from'].'" AND "'.$_GET['to'].'"')->fetch()['hitstoday'])) {
+										$counttotalhits = '0';
+									} else {
+										$counttotalhits = $this->podb->from('traffic')->select('SUM(hits) as hitstoday')->where('date BETWEEN "'.$_GET['from'].'" AND "'.$_GET['to'].'"')->fetch()['hitstoday'];
+									}
+							?>
+								<h3><?=$counttotalhits;?></h3>
+							<?php
+								} else {
+									if (empty($this->podb->from('traffic')->select('SUM(hits) as hitstoday')->where('date', date('Y-m-d'))->fetch()['hitstoday'])) {
+										$counttotalhits = '0';
+									} else {
+										$counttotalhits = $this->podb->from('traffic')->select('SUM(hits) as hitstoday')->where('date', date('Y-m-d'))->fetch()['hitstoday'];
+									}
+							?>
+								<h3><?=$counttotalhits;?></h3>
 							<?php } ?>
 						</div>
 					</div>
