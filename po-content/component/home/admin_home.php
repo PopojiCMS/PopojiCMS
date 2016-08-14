@@ -463,7 +463,8 @@ class Home extends PoCore
 							<p><?=$GLOBALS['_']['home_visitors'];?></p>
 							<?php
 								if (isset($_GET['from']) && isset($_GET['to'])) {
-									if (empty($this->podb->from('traffic')->where('date BETWEEN "'.$_GET['from'].'" AND "'.$_GET['to'].'"')->groupBy('ip')->count())) {
+									$condvisitor = $this->podb->from('traffic')->where('date BETWEEN "'.$_GET['from'].'" AND "'.$_GET['to'].'"')->groupBy('ip')->count();
+									if (empty($condvisitor)) {
 										$counttotalvisitor = '0';
 									} else {
 										$counttotalvisitor = $this->podb->from('traffic')->where('date BETWEEN "'.$_GET['from'].'" AND "'.$_GET['to'].'"')->groupBy('ip')->count();
@@ -472,7 +473,8 @@ class Home extends PoCore
 								<h3><?=$counttotalvisitor;?></h3>
 							<?php
 								} else {
-									if (empty($this->podb->from('traffic')->where('date', date('Y-m-d'))->groupBy('ip')->fetchAll())) {
+									$condvisitor = $this->podb->from('traffic')->where('date', date('Y-m-d'))->groupBy('ip')->fetchAll();
+									if (empty($condvisitor)) {
 										$counttotalvisitor = '0';
 									} else {
 										$counttotalvisitor = count($this->podb->from('traffic')->where('date', date('Y-m-d'))->groupBy('ip')->fetchAll());
@@ -490,7 +492,8 @@ class Home extends PoCore
 							<p><?=$GLOBALS['_']['home_hits'];?></p>
 							<?php
 								if (isset($_GET['from']) && isset($_GET['to'])) {
-									if (empty($this->podb->from('traffic')->select('SUM(hits) as hitstoday')->where('date BETWEEN "'.$_GET['from'].'" AND "'.$_GET['to'].'"')->fetch()['hitstoday'])) {
+									$condhits = $this->podb->from('traffic')->select('SUM(hits) as hitstoday')->where('date BETWEEN "'.$_GET['from'].'" AND "'.$_GET['to'].'"')->fetch()['hitstoday'];
+									if (empty($condhits)) {
 										$counttotalhits = '0';
 									} else {
 										$counttotalhits = $this->podb->from('traffic')->select('SUM(hits) as hitstoday')->where('date BETWEEN "'.$_GET['from'].'" AND "'.$_GET['to'].'"')->fetch()['hitstoday'];
@@ -499,7 +502,8 @@ class Home extends PoCore
 								<h3><?=$counttotalhits;?></h3>
 							<?php
 								} else {
-									if (empty($this->podb->from('traffic')->select('SUM(hits) as hitstoday')->where('date', date('Y-m-d'))->fetch()['hitstoday'])) {
+									$condhits = $this->podb->from('traffic')->select('SUM(hits) as hitstoday')->where('date', date('Y-m-d'))->fetch()['hitstoday'];
+									if (empty($condhits)) {
 										$counttotalhits = '0';
 									} else {
 										$counttotalhits = $this->podb->from('traffic')->select('SUM(hits) as hitstoday')->where('date', date('Y-m-d'))->fetch()['hitstoday'];
