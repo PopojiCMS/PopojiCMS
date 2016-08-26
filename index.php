@@ -121,7 +121,7 @@ if (file_exists('install.php')) {
 		if ($core->porequest->check_internet_connection()) {
 			$ip_data = json_decode(@file_get_contents("http://www.geoplugin.net/json.gp?ip=".$ip_stat));    
 			if ($ip_data && $ip_data->geoplugin_countryName != null) {
-				$country_stat = $ip_data->geoplugin_countryCode;
+				$country_stat = $ip_data->geoplugin_countryName;
 				$city_stat = $ip_data->geoplugin_city;
 			} else {
 				$country_stat = '';
