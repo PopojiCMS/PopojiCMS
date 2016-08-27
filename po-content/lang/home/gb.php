@@ -4,7 +4,7 @@
  * - PopojiCMS Home Language
  *
  * - File : gb.php
- * - Version : 1.0
+ * - Version : 1.1
  * - Author : Jenuar Dalapang
  * - License : MIT License
  *
@@ -17,7 +17,10 @@ $_['home_popular_desc'] = 'Most post viewed';
 $_['home_popular_view'] = 'Viewed';
 $_['home_popular_times'] = 'times';
 $_['home_stats'] = 'Visitor Stats';
-$_['home_stats_desc'] = 'Website visitors per 7 days';
+$_['home_statsweek'] = 'A Week Ago';
+$_['home_statsmonth'] = 'This Month';
+$_['home_statsyear'] = 'This Year';
+$_['home_stats_desc'] = 'Website visitors';
 $_['home_notif'] = 'Notifications';
 $_['home_notif_have'] = 'You have';
 $_['home_notif_new'] = 'new';

@@ -4,7 +4,7 @@
  * - PopojiCMS Home Language
  *
  * - File : id.php
- * - Version : 1.0
+ * - Version : 1.1
  * - Author : Jenuar Dalapang
  * - License : MIT License
  *
@@ -17,7 +17,10 @@ $_['home_popular_desc'] = 'Post paling banyak dilihat';
 $_['home_popular_view'] = 'Dilihat';
 $_['home_popular_times'] = 'kali';
 $_['home_stats'] = 'Stats Pengunjung';
-$_['home_stats_desc'] = 'Pengunjung website per 7 hari';
+$_['home_statsweek'] = '7 Hari Terakhir';
+$_['home_statsmonth'] = 'Bulan Ini';
+$_['home_statsyear'] = 'Tahun Ini';
+$_['home_stats_desc'] = 'Pengunjung website';
 $_['home_notif'] = 'Pemberitahuan';
 $_['home_notif_have'] = 'Anda memiliki';
 $_['home_notif_new'] = 'baru';

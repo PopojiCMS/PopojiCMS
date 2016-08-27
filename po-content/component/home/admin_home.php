@@ -4,7 +4,7 @@
  * - PopojiCMS Admin File
  *
  * - File : admin_home.php
- * - Version : 1.2
+ * - Version : 1.3
  * - Author : Jenuar Dalapang
  * - License : MIT License
  *
@@ -44,9 +44,16 @@ class Home extends PoCore
 	 *
 	 * This function use for index home page.
 	 *
+	 * Added chart by https://github.com/n4mlih
+	 *
 	*/
 	public function index()
 	{
+		if (isset($_POST['showchart'])) {
+			$pilchart = $_POST['showchart'];
+		} else {
+			$pilchart = 'chartweek';
+		}
 	?>
 		<div class="row">
 			<div class="col-md-12">
@@ -223,36 +230,125 @@ class Home extends PoCore
 					<div class="stats">
 						<div class="widget-title">
 							<h3 class="text-uppercase"><?=$GLOBALS['_']['home_stats'];?></h3>
-							<span><?=$GLOBALS['_']['home_stats_desc'];?></span>
+							<span>
+								<i class="fa fa-circle" style="color:#DCDCDC;"></i> <?=$GLOBALS['_']['home_visitors'];?>
+								<i class="fa fa-circle" style="color:#97BBCD;"></i> <?=$GLOBALS['_']['home_hits'];?>
+							</span>
 						</div>
-						<div class="pull-right" style="margin-top:-60px;">
-							<span><i class="fa fa-circle" style="color:#DCDCDC;"></i> <?=$GLOBALS['_']['home_visitors'];?></span>
-							<span><i class="fa fa-circle" style="color:#97BBCD;"></i> <?=$GLOBALS['_']['home_hits'];?></span>
-							<a href="admin.php?mod=home&act=statistics" class="btn btn-sm btn-success" title="<?=$GLOBALS['_']['home_summary'];?>" style="padding:1px 3px; font-size:12px;"><i class="fa fa-line-chart"></i></a>
+						<div class="pull-right text-right" style="margin-top:-60px;">
+							<form class="form-inline" action="admin.php?mod=home" method="post">
+								<select class="form-control input-sm" name="showchart" onChange="submit()">
+									<option value="chartweek" <?=($pilchart == 'chartweek' ? 'selected' : '');?>><?=$GLOBALS['_']['home_statsweek'];?></option>
+									<option value="chartmonth" <?=($pilchart == 'chartmonth' ? 'selected' : '');?>><?=$GLOBALS['_']['home_statsmonth'];?></option>
+									<option value="chartyear" <?=($pilchart == 'chartyear' ? 'selected' : '');?>><?=$GLOBALS['_']['home_statsyear'];?></option>
+								</select>
+								<a href="admin.php?mod=home&act=statistics" class="btn btn-sm btn-success" title="<?=$GLOBALS['_']['home_summary'];?>"><i class="fa fa-line-chart"></i></a>
+							</form>
 						</div>
 					</div>
 					<div class="stats-desc">
 						<canvas id="canvas-stats"></canvas>
 					</div>
 					<?php
-						$visitor1 = $this->podb->from('traffic')->where('date', date('Y-m-d', strtotime('-6 days')))->groupBy('ip')->fetchAll();
-						$visitor2 = $this->podb->from('traffic')->where('date', date('Y-m-d', strtotime('-5 days')))->groupBy('ip')->fetchAll();
-						$visitor3 = $this->podb->from('traffic')->where('date', date('Y-m-d', strtotime('-4 days')))->groupBy('ip')->fetchAll();
-						$visitor4 = $this->podb->from('traffic')->where('date', date('Y-m-d', strtotime('-3 days')))->groupBy('ip')->fetchAll();
-						$visitor5 = $this->podb->from('traffic')->where('date', date('Y-m-d', strtotime('-2 days')))->groupBy('ip')->fetchAll();
-						$visitor6 = $this->podb->from('traffic')->where('date', date('Y-m-d', strtotime('-1 days')))->groupBy('ip')->fetchAll();
-						$visitor7 = $this->podb->from('traffic')->where('date', date('Y-m-d'))->groupBy('ip')->fetchAll();
-						$hits1 = $this->podb->from('traffic')->select('SUM(hits) as hitstoday')->where('date', date('Y-m-d', strtotime('-6 days')))->groupBy('date')->fetch();
-						$hits2 = $this->podb->from('traffic')->select('SUM(hits) as hitstoday')->where('date', date('Y-m-d', strtotime('-5 days')))->groupBy('date')->fetch();
-						$hits3 = $this->podb->from('traffic')->select('SUM(hits) as hitstoday')->where('date', date('Y-m-d', strtotime('-4 days')))->groupBy('date')->fetch();
-						$hits4 = $this->podb->from('traffic')->select('SUM(hits) as hitstoday')->where('date', date('Y-m-d', strtotime('-3 days')))->groupBy('date')->fetch();
-						$hits5 = $this->podb->from('traffic')->select('SUM(hits) as hitstoday')->where('date', date('Y-m-d', strtotime('-2 days')))->groupBy('date')->fetch();
-						$hits6 = $this->podb->from('traffic')->select('SUM(hits) as hitstoday')->where('date', date('Y-m-d', strtotime('-1 days')))->groupBy('date')->fetch();
-						$hits7 = $this->podb->from('traffic')->select('SUM(hits) as hitstoday')->where('date', date('Y-m-d'))->groupBy('date')->fetch();
+						switch($pilchart) {
+							case "chartweek":
+								$hstart = 0;
+								$hend = 6;
+								for($i = $hend; $i >= $hstart; $i--){
+									if ($i==0) {
+										$visitorstemp = $this->podb->from('traffic')
+											->where('date', date('Y-m-d'))
+											->groupBy('ip')
+											->fetchAll();
+										$hitstemp = $this->podb->from('traffic')
+											->select('SUM(hits) as hitstoday')
+											->where('date', date('Y-m-d'))
+											->groupBy('date')
+											->fetch();
+									} else {
+										$visitorstemp = $this->podb->from('traffic')
+											->where('date', date('Y-m-d', strtotime('-'.$i.' days')))
+											->groupBy('ip')
+											->fetchAll();
+										$hitstemp = $this->podb->from('traffic')
+											->select('SUM(hits) as hitstoday')
+											->where('date', date('Y-m-d', strtotime('-'.$i.' days')))
+											->groupBy('date')
+											->fetch();
+									}
+									$arrvisitor[$i] = count($visitorstemp);
+									$arrhari[$i] = '"'.date('d M', strtotime('-'.$i.' days')).'"';
+									$arrhits[$i] = (empty($hitstemp['hitstoday']) ? '0' : $hitstemp['hitstoday']);
+								}
+								$rvisitors = array_combine(array_keys($arrvisitor), array_reverse(array_values($arrvisitor)));
+								$rhits = array_combine(array_keys($arrhits), array_reverse(array_values($arrhits)));
+							break;
+
+							case "chartmonth":
+								$hstart = 0;
+								$lastend = $this->podb->from('traffic')
+									->select('SUM(hits) as hitstotal,count(date) as unikvisitor')
+									->where('MONTH(date) = ?', date('m'))
+									->groupBy('date')
+									->orderBy('date DESC')
+									->fetch();
+								$hend = date('j', strtotime($lastend['date']));
+								for($i = $hend; $i > $hstart; $i--){
+									$stats = $this->podb->from('traffic')
+										->select('SUM(hits) as hitstotal, count(date) as unikvisitor')
+										->where('MONTH(date) = ?', date('m'))
+										->where('DAY(date) = ?', "0".$i)
+										->groupBy('date')
+										->fetch();
+									
+									if (empty($stats)) {
+										$rvisitors[$i] = 0;
+										$arrhari[$i] = '"'.date('d M', strtotime(date('Y-m-').$i)).'"';
+										$rhits[$i] = 0;
+									} else {
+										$rvisitors[$i] = $stats['unikvisitor'];
+										$arrhari[$i] = '"'.date('d M', strtotime($stats['date'])).'"';
+										$rhits[$i] = $stats['hitstotal'];
+									}
+								}
+								$arrhari = array_reverse($arrhari);
+							break;
+
+							case "chartyear":
+								$hstart = 0;
+								$lastend = $this->podb->from('traffic')
+									->select('SUM(hits) as hitstotal, count(date) as unikvisitor')
+									->where('YEAR(date) = ?', date('Y'))
+									->groupBy('MONTH(date)')
+									->orderBy('date DESC')
+									->fetch();
+								$hend = date('n', strtotime($lastend['date']));
+								for($i = $hend; $i > $hstart; $i--){
+									$stats = $this->podb->from('traffic')
+										->select('SUM(hits) as hitstotal, count(date) as unikvisitor')
+										->where('YEAR(date) = ?', date('Y'))
+										->where('MONTH(date) = ?', "0".$i)
+										->groupBy('MONTH(date)')
+										->orderBy('date DESC')
+										->fetch();
+									
+									if (empty($stats)) {
+										$rvisitors[$i] = 0;
+										$arrhari[$i] = '"'.date('M', strtotime(date('Y-').$i.'-01')).'"';
+										$rhits[$i] = 0;
+									} else {
+										$rvisitors[$i] = $stats['unikvisitor'];
+										$arrhari[$i] = '"'.date('M', strtotime(date('Y-').$i.'-01')).'"';
+										$rhits[$i] = $stats['hitstotal'];
+									}
+								}
+								$arrhari = array_reverse($arrhari);
+							break;
+						}
 					?>
 					<script type="text/javascript">
 						var datastats = {
-							labels: ["<?=date('d M', strtotime('-6 days'));?>", "<?=date('d M', strtotime('-5 days'));?>", "<?=date('d M', strtotime('-4 days'));?>", "<?=date('d M', strtotime('-3 days'));?>", "<?=date('d M', strtotime('-2 days'));?>", "<?=date('d M', strtotime('-1 days'));?>", "<?=date('d M', strtotime('0 days'));?>"],
+							labels: [<?=implode($arrhari, ",");?>],
 							datasets: [
 								{
 									label: "Visitor",
@@ -263,13 +359,7 @@ class Home extends PoCore
 									pointHighlightFill: "#fff",
 									pointHighlightStroke: "rgba(220,220,220,1)",
 									data: [
-										<?=(empty($visitor1) ? '0' : count($visitor1));?>,
-										<?=(empty($visitor2) ? '0' : count($visitor2));?>,
-										<?=(empty($visitor3) ? '0' : count($visitor3));?>,
-										<?=(empty($visitor4) ? '0' : count($visitor4));?>,
-										<?=(empty($visitor5) ? '0' : count($visitor5));?>,
-										<?=(empty($visitor6) ? '0' : count($visitor6));?>,
-										<?=(empty($visitor7) ? '0' : count($visitor7));?>
+										<?=implode(array_reverse($rvisitors), ",");?>
 									]
 								},
 								{
@@ -281,13 +371,7 @@ class Home extends PoCore
 									pointHighlightFill: "#fff",
 									pointHighlightStroke: "rgba(151,187,205,1)",
 									data: [
-										<?=(empty($hits1['hitstoday']) ? '0' : $hits1['hitstoday']);?>,
-										<?=(empty($hits2['hitstoday']) ? '0' : $hits2['hitstoday']);?>,
-										<?=(empty($hits3['hitstoday']) ? '0' : $hits3['hitstoday']);?>,
-										<?=(empty($hits4['hitstoday']) ? '0' : $hits4['hitstoday']);?>,
-										<?=(empty($hits5['hitstoday']) ? '0' : $hits5['hitstoday']);?>,
-										<?=(empty($hits6['hitstoday']) ? '0' : $hits6['hitstoday']);?>,
-										<?=(empty($hits7['hitstoday']) ? '0' : $hits7['hitstoday']);?>
+										<?=implode(array_reverse($rhits), ",");?>
 									]
 								}
 							]
@@ -304,7 +388,6 @@ class Home extends PoCore
 	 *
 	 * This function use for statistic home page.
 	 *
-	 * Added in v.2.0.1
 	*/
 	public function statistics()
 	{
@@ -461,26 +544,10 @@ class Home extends PoCore
 						<div class="mini-stats">
 							<a href="javascript:void(0)"><span class="bg-danger"><i class="fa fa-users"></i></span></a>
 							<p><?=$GLOBALS['_']['home_visitors'];?></p>
-							<?php
-								if (isset($_GET['from']) && isset($_GET['to'])) {
-									$condvisitor = $this->podb->from('traffic')->where('date BETWEEN "'.$_GET['from'].'" AND "'.$_GET['to'].'"')->groupBy('ip')->count();
-									if (empty($condvisitor)) {
-										$counttotalvisitor = '0';
-									} else {
-										$counttotalvisitor = $this->podb->from('traffic')->where('date BETWEEN "'.$_GET['from'].'" AND "'.$_GET['to'].'"')->groupBy('ip')->count();
-									}
-							?>
-								<h3><?=$counttotalvisitor;?></h3>
-							<?php
-								} else {
-									$condvisitor = $this->podb->from('traffic')->where('date', date('Y-m-d'))->groupBy('ip')->fetchAll();
-									if (empty($condvisitor)) {
-										$counttotalvisitor = '0';
-									} else {
-										$counttotalvisitor = count($this->podb->from('traffic')->where('date', date('Y-m-d'))->groupBy('ip')->fetchAll());
-									}
-							?>
-								<h3><?=$counttotalvisitor;?></h3>
+							<?php if (isset($_GET['from']) && isset($_GET['to'])) { ?>
+							<h3><?=(empty($this->podb->from('traffic')->where('date BETWEEN "'.$_GET['from'].'" AND "'.$_GET['to'].'"')->groupBy('ip')->count()) ? '0' : $this->podb->from('traffic')->where('date BETWEEN "'.$_GET['from'].'" AND "'.$_GET['to'].'"')->groupBy('ip')->count());?></h3>
+							<?php } else { ?>
+							<h3><?=(empty($this->podb->from('traffic')->where('date', date('Y-m-d'))->groupBy('ip')->fetchAll()) ? '0' : count($this->podb->from('traffic')->where('date', date('Y-m-d'))->groupBy('ip')->fetchAll()));?></h3>
 							<?php } ?>
 						</div>
 					</div>
@@ -490,26 +557,10 @@ class Home extends PoCore
 						<div class="mini-stats">
 							<a href="javascript:void(0)"><span class="bg-warning"><i class="fa fa-heart"></i></span></a>
 							<p><?=$GLOBALS['_']['home_hits'];?></p>
-							<?php
-								if (isset($_GET['from']) && isset($_GET['to'])) {
-									$condhits = $this->podb->from('traffic')->select('SUM(hits) as hitstoday')->where('date BETWEEN "'.$_GET['from'].'" AND "'.$_GET['to'].'"')->fetch()['hitstoday'];
-									if (empty($condhits)) {
-										$counttotalhits = '0';
-									} else {
-										$counttotalhits = $this->podb->from('traffic')->select('SUM(hits) as hitstoday')->where('date BETWEEN "'.$_GET['from'].'" AND "'.$_GET['to'].'"')->fetch()['hitstoday'];
-									}
-							?>
-								<h3><?=$counttotalhits;?></h3>
-							<?php
-								} else {
-									$condhits = $this->podb->from('traffic')->select('SUM(hits) as hitstoday')->where('date', date('Y-m-d'))->fetch()['hitstoday'];
-									if (empty($condhits)) {
-										$counttotalhits = '0';
-									} else {
-										$counttotalhits = $this->podb->from('traffic')->select('SUM(hits) as hitstoday')->where('date', date('Y-m-d'))->fetch()['hitstoday'];
-									}
-							?>
-								<h3><?=$counttotalhits;?></h3>
+							<?php if (isset($_GET['from']) && isset($_GET['to'])) { ?>
+							<h3><?=(empty($this->podb->from('traffic')->select('SUM(hits) as hitstoday')->where('date BETWEEN "'.$_GET['from'].'" AND "'.$_GET['to'].'"')->fetch()['hitstoday']) ? '0' : $this->podb->from('traffic')->select('SUM(hits) as hitstoday')->where('date BETWEEN "'.$_GET['from'].'" AND "'.$_GET['to'].'"')->fetch()['hitstoday']);?></h3>
+							<?php } else { ?>
+							<h3><?=(empty($this->podb->from('traffic')->select('SUM(hits) as hitstoday')->where('date', date('Y-m-d'))->fetch()['hitstoday']) ? '0' : $this->podb->from('traffic')->select('SUM(hits) as hitstoday')->where('date', date('Y-m-d'))->fetch()['hitstoday']);?></h3>
 							<?php } ?>
 						</div>
 					</div>
@@ -684,7 +735,6 @@ class Home extends PoCore
 	 *
 	 * This function use for create addcslashes array js.
 	 *
-	 * Added in v.2.0.1
 	*/
 	public function js_str($s)
 	{
@@ -696,7 +746,6 @@ class Home extends PoCore
 	 *
 	 * This function use for create array php to array js.
 	 *
-	 * Added in v.2.0.1
 	*/
 	public function js_array($array)
 	{
