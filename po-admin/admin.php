@@ -65,7 +65,7 @@ if ($_SESSION['login'] == 0) {
 	<link type="text/css" rel="stylesheet" href="../<?=DIR_INC;?>/css/bootstrap-editable.css" />
 	<link type="text/css" rel="stylesheet" href="../<?=DIR_INC;?>/css/dropzone.css" />
 
-	<?php if ($_GET['mod'] == "theme" || $_GET['mod'] == "setting") { ?>
+	<?php if ($_GET['mod'] == "theme" || $_GET['mod'] == "setting" || $_GET['mod'] == "clark") { ?>
 	<link type="text/css" rel="stylesheet" href="../<?=DIR_INC;?>/js/codemirror/lib/codemirror.css" />
 	<link type="text/css" rel="stylesheet" href="../<?=DIR_INC;?>/js/codemirror/theme/github.css" />
 	<link type="text/css" rel="stylesheet" href="../<?=DIR_INC;?>/js/codemirror/addon/display/fullscreen.css" />
@@ -205,7 +205,7 @@ if ($_SESSION['login'] == 0) {
 	<script type="text/javascript" src="../<?=DIR_INC;?>/js/chartjs/chart.min.js"></script>
 	<script type="text/javascript" src="../<?=DIR_INC;?>/js/dropzone/dropzone.js"></script>
 
-	<?php if ($_GET['mod'] == "theme" || $_GET['mod'] == "setting") { ?>
+	<?php if ($_GET['mod'] == "theme" || $_GET['mod'] == "setting" || $_GET['mod'] == "clark") { ?>
 	<script type="text/javascript" src="../<?=DIR_INC;?>/js/codemirror/lib/codemirror.js"></script>
 	<script type="text/javascript" src="../<?=DIR_INC;?>/js/codemirror/addon/fold/xml-fold.js"></script>
 	<script type="text/javascript" src="../<?=DIR_INC;?>/js/codemirror/addon/edit/matchtags.js"></script>

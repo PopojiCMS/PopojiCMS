@@ -4,7 +4,7 @@
  * - PopojiCMS Admin File
  *
  * - File : admin_setting.php
- * - Version : 1.1
+ * - Version : 1.2
  * - Author : Jenuar Dalapang
  * - License : MIT License
  *
@@ -571,7 +571,22 @@ class Setting extends PoCore
 				$text = $this->postring->valid($_POST['value'], 'xss');
 				$num_bytes = $this->insert_into_file($file_path, $insert_marker, $text, 'replace');
 			}
-			if ($_POST['pk'] == '29') {
+			if ($_POST['pk'] == '2') {
+				$ifsetting = $this->podb->from('setting')->where('id_setting', '2')->limit(1)->fetch();
+				if (!empty($ifsetting)) {
+					$setting = array(
+						'value' => rtrim($this->postring->valid($_POST['value'], 'xss'), '/')
+					);
+					$query_setting = $this->podb->update('setting')
+						->set($setting)
+						->where('id_setting', '2');
+					$query_setting->execute();
+					$file_path = "../".DIR_INC."/core/config.php";
+					$insert_marker = $ifsetting['value'].'/';
+					$text = rtrim($this->postring->valid($_POST['value'], 'xss'), '/').'/';
+					$num_bytes = $this->insert_into_file($file_path, $insert_marker, $text, 'replace');
+				}
+			} elseif ($_POST['pk'] == '29') {
 				$ifsetting = $this->podb->from('setting')->where('id_setting', '29')->limit(1)->fetch();
 				if (!empty($ifsetting)) {
 					$setting = array(

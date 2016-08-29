@@ -4,7 +4,7 @@
  * - PopojiCMS Front End File
  *
  * - File : index.php
- * - Version : 1.1
+ * - Version : 1.2
  * - Author : Jenuar Dalapang
  * - License : MIT License
  *
@@ -79,16 +79,43 @@ if (file_exists('install.php')) {
 		 *
 		 * Declaration language choosing
 		 *
+		 * Add change language with get method (v.2.0.2)
 		*/
 		if (isset($_POST['lang'])) {
-			setcookie('po_lang_front', $core->postring->valid($_POST['lang'], 'xss'), 1719241200, '/');
-			$current_lang = $core->podb->from('language')
+			$check_lang = $core->podb->from('language')
 				->where('code', $core->postring->valid($_POST['lang'], 'xss'))
 				->limit(1)
 				->fetch();
-			define('WEB_LANG_ID', $current_lang['id_language']);
-			define('WEB_LANG', $current_lang['code']);
+			if ($check_lang) {
+				setcookie('po_lang_front', $core->postring->valid($_POST['lang'], 'xss'), 1719241200, '/');
+				define('WEB_LANG_ID', $check_lang['id_language']);
+				define('WEB_LANG', $check_lang['code']);
+			} else {
+				$current_lang = $core->podb->from('language')
+					->where('id_language', '1')
+					->limit(1)
+					->fetch();
+				define('WEB_LANG_ID', $current_lang['id_language']);
+				define('WEB_LANG', $current_lang['code']);
+			}
 			header('location:'.$_POST['refer']);
+		} elseif (isset($_GET['lang'])) {
+			$check_lang = $core->podb->from('language')
+				->where('code', $core->postring->valid($_GET['lang'], 'xss'))
+				->limit(1)
+				->fetch();
+			if ($check_lang) {
+				setcookie('po_lang_front', $core->postring->valid($_GET['lang'], 'xss'), 1719241200, '/');
+				define('WEB_LANG_ID', $check_lang['id_language']);
+				define('WEB_LANG', $check_lang['code']);
+			} else {
+				$current_lang = $core->podb->from('language')
+					->where('id_language', '1')
+					->limit(1)
+					->fetch();
+				define('WEB_LANG_ID', $current_lang['id_language']);
+				define('WEB_LANG', $current_lang['code']);
+			}
 		} elseif (isset($_COOKIE['po_lang_front'])) {
 			$current_lang = $core->podb->from('language')
 				->where('code', $_COOKIE['po_lang_front'])
