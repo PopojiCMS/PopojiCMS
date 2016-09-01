@@ -4,7 +4,7 @@
  * - PopojiCMS Widget File
  *
  * - File : post.php
- * - Version : 1.1
+ * - Version : 1.2
  * - Author : Jenuar Dalapang
  * - License : MIT License
  *
@@ -292,6 +292,7 @@ class Post implements ExtensionInterface
 			->where('post_description.id_language', $lang)
 			->where('post.active', 'Y')
 			->where('post.publishdate < ?', date('Y-m-d H:i:s'))
+			->orderBy('post.id_post DESC')
 			->limit(1)
 			->fetch();
         return $post;
