@@ -4,7 +4,7 @@
  * - PopojiCMS Front End File
  *
  * - File : post.php
- * - Version : 1.1
+ * - Version : 1.3
  * - Author : Jenuar Dalapang
  * - License : MIT License
  *
@@ -14,1501 +14,16 @@
  *
 */
 
-/**
- * Router untuk menampilkan request halaman post.
- *
- * Router for display request in post page.
- *
- * $seotitle = string [a-z0-9_-]
-*/
-$router->match('GET|POST', '/detailpost/([a-z0-9_-]+)', function($seotitle) use ($core, $templates) {
-	$lang = $core->setlang('post', WEB_LANG);
-	$post = $core->podb->from('post')
-		->select(array('post_description.title', 'post_description.content'))
-		->leftJoin('post_description ON post_description.id_post = post.id_post')
-		->where('post.seotitle', $seotitle)
-		->where('post_description.id_language', WEB_LANG_ID)
-		->where('post.active', 'Y')
-		->where('post.publishdate < ?', date('Y-m-d H:i:s'))
-		->limit(1)
-		->fetch();
-	if ($post) {
-		if (!empty($_POST)) {
-			require_once(DIR_INC.'/core/vendor/recaptcha/recaptchalib.php');
-			$secret = $core->posetting[22]['value'];
-			$recaptcha = new PoReCaptcha($secret);
-			if (!empty($_POST["g-recaptcha-response"])) {
-				$resp = $recaptcha->verifyResponse(
-					$_SERVER["REMOTE_ADDR"],
-					$_POST["g-recaptcha-response"]
-				);
-				if ($resp != null && $resp->success) {
-					$core->poval->validation_rules(array(
-						'id' => 'required|integer',
-						'id_parent' => 'required|integer',
-						'name' => 'required|max_len,100|min_len,3',
-						'email' => 'required|valid_email',
-						'url' => 'max_len,255|valid_url',
-						'comment' => 'required|min_len,10',
-						'seotitle' => 'required'
-					));
-					$core->poval->filter_rules(array(
-						'id' => 'trim|sanitize_numbers',
-						'id_parent' => 'trim',
-						'name' => 'trim|sanitize_string',
-						'email' => 'trim|sanitize_email',
-						'url' => 'trim|sanitize_string',
-						'comment' => 'trim|sanitize_string|basic_tags',
-						'seotitle' => 'trim'
-					));
-					$validated_data = $core->poval->run($_POST);
-					if ($validated_data === false) {
-						$core->poflash->error($lang['front_comment_error_3']);
-					} else {
-						if ($core->posetting[18]['value'] == 'Y') {
-							$active = 'Y';
-						} else {
-							$active = 'N';
-						}
-						$data = array(
-							'id_post' => $_POST['id'],
-							'id_parent' => $_POST['id_parent'],
-							'name' => $_POST['name'],
-							'email' => $_POST['email'],
-							'url' => $_POST['url'],
-							'comment' => $_POST['comment'],
-							'date' => date('Y-m-d'),
-							'time' => date('h:i:s'),
-							'active' => $active
-						);
-						$query = $core->podb->insertInto('comment')->values($data);
-						$query->execute();
-						unset($_POST);
-						$core->poflash->success($lang['front_comment_success']);
-					}
-				} else {
-					$core->poflash->error($lang['front_comment_error_2']);
-				}
-			} else {
-				$core->poflash->error($lang['front_comment_error_1']);
-			}
-		}
-		$query_hits = $core->podb->update('post')
-			->set(array('hits' => $post['hits']+1))
-			->where('id_post', $post['id_post']);
-		$query_hits->execute();
-		$info = array(
-			'page_title' => htmlspecialchars_decode($post['title']),
-			'page_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
-			'page_key' => $post['tag'],
-			'social_mod' => $lang['front_post_title'],
-			'social_name' => $core->posetting[0]['value'],
-			'social_url' => $core->posetting[1]['value'].'/detailpost/'.$post['seotitle'],
-			'social_title' => htmlspecialchars_decode($post['title']),
-			'social_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
-			'social_img' => $core->posetting[1]['value'].'/'.DIR_CON.'/uploads/'.$post['picture'],
-			'page' => '1'
-		);
-		$adddata = array_merge($info, $lang);
-		$templates->addData(
-			$adddata
-		);
-		echo $templates->render('detailpost', compact('post','lang'));
-	} else {
-		$info = array(
-			'page_title' => $lang['front_post_not_found'],
-			'page_desc' => $core->posetting[2]['value'],
-			'page_key' => $core->posetting[3]['value'],
-			'social_mod' => $lang['front_post_title'],
-			'social_name' => $core->posetting[0]['value'],
-			'social_url' => $core->posetting[1]['value'],
-			'social_title' => $lang['front_post_not_found'],
-			'social_desc' => $core->posetting[2]['value'],
-			'social_img' => $core->posetting[1]['value'].'/'.DIR_INC.'/images/favicon.png'
-		);
-		$adddata = array_merge($info, $lang);
-		$templates->addData(
-			$adddata
-		);
-		echo $templates->render('404', compact('lang'));
-	}
-});
-
-/**
- * Router untuk menampilkan request halaman post dengan nomor halaman.
- *
- * Router for display request in post page with pagination.
- *
- * $seotitle = string [a-z0-9_-]
- * $page = integer
-*/
-$router->match('GET|POST', '/detailpost/([a-z0-9_-]+)/page/(\d+)', function($seotitle, $page) use ($core, $templates) {
-	$lang = $core->setlang('post', WEB_LANG);
-	$post = $core->podb->from('post')
-		->select(array('post_description.title', 'post_description.content'))
-		->leftJoin('post_description ON post_description.id_post = post.id_post')
-		->where('post.seotitle', $seotitle)
-		->where('post_description.id_language', WEB_LANG_ID)
-		->where('post.active', 'Y')
-		->where('post.publishdate < ?', date('Y-m-d H:i:s'))
-		->limit(1)
-		->fetch();
-	if ($post) {
-		if (!empty($_POST)) {
-			require_once(DIR_INC.'/core/vendor/recaptcha/recaptchalib.php');
-			$secret = $core->posetting[22]['value'];
-			$recaptcha = new PoReCaptcha($secret);
-			if (!empty($_POST["g-recaptcha-response"])) {
-				$resp = $recaptcha->verifyResponse(
-					$_SERVER["REMOTE_ADDR"],
-					$_POST["g-recaptcha-response"]
-				);
-				if ($resp != null && $resp->success) {
-					$core->poval->validation_rules(array(
-						'id' => 'required|integer',
-						'id_parent' => 'required|integer',
-						'name' => 'required|max_len,100|min_len,3',
-						'email' => 'required|valid_email',
-						'url' => 'max_len,255|valid_url',
-						'comment' => 'required|min_len,10',
-						'seotitle' => 'required'
-					));
-					$core->poval->filter_rules(array(
-						'id' => 'trim|sanitize_numbers',
-						'id_parent' => 'trim',
-						'name' => 'trim|sanitize_string',
-						'email' => 'trim|sanitize_email',
-						'url' => 'trim|sanitize_string',
-						'comment' => 'trim|sanitize_string|basic_tags',
-						'seotitle' => 'trim'
-					));
-					$validated_data = $core->poval->run($_POST);
-					if ($validated_data === false) {
-						$core->poflash->error($lang['front_comment_error_3']);
-					} else {
-						if ($core->posetting[18]['value'] == 'Y') {
-							$active = 'Y';
-						} else {
-							$active = 'N';
-						}
-						$data = array(
-							'id_post' => $_POST['id'],
-							'id_parent' => $_POST['id_parent'],
-							'name' => $_POST['name'],
-							'email' => $_POST['email'],
-							'url' => $_POST['url'],
-							'comment' => $_POST['comment'],
-							'date' => date('Y-m-d'),
-							'time' => date('h:i:s'),
-							'active' => $active
-						);
-						$query = $core->podb->insertInto('comment')->values($data);
-						$query->execute();
-						unset($_POST);
-						$core->poflash->success($lang['front_comment_success']);
-					}
-				} else {
-					$core->poflash->error($lang['front_comment_error_2']);
-				}
-			} else {
-				$core->poflash->error($lang['front_comment_error_1']);
-			}
-		}
-		$query_hits = $core->podb->update('post')
-			->set(array('hits' => $post['hits']+1))
-			->where('id_post', $post['id_post']);
-		$query_hits->execute();
-		$info = array(
-			'page_title' => htmlspecialchars_decode($post['title']),
-			'page_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
-			'page_key' => $post['tag'],
-			'social_mod' => $lang['front_post_title'],
-			'social_name' => $core->posetting[0]['value'],
-			'social_url' => $core->posetting[1]['value'].'/detailpost/'.$post['seotitle'],
-			'social_title' => htmlspecialchars_decode($post['title']),
-			'social_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
-			'social_img' => $core->posetting[1]['value'].'/'.DIR_CON.'/uploads/'.$post['picture'],
-			'page' => $page
-		);
-		$adddata = array_merge($info, $lang);
-		$templates->addData(
-			$adddata
-		);
-		echo $templates->render('detailpost', compact('post','lang'));
-	} else {
-		$info = array(
-			'page_title' => $lang['front_post_not_found'],
-			'page_desc' => $core->posetting[2]['value'],
-			'page_key' => $core->posetting[3]['value'],
-			'social_mod' => $lang['front_post_title'],
-			'social_name' => $core->posetting[0]['value'],
-			'social_url' => $core->posetting[1]['value'],
-			'social_title' => $lang['front_post_not_found'],
-			'social_desc' => $core->posetting[2]['value'],
-			'social_img' => $core->posetting[1]['value'].'/'.DIR_INC.'/images/favicon.png'
-		);
-		$adddata = array_merge($info, $lang);
-		$templates->addData(
-			$adddata
-		);
-		echo $templates->render('404', compact('lang'));
-	}
-});
-
-/**
- * Router untuk menampilkan request halaman post.
- *
- * Router for display request in post page.
- *
- * $year = string
- * $month = string
- * $day = string
- * $seotitle = string [a-z0-9_-]
- *
- * Added in v.2.0.1
-*/
-$router->match('GET|POST', '/(\d+)/(\d+)/(\d+)/([a-z0-9_-]+)', function($year, $month, $day, $seotitle) use ($core, $templates) {
-	$lang = $core->setlang('post', WEB_LANG);
-	$post = $core->podb->from('post')
-		->select(array('post_description.title', 'post_description.content'))
-		->leftJoin('post_description ON post_description.id_post = post.id_post')
-		->where('post.seotitle', $seotitle)
-		->where('post_description.id_language', WEB_LANG_ID)
-		->where('post.active', 'Y')
-		->where('post.publishdate < ?', date('Y-m-d H:i:s'))
-		->limit(1)
-		->fetch();
-	if ($post) {
-		if (!empty($_POST)) {
-			require_once(DIR_INC.'/core/vendor/recaptcha/recaptchalib.php');
-			$secret = $core->posetting[22]['value'];
-			$recaptcha = new PoReCaptcha($secret);
-			if (!empty($_POST["g-recaptcha-response"])) {
-				$resp = $recaptcha->verifyResponse(
-					$_SERVER["REMOTE_ADDR"],
-					$_POST["g-recaptcha-response"]
-				);
-				if ($resp != null && $resp->success) {
-					$core->poval->validation_rules(array(
-						'id' => 'required|integer',
-						'id_parent' => 'required|integer',
-						'name' => 'required|max_len,100|min_len,3',
-						'email' => 'required|valid_email',
-						'url' => 'max_len,255|valid_url',
-						'comment' => 'required|min_len,10',
-						'seotitle' => 'required'
-					));
-					$core->poval->filter_rules(array(
-						'id' => 'trim|sanitize_numbers',
-						'id_parent' => 'trim',
-						'name' => 'trim|sanitize_string',
-						'email' => 'trim|sanitize_email',
-						'url' => 'trim|sanitize_string',
-						'comment' => 'trim|sanitize_string|basic_tags',
-						'seotitle' => 'trim'
-					));
-					$validated_data = $core->poval->run($_POST);
-					if ($validated_data === false) {
-						$core->poflash->error($lang['front_comment_error_3']);
-					} else {
-						if ($core->posetting[18]['value'] == 'Y') {
-							$active = 'Y';
-						} else {
-							$active = 'N';
-						}
-						$data = array(
-							'id_post' => $_POST['id'],
-							'id_parent' => $_POST['id_parent'],
-							'name' => $_POST['name'],
-							'email' => $_POST['email'],
-							'url' => $_POST['url'],
-							'comment' => $_POST['comment'],
-							'date' => date('Y-m-d'),
-							'time' => date('h:i:s'),
-							'active' => $active
-						);
-						$query = $core->podb->insertInto('comment')->values($data);
-						$query->execute();
-						unset($_POST);
-						$core->poflash->success($lang['front_comment_success']);
-					}
-				} else {
-					$core->poflash->error($lang['front_comment_error_2']);
-				}
-			} else {
-				$core->poflash->error($lang['front_comment_error_1']);
-			}
-		}
-		$query_hits = $core->podb->update('post')
-			->set(array('hits' => $post['hits']+1))
-			->where('id_post', $post['id_post']);
-		$query_hits->execute();
-		$info = array(
-			'page_title' => htmlspecialchars_decode($post['title']),
-			'page_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
-			'page_key' => $post['tag'],
-			'social_mod' => $lang['front_post_title'],
-			'social_name' => $core->posetting[0]['value'],
-			'social_url' => $core->posetting[1]['value'].'/'.substr($post['date'],0,4).'/'.substr($post['date'],5,2).'/'.substr($post['date'],8,2).'/'.$post['seotitle'],
-			'social_title' => htmlspecialchars_decode($post['title']),
-			'social_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
-			'social_img' => $core->posetting[1]['value'].'/'.DIR_CON.'/uploads/'.$post['picture'],
-			'page' => '1'
-		);
-		$adddata = array_merge($info, $lang);
-		$templates->addData(
-			$adddata
-		);
-		echo $templates->render('detailpost', compact('post','lang'));
-	} else {
-		$info = array(
-			'page_title' => $lang['front_post_not_found'],
-			'page_desc' => $core->posetting[2]['value'],
-			'page_key' => $core->posetting[3]['value'],
-			'social_mod' => $lang['front_post_title'],
-			'social_name' => $core->posetting[0]['value'],
-			'social_url' => $core->posetting[1]['value'],
-			'social_title' => $lang['front_post_not_found'],
-			'social_desc' => $core->posetting[2]['value'],
-			'social_img' => $core->posetting[1]['value'].'/'.DIR_INC.'/images/favicon.png'
-		);
-		$adddata = array_merge($info, $lang);
-		$templates->addData(
-			$adddata
-		);
-		echo $templates->render('404', compact('lang'));
-	}
-});
-
-/**
- * Router untuk menampilkan request halaman post dengan nomor halaman.
- *
- * Router for display request in post page with pagination.
- *
- * $year = string
- * $month = string
- * $day = string
- * $seotitle = string [a-z0-9_-]
- * $page = integer
- *
- * Added in v.2.0.1
-*/
-$router->match('GET|POST', '/(\d+)/(\d+)/(\d+)/([a-z0-9_-]+)/page/(\d+)', function($year, $month, $day, $seotitle, $page) use ($core, $templates) {
-	$lang = $core->setlang('post', WEB_LANG);
-	$post = $core->podb->from('post')
-		->select(array('post_description.title', 'post_description.content'))
-		->leftJoin('post_description ON post_description.id_post = post.id_post')
-		->where('post.seotitle', $seotitle)
-		->where('post_description.id_language', WEB_LANG_ID)
-		->where('post.active', 'Y')
-		->where('post.publishdate < ?', date('Y-m-d H:i:s'))
-		->limit(1)
-		->fetch();
-	if ($post) {
-		if (!empty($_POST)) {
-			require_once(DIR_INC.'/core/vendor/recaptcha/recaptchalib.php');
-			$secret = $core->posetting[22]['value'];
-			$recaptcha = new PoReCaptcha($secret);
-			if (!empty($_POST["g-recaptcha-response"])) {
-				$resp = $recaptcha->verifyResponse(
-					$_SERVER["REMOTE_ADDR"],
-					$_POST["g-recaptcha-response"]
-				);
-				if ($resp != null && $resp->success) {
-					$core->poval->validation_rules(array(
-						'id' => 'required|integer',
-						'id_parent' => 'required|integer',
-						'name' => 'required|max_len,100|min_len,3',
-						'email' => 'required|valid_email',
-						'url' => 'max_len,255|valid_url',
-						'comment' => 'required|min_len,10',
-						'seotitle' => 'required'
-					));
-					$core->poval->filter_rules(array(
-						'id' => 'trim|sanitize_numbers',
-						'id_parent' => 'trim',
-						'name' => 'trim|sanitize_string',
-						'email' => 'trim|sanitize_email',
-						'url' => 'trim|sanitize_string',
-						'comment' => 'trim|sanitize_string|basic_tags',
-						'seotitle' => 'trim'
-					));
-					$validated_data = $core->poval->run($_POST);
-					if ($validated_data === false) {
-						$core->poflash->error($lang['front_comment_error_3']);
-					} else {
-						if ($core->posetting[18]['value'] == 'Y') {
-							$active = 'Y';
-						} else {
-							$active = 'N';
-						}
-						$data = array(
-							'id_post' => $_POST['id'],
-							'id_parent' => $_POST['id_parent'],
-							'name' => $_POST['name'],
-							'email' => $_POST['email'],
-							'url' => $_POST['url'],
-							'comment' => $_POST['comment'],
-							'date' => date('Y-m-d'),
-							'time' => date('h:i:s'),
-							'active' => $active
-						);
-						$query = $core->podb->insertInto('comment')->values($data);
-						$query->execute();
-						unset($_POST);
-						$core->poflash->success($lang['front_comment_success']);
-					}
-				} else {
-					$core->poflash->error($lang['front_comment_error_2']);
-				}
-			} else {
-				$core->poflash->error($lang['front_comment_error_1']);
-			}
-		}
-		$query_hits = $core->podb->update('post')
-			->set(array('hits' => $post['hits']+1))
-			->where('id_post', $post['id_post']);
-		$query_hits->execute();
-		$info = array(
-			'page_title' => htmlspecialchars_decode($post['title']),
-			'page_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
-			'page_key' => $post['tag'],
-			'social_mod' => $lang['front_post_title'],
-			'social_name' => $core->posetting[0]['value'],
-			'social_url' => $core->posetting[1]['value'].'/'.substr($post['date'],0,4).'/'.substr($post['date'],5,2).'/'.substr($post['date'],8,2).'/'.$post['seotitle'],
-			'social_title' => htmlspecialchars_decode($post['title']),
-			'social_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
-			'social_img' => $core->posetting[1]['value'].'/'.DIR_CON.'/uploads/'.$post['picture'],
-			'page' => $page
-		);
-		$adddata = array_merge($info, $lang);
-		$templates->addData(
-			$adddata
-		);
-		echo $templates->render('detailpost', compact('post','lang'));
-	} else {
-		$info = array(
-			'page_title' => $lang['front_post_not_found'],
-			'page_desc' => $core->posetting[2]['value'],
-			'page_key' => $core->posetting[3]['value'],
-			'social_mod' => $lang['front_post_title'],
-			'social_name' => $core->posetting[0]['value'],
-			'social_url' => $core->posetting[1]['value'],
-			'social_title' => $lang['front_post_not_found'],
-			'social_desc' => $core->posetting[2]['value'],
-			'social_img' => $core->posetting[1]['value'].'/'.DIR_INC.'/images/favicon.png'
-		);
-		$adddata = array_merge($info, $lang);
-		$templates->addData(
-			$adddata
-		);
-		echo $templates->render('404', compact('lang'));
-	}
-});
-
-/**
- * Router untuk menampilkan request halaman post.
- *
- * Router for display request in post page.
- *
- * $year = string
- * $month = string
- * $seotitle = string [a-z0-9_-]
- *
- * Added in v.2.0.1
-*/
-$router->match('GET|POST', '/(\d+)/(\d+)/([a-z0-9_-]+)', function($year, $month, $seotitle) use ($core, $templates) {
-	$lang = $core->setlang('post', WEB_LANG);
-	$post = $core->podb->from('post')
-		->select(array('post_description.title', 'post_description.content'))
-		->leftJoin('post_description ON post_description.id_post = post.id_post')
-		->where('post.seotitle', $seotitle)
-		->where('post_description.id_language', WEB_LANG_ID)
-		->where('post.active', 'Y')
-		->where('post.publishdate < ?', date('Y-m-d H:i:s'))
-		->limit(1)
-		->fetch();
-	if ($post) {
-		if (!empty($_POST)) {
-			require_once(DIR_INC.'/core/vendor/recaptcha/recaptchalib.php');
-			$secret = $core->posetting[22]['value'];
-			$recaptcha = new PoReCaptcha($secret);
-			if (!empty($_POST["g-recaptcha-response"])) {
-				$resp = $recaptcha->verifyResponse(
-					$_SERVER["REMOTE_ADDR"],
-					$_POST["g-recaptcha-response"]
-				);
-				if ($resp != null && $resp->success) {
-					$core->poval->validation_rules(array(
-						'id' => 'required|integer',
-						'id_parent' => 'required|integer',
-						'name' => 'required|max_len,100|min_len,3',
-						'email' => 'required|valid_email',
-						'url' => 'max_len,255|valid_url',
-						'comment' => 'required|min_len,10',
-						'seotitle' => 'required'
-					));
-					$core->poval->filter_rules(array(
-						'id' => 'trim|sanitize_numbers',
-						'id_parent' => 'trim',
-						'name' => 'trim|sanitize_string',
-						'email' => 'trim|sanitize_email',
-						'url' => 'trim|sanitize_string',
-						'comment' => 'trim|sanitize_string|basic_tags',
-						'seotitle' => 'trim'
-					));
-					$validated_data = $core->poval->run($_POST);
-					if ($validated_data === false) {
-						$core->poflash->error($lang['front_comment_error_3']);
-					} else {
-						if ($core->posetting[18]['value'] == 'Y') {
-							$active = 'Y';
-						} else {
-							$active = 'N';
-						}
-						$data = array(
-							'id_post' => $_POST['id'],
-							'id_parent' => $_POST['id_parent'],
-							'name' => $_POST['name'],
-							'email' => $_POST['email'],
-							'url' => $_POST['url'],
-							'comment' => $_POST['comment'],
-							'date' => date('Y-m-d'),
-							'time' => date('h:i:s'),
-							'active' => $active
-						);
-						$query = $core->podb->insertInto('comment')->values($data);
-						$query->execute();
-						unset($_POST);
-						$core->poflash->success($lang['front_comment_success']);
-					}
-				} else {
-					$core->poflash->error($lang['front_comment_error_2']);
-				}
-			} else {
-				$core->poflash->error($lang['front_comment_error_1']);
-			}
-		}
-		$query_hits = $core->podb->update('post')
-			->set(array('hits' => $post['hits']+1))
-			->where('id_post', $post['id_post']);
-		$query_hits->execute();
-		$info = array(
-			'page_title' => htmlspecialchars_decode($post['title']),
-			'page_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
-			'page_key' => $post['tag'],
-			'social_mod' => $lang['front_post_title'],
-			'social_name' => $core->posetting[0]['value'],
-			'social_url' => $core->posetting[1]['value'].'/'.substr($post['date'],0,4).'/'.substr($post['date'],5,2).'/'.$post['seotitle'],
-			'social_title' => htmlspecialchars_decode($post['title']),
-			'social_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
-			'social_img' => $core->posetting[1]['value'].'/'.DIR_CON.'/uploads/'.$post['picture'],
-			'page' => '1'
-		);
-		$adddata = array_merge($info, $lang);
-		$templates->addData(
-			$adddata
-		);
-		echo $templates->render('detailpost', compact('post','lang'));
-	} else {
-		$info = array(
-			'page_title' => $lang['front_post_not_found'],
-			'page_desc' => $core->posetting[2]['value'],
-			'page_key' => $core->posetting[3]['value'],
-			'social_mod' => $lang['front_post_title'],
-			'social_name' => $core->posetting[0]['value'],
-			'social_url' => $core->posetting[1]['value'],
-			'social_title' => $lang['front_post_not_found'],
-			'social_desc' => $core->posetting[2]['value'],
-			'social_img' => $core->posetting[1]['value'].'/'.DIR_INC.'/images/favicon.png'
-		);
-		$adddata = array_merge($info, $lang);
-		$templates->addData(
-			$adddata
-		);
-		echo $templates->render('404', compact('lang'));
-	}
-});
-
-/**
- * Router untuk menampilkan request halaman post dengan nomor halaman.
- *
- * Router for display request in post page with pagination.
- *
- * $year = string
- * $month = string
- * $seotitle = string [a-z0-9_-]
- * $page = integer
- *
- * Added in v.2.0.1
-*/
-$router->match('GET|POST', '/(\d+)/(\d+)/([a-z0-9_-]+)/page/(\d+)', function($year, $month, $seotitle, $page) use ($core, $templates) {
-	$lang = $core->setlang('post', WEB_LANG);
-	$post = $core->podb->from('post')
-		->select(array('post_description.title', 'post_description.content'))
-		->leftJoin('post_description ON post_description.id_post = post.id_post')
-		->where('post.seotitle', $seotitle)
-		->where('post_description.id_language', WEB_LANG_ID)
-		->where('post.active', 'Y')
-		->where('post.publishdate < ?', date('Y-m-d H:i:s'))
-		->limit(1)
-		->fetch();
-	if ($post) {
-		if (!empty($_POST)) {
-			require_once(DIR_INC.'/core/vendor/recaptcha/recaptchalib.php');
-			$secret = $core->posetting[22]['value'];
-			$recaptcha = new PoReCaptcha($secret);
-			if (!empty($_POST["g-recaptcha-response"])) {
-				$resp = $recaptcha->verifyResponse(
-					$_SERVER["REMOTE_ADDR"],
-					$_POST["g-recaptcha-response"]
-				);
-				if ($resp != null && $resp->success) {
-					$core->poval->validation_rules(array(
-						'id' => 'required|integer',
-						'id_parent' => 'required|integer',
-						'name' => 'required|max_len,100|min_len,3',
-						'email' => 'required|valid_email',
-						'url' => 'max_len,255|valid_url',
-						'comment' => 'required|min_len,10',
-						'seotitle' => 'required'
-					));
-					$core->poval->filter_rules(array(
-						'id' => 'trim|sanitize_numbers',
-						'id_parent' => 'trim',
-						'name' => 'trim|sanitize_string',
-						'email' => 'trim|sanitize_email',
-						'url' => 'trim|sanitize_string',
-						'comment' => 'trim|sanitize_string|basic_tags',
-						'seotitle' => 'trim'
-					));
-					$validated_data = $core->poval->run($_POST);
-					if ($validated_data === false) {
-						$core->poflash->error($lang['front_comment_error_3']);
-					} else {
-						if ($core->posetting[18]['value'] == 'Y') {
-							$active = 'Y';
-						} else {
-							$active = 'N';
-						}
-						$data = array(
-							'id_post' => $_POST['id'],
-							'id_parent' => $_POST['id_parent'],
-							'name' => $_POST['name'],
-							'email' => $_POST['email'],
-							'url' => $_POST['url'],
-							'comment' => $_POST['comment'],
-							'date' => date('Y-m-d'),
-							'time' => date('h:i:s'),
-							'active' => $active
-						);
-						$query = $core->podb->insertInto('comment')->values($data);
-						$query->execute();
-						unset($_POST);
-						$core->poflash->success($lang['front_comment_success']);
-					}
-				} else {
-					$core->poflash->error($lang['front_comment_error_2']);
-				}
-			} else {
-				$core->poflash->error($lang['front_comment_error_1']);
-			}
-		}
-		$query_hits = $core->podb->update('post')
-			->set(array('hits' => $post['hits']+1))
-			->where('id_post', $post['id_post']);
-		$query_hits->execute();
-		$info = array(
-			'page_title' => htmlspecialchars_decode($post['title']),
-			'page_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
-			'page_key' => $post['tag'],
-			'social_mod' => $lang['front_post_title'],
-			'social_name' => $core->posetting[0]['value'],
-			'social_url' => $core->posetting[1]['value'].'/'.substr($post['date'],0,4).'/'.substr($post['date'],5,2).'/'.$post['seotitle'],
-			'social_title' => htmlspecialchars_decode($post['title']),
-			'social_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
-			'social_img' => $core->posetting[1]['value'].'/'.DIR_CON.'/uploads/'.$post['picture'],
-			'page' => $page
-		);
-		$adddata = array_merge($info, $lang);
-		$templates->addData(
-			$adddata
-		);
-		echo $templates->render('detailpost', compact('post','lang'));
-	} else {
-		$info = array(
-			'page_title' => $lang['front_post_not_found'],
-			'page_desc' => $core->posetting[2]['value'],
-			'page_key' => $core->posetting[3]['value'],
-			'social_mod' => $lang['front_post_title'],
-			'social_name' => $core->posetting[0]['value'],
-			'social_url' => $core->posetting[1]['value'],
-			'social_title' => $lang['front_post_not_found'],
-			'social_desc' => $core->posetting[2]['value'],
-			'social_img' => $core->posetting[1]['value'].'/'.DIR_INC.'/images/favicon.png'
-		);
-		$adddata = array_merge($info, $lang);
-		$templates->addData(
-			$adddata
-		);
-		echo $templates->render('404', compact('lang'));
-	}
-});
-
-/**
- * Router untuk menampilkan request halaman post.
- *
- * Router for display request in post page.
- *
- * $seotitle = string [a-z0-9_-]
- *
- * Added in v.2.0.1
-*/
-$router->match('GET|POST', '/'.SLUG_PERMALINK.'/([a-z0-9_-]+)', function($seotitle) use ($core, $templates) {
-	$lang = $core->setlang('post', WEB_LANG);
-	$post = $core->podb->from('post')
-		->select(array('post_description.title', 'post_description.content'))
-		->leftJoin('post_description ON post_description.id_post = post.id_post')
-		->where('post.seotitle', $seotitle)
-		->where('post_description.id_language', WEB_LANG_ID)
-		->where('post.active', 'Y')
-		->where('post.publishdate < ?', date('Y-m-d H:i:s'))
-		->limit(1)
-		->fetch();
-	if ($post) {
-		if (!empty($_POST)) {
-			require_once(DIR_INC.'/core/vendor/recaptcha/recaptchalib.php');
-			$secret = $core->posetting[22]['value'];
-			$recaptcha = new PoReCaptcha($secret);
-			if (!empty($_POST["g-recaptcha-response"])) {
-				$resp = $recaptcha->verifyResponse(
-					$_SERVER["REMOTE_ADDR"],
-					$_POST["g-recaptcha-response"]
-				);
-				if ($resp != null && $resp->success) {
-					$core->poval->validation_rules(array(
-						'id' => 'required|integer',
-						'id_parent' => 'required|integer',
-						'name' => 'required|max_len,100|min_len,3',
-						'email' => 'required|valid_email',
-						'url' => 'max_len,255|valid_url',
-						'comment' => 'required|min_len,10',
-						'seotitle' => 'required'
-					));
-					$core->poval->filter_rules(array(
-						'id' => 'trim|sanitize_numbers',
-						'id_parent' => 'trim',
-						'name' => 'trim|sanitize_string',
-						'email' => 'trim|sanitize_email',
-						'url' => 'trim|sanitize_string',
-						'comment' => 'trim|sanitize_string|basic_tags',
-						'seotitle' => 'trim'
-					));
-					$validated_data = $core->poval->run($_POST);
-					if ($validated_data === false) {
-						$core->poflash->error($lang['front_comment_error_3']);
-					} else {
-						if ($core->posetting[18]['value'] == 'Y') {
-							$active = 'Y';
-						} else {
-							$active = 'N';
-						}
-						$data = array(
-							'id_post' => $_POST['id'],
-							'id_parent' => $_POST['id_parent'],
-							'name' => $_POST['name'],
-							'email' => $_POST['email'],
-							'url' => $_POST['url'],
-							'comment' => $_POST['comment'],
-							'date' => date('Y-m-d'),
-							'time' => date('h:i:s'),
-							'active' => $active
-						);
-						$query = $core->podb->insertInto('comment')->values($data);
-						$query->execute();
-						unset($_POST);
-						$core->poflash->success($lang['front_comment_success']);
-					}
-				} else {
-					$core->poflash->error($lang['front_comment_error_2']);
-				}
-			} else {
-				$core->poflash->error($lang['front_comment_error_1']);
-			}
-		}
-		$query_hits = $core->podb->update('post')
-			->set(array('hits' => $post['hits']+1))
-			->where('id_post', $post['id_post']);
-		$query_hits->execute();
-		$info = array(
-			'page_title' => htmlspecialchars_decode($post['title']),
-			'page_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
-			'page_key' => $post['tag'],
-			'social_mod' => $lang['front_post_title'],
-			'social_name' => $core->posetting[0]['value'],
-			'social_url' => $core->posetting[1]['value'].'/'.SLUG_PERMALINK.'/'.$post['seotitle'],
-			'social_title' => htmlspecialchars_decode($post['title']),
-			'social_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
-			'social_img' => $core->posetting[1]['value'].'/'.DIR_CON.'/uploads/'.$post['picture'],
-			'page' => '1'
-		);
-		$adddata = array_merge($info, $lang);
-		$templates->addData(
-			$adddata
-		);
-		echo $templates->render('detailpost', compact('post','lang'));
-	} else {
-		$info = array(
-			'page_title' => $lang['front_post_not_found'],
-			'page_desc' => $core->posetting[2]['value'],
-			'page_key' => $core->posetting[3]['value'],
-			'social_mod' => $lang['front_post_title'],
-			'social_name' => $core->posetting[0]['value'],
-			'social_url' => $core->posetting[1]['value'],
-			'social_title' => $lang['front_post_not_found'],
-			'social_desc' => $core->posetting[2]['value'],
-			'social_img' => $core->posetting[1]['value'].'/'.DIR_INC.'/images/favicon.png'
-		);
-		$adddata = array_merge($info, $lang);
-		$templates->addData(
-			$adddata
-		);
-		echo $templates->render('404', compact('lang'));
-	}
-});
-
-/**
- * Router untuk menampilkan request halaman post dengan nomor halaman.
- *
- * Router for display request in post page with pagination.
- *
- * $seotitle = string [a-z0-9_-]
- * $page = integer
- *
- * Added in v.2.0.1
-*/
-$router->match('GET|POST', '/'.SLUG_PERMALINK.'/([a-z0-9_-]+)/page/(\d+)', function($seotitle, $page) use ($core, $templates) {
-	$lang = $core->setlang('post', WEB_LANG);
-	$post = $core->podb->from('post')
-		->select(array('post_description.title', 'post_description.content'))
-		->leftJoin('post_description ON post_description.id_post = post.id_post')
-		->where('post.seotitle', $seotitle)
-		->where('post_description.id_language', WEB_LANG_ID)
-		->where('post.active', 'Y')
-		->where('post.publishdate < ?', date('Y-m-d H:i:s'))
-		->limit(1)
-		->fetch();
-	if ($post) {
-		if (!empty($_POST)) {
-			require_once(DIR_INC.'/core/vendor/recaptcha/recaptchalib.php');
-			$secret = $core->posetting[22]['value'];
-			$recaptcha = new PoReCaptcha($secret);
-			if (!empty($_POST["g-recaptcha-response"])) {
-				$resp = $recaptcha->verifyResponse(
-					$_SERVER["REMOTE_ADDR"],
-					$_POST["g-recaptcha-response"]
-				);
-				if ($resp != null && $resp->success) {
-					$core->poval->validation_rules(array(
-						'id' => 'required|integer',
-						'id_parent' => 'required|integer',
-						'name' => 'required|max_len,100|min_len,3',
-						'email' => 'required|valid_email',
-						'url' => 'max_len,255|valid_url',
-						'comment' => 'required|min_len,10',
-						'seotitle' => 'required'
-					));
-					$core->poval->filter_rules(array(
-						'id' => 'trim|sanitize_numbers',
-						'id_parent' => 'trim',
-						'name' => 'trim|sanitize_string',
-						'email' => 'trim|sanitize_email',
-						'url' => 'trim|sanitize_string',
-						'comment' => 'trim|sanitize_string|basic_tags',
-						'seotitle' => 'trim'
-					));
-					$validated_data = $core->poval->run($_POST);
-					if ($validated_data === false) {
-						$core->poflash->error($lang['front_comment_error_3']);
-					} else {
-						if ($core->posetting[18]['value'] == 'Y') {
-							$active = 'Y';
-						} else {
-							$active = 'N';
-						}
-						$data = array(
-							'id_post' => $_POST['id'],
-							'id_parent' => $_POST['id_parent'],
-							'name' => $_POST['name'],
-							'email' => $_POST['email'],
-							'url' => $_POST['url'],
-							'comment' => $_POST['comment'],
-							'date' => date('Y-m-d'),
-							'time' => date('h:i:s'),
-							'active' => $active
-						);
-						$query = $core->podb->insertInto('comment')->values($data);
-						$query->execute();
-						unset($_POST);
-						$core->poflash->success($lang['front_comment_success']);
-					}
-				} else {
-					$core->poflash->error($lang['front_comment_error_2']);
-				}
-			} else {
-				$core->poflash->error($lang['front_comment_error_1']);
-			}
-		}
-		$query_hits = $core->podb->update('post')
-			->set(array('hits' => $post['hits']+1))
-			->where('id_post', $post['id_post']);
-		$query_hits->execute();
-		$info = array(
-			'page_title' => htmlspecialchars_decode($post['title']),
-			'page_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
-			'page_key' => $post['tag'],
-			'social_mod' => $lang['front_post_title'],
-			'social_name' => $core->posetting[0]['value'],
-			'social_url' => $core->posetting[1]['value'].'/'.SLUG_PERMALINK.'/'.$post['seotitle'],
-			'social_title' => htmlspecialchars_decode($post['title']),
-			'social_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
-			'social_img' => $core->posetting[1]['value'].'/'.DIR_CON.'/uploads/'.$post['picture'],
-			'page' => $page
-		);
-		$adddata = array_merge($info, $lang);
-		$templates->addData(
-			$adddata
-		);
-		echo $templates->render('detailpost', compact('post','lang'));
-	} else {
-		$info = array(
-			'page_title' => $lang['front_post_not_found'],
-			'page_desc' => $core->posetting[2]['value'],
-			'page_key' => $core->posetting[3]['value'],
-			'social_mod' => $lang['front_post_title'],
-			'social_name' => $core->posetting[0]['value'],
-			'social_url' => $core->posetting[1]['value'],
-			'social_title' => $lang['front_post_not_found'],
-			'social_desc' => $core->posetting[2]['value'],
-			'social_img' => $core->posetting[1]['value'].'/'.DIR_INC.'/images/favicon.png'
-		);
-		$adddata = array_merge($info, $lang);
-		$templates->addData(
-			$adddata
-		);
-		echo $templates->render('404', compact('lang'));
-	}
-});
-
-/**
- * Router untuk menampilkan request halaman post.
- *
- * Router for display request in post page.
- *
- * $id = integer
- *
- * Added in v.2.0.1
-*/
-$router->match('GET|POST', '/archives/(\d+)', function($id) use ($core, $templates) {
-	$lang = $core->setlang('post', WEB_LANG);
-	$post = $core->podb->from('post')
-		->select(array('post_description.title', 'post_description.content'))
-		->leftJoin('post_description ON post_description.id_post = post.id_post')
-		->where('post.id_post', $id)
-		->where('post_description.id_language', WEB_LANG_ID)
-		->where('post.active', 'Y')
-		->where('post.publishdate < ?', date('Y-m-d H:i:s'))
-		->limit(1)
-		->fetch();
-	if ($post) {
-		if (!empty($_POST)) {
-			require_once(DIR_INC.'/core/vendor/recaptcha/recaptchalib.php');
-			$secret = $core->posetting[22]['value'];
-			$recaptcha = new PoReCaptcha($secret);
-			if (!empty($_POST["g-recaptcha-response"])) {
-				$resp = $recaptcha->verifyResponse(
-					$_SERVER["REMOTE_ADDR"],
-					$_POST["g-recaptcha-response"]
-				);
-				if ($resp != null && $resp->success) {
-					$core->poval->validation_rules(array(
-						'id' => 'required|integer',
-						'id_parent' => 'required|integer',
-						'name' => 'required|max_len,100|min_len,3',
-						'email' => 'required|valid_email',
-						'url' => 'max_len,255|valid_url',
-						'comment' => 'required|min_len,10',
-						'seotitle' => 'required'
-					));
-					$core->poval->filter_rules(array(
-						'id' => 'trim|sanitize_numbers',
-						'id_parent' => 'trim',
-						'name' => 'trim|sanitize_string',
-						'email' => 'trim|sanitize_email',
-						'url' => 'trim|sanitize_string',
-						'comment' => 'trim|sanitize_string|basic_tags',
-						'seotitle' => 'trim'
-					));
-					$validated_data = $core->poval->run($_POST);
-					if ($validated_data === false) {
-						$core->poflash->error($lang['front_comment_error_3']);
-					} else {
-						if ($core->posetting[18]['value'] == 'Y') {
-							$active = 'Y';
-						} else {
-							$active = 'N';
-						}
-						$data = array(
-							'id_post' => $_POST['id'],
-							'id_parent' => $_POST['id_parent'],
-							'name' => $_POST['name'],
-							'email' => $_POST['email'],
-							'url' => $_POST['url'],
-							'comment' => $_POST['comment'],
-							'date' => date('Y-m-d'),
-							'time' => date('h:i:s'),
-							'active' => $active
-						);
-						$query = $core->podb->insertInto('comment')->values($data);
-						$query->execute();
-						unset($_POST);
-						$core->poflash->success($lang['front_comment_success']);
-					}
-				} else {
-					$core->poflash->error($lang['front_comment_error_2']);
-				}
-			} else {
-				$core->poflash->error($lang['front_comment_error_1']);
-			}
-		}
-		$query_hits = $core->podb->update('post')
-			->set(array('hits' => $post['hits']+1))
-			->where('id_post', $post['id_post']);
-		$query_hits->execute();
-		$info = array(
-			'page_title' => htmlspecialchars_decode($post['title']),
-			'page_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
-			'page_key' => $post['tag'],
-			'social_mod' => $lang['front_post_title'],
-			'social_name' => $core->posetting[0]['value'],
-			'social_url' => $core->posetting[1]['value'].'/archives/'.$post['id_post'],
-			'social_title' => htmlspecialchars_decode($post['title']),
-			'social_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
-			'social_img' => $core->posetting[1]['value'].'/'.DIR_CON.'/uploads/'.$post['picture'],
-			'page' => '1'
-		);
-		$adddata = array_merge($info, $lang);
-		$templates->addData(
-			$adddata
-		);
-		echo $templates->render('detailpost', compact('post','lang'));
-	} else {
-		$info = array(
-			'page_title' => $lang['front_post_not_found'],
-			'page_desc' => $core->posetting[2]['value'],
-			'page_key' => $core->posetting[3]['value'],
-			'social_mod' => $lang['front_post_title'],
-			'social_name' => $core->posetting[0]['value'],
-			'social_url' => $core->posetting[1]['value'],
-			'social_title' => $lang['front_post_not_found'],
-			'social_desc' => $core->posetting[2]['value'],
-			'social_img' => $core->posetting[1]['value'].'/'.DIR_INC.'/images/favicon.png'
-		);
-		$adddata = array_merge($info, $lang);
-		$templates->addData(
-			$adddata
-		);
-		echo $templates->render('404', compact('lang'));
-	}
-});
-
-/**
- * Router untuk menampilkan request halaman post dengan nomor halaman.
- *
- * Router for display request in post page with pagination.
- *
- * $id = integer
- * $page = integer
- *
- * Added in v.2.0.1
-*/
-$router->match('GET|POST', '/archives/(\d+)/page/(\d+)', function($id, $page) use ($core, $templates) {
-	$lang = $core->setlang('post', WEB_LANG);
-	$post = $core->podb->from('post')
-		->select(array('post_description.title', 'post_description.content'))
-		->leftJoin('post_description ON post_description.id_post = post.id_post')
-		->where('post.id_post', $id)
-		->where('post_description.id_language', WEB_LANG_ID)
-		->where('post.active', 'Y')
-		->where('post.publishdate < ?', date('Y-m-d H:i:s'))
-		->limit(1)
-		->fetch();
-	if ($post) {
-		if (!empty($_POST)) {
-			require_once(DIR_INC.'/core/vendor/recaptcha/recaptchalib.php');
-			$secret = $core->posetting[22]['value'];
-			$recaptcha = new PoReCaptcha($secret);
-			if (!empty($_POST["g-recaptcha-response"])) {
-				$resp = $recaptcha->verifyResponse(
-					$_SERVER["REMOTE_ADDR"],
-					$_POST["g-recaptcha-response"]
-				);
-				if ($resp != null && $resp->success) {
-					$core->poval->validation_rules(array(
-						'id' => 'required|integer',
-						'id_parent' => 'required|integer',
-						'name' => 'required|max_len,100|min_len,3',
-						'email' => 'required|valid_email',
-						'url' => 'max_len,255|valid_url',
-						'comment' => 'required|min_len,10',
-						'seotitle' => 'required'
-					));
-					$core->poval->filter_rules(array(
-						'id' => 'trim|sanitize_numbers',
-						'id_parent' => 'trim',
-						'name' => 'trim|sanitize_string',
-						'email' => 'trim|sanitize_email',
-						'url' => 'trim|sanitize_string',
-						'comment' => 'trim|sanitize_string|basic_tags',
-						'seotitle' => 'trim'
-					));
-					$validated_data = $core->poval->run($_POST);
-					if ($validated_data === false) {
-						$core->poflash->error($lang['front_comment_error_3']);
-					} else {
-						if ($core->posetting[18]['value'] == 'Y') {
-							$active = 'Y';
-						} else {
-							$active = 'N';
-						}
-						$data = array(
-							'id_post' => $_POST['id'],
-							'id_parent' => $_POST['id_parent'],
-							'name' => $_POST['name'],
-							'email' => $_POST['email'],
-							'url' => $_POST['url'],
-							'comment' => $_POST['comment'],
-							'date' => date('Y-m-d'),
-							'time' => date('h:i:s'),
-							'active' => $active
-						);
-						$query = $core->podb->insertInto('comment')->values($data);
-						$query->execute();
-						unset($_POST);
-						$core->poflash->success($lang['front_comment_success']);
-					}
-				} else {
-					$core->poflash->error($lang['front_comment_error_2']);
-				}
-			} else {
-				$core->poflash->error($lang['front_comment_error_1']);
-			}
-		}
-		$query_hits = $core->podb->update('post')
-			->set(array('hits' => $post['hits']+1))
-			->where('id_post', $post['id_post']);
-		$query_hits->execute();
-		$info = array(
-			'page_title' => htmlspecialchars_decode($post['title']),
-			'page_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
-			'page_key' => $post['tag'],
-			'social_mod' => $lang['front_post_title'],
-			'social_name' => $core->posetting[0]['value'],
-			'social_url' => $core->posetting[1]['value'].'/archives/'.$post['id_post'],
-			'social_title' => htmlspecialchars_decode($post['title']),
-			'social_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
-			'social_img' => $core->posetting[1]['value'].'/'.DIR_CON.'/uploads/'.$post['picture'],
-			'page' => $page
-		);
-		$adddata = array_merge($info, $lang);
-		$templates->addData(
-			$adddata
-		);
-		echo $templates->render('detailpost', compact('post','lang'));
-	} else {
-		$info = array(
-			'page_title' => $lang['front_post_not_found'],
-			'page_desc' => $core->posetting[2]['value'],
-			'page_key' => $core->posetting[3]['value'],
-			'social_mod' => $lang['front_post_title'],
-			'social_name' => $core->posetting[0]['value'],
-			'social_url' => $core->posetting[1]['value'],
-			'social_title' => $lang['front_post_not_found'],
-			'social_desc' => $core->posetting[2]['value'],
-			'social_img' => $core->posetting[1]['value'].'/'.DIR_INC.'/images/favicon.png'
-		);
-		$adddata = array_merge($info, $lang);
-		$templates->addData(
-			$adddata
-		);
-		echo $templates->render('404', compact('lang'));
-	}
-});
-
-/**
- * Router untuk menampilkan request halaman post.
- *
- * Router for display request in post page.
- *
- * $id = integer
- * $seotitle = string
- *
- * Added in v.2.0.1
-*/
-$router->match('GET|POST', '/'.SLUG_PERMALINK.'-(\d+)-([a-z0-9_-]+)', function($id, $seotitle) use ($core, $templates) {
-	$lang = $core->setlang('post', WEB_LANG);
-	$post = $core->podb->from('post')
-		->select(array('post_description.title', 'post_description.content'))
-		->leftJoin('post_description ON post_description.id_post = post.id_post')
-		->where('post.id_post', $id)
-		->where('post_description.id_language', WEB_LANG_ID)
-		->where('post.active', 'Y')
-		->where('post.publishdate < ?', date('Y-m-d H:i:s'))
-		->limit(1)
-		->fetch();
-	if ($post) {
-		if (!empty($_POST)) {
-			require_once(DIR_INC.'/core/vendor/recaptcha/recaptchalib.php');
-			$secret = $core->posetting[22]['value'];
-			$recaptcha = new PoReCaptcha($secret);
-			if (!empty($_POST["g-recaptcha-response"])) {
-				$resp = $recaptcha->verifyResponse(
-					$_SERVER["REMOTE_ADDR"],
-					$_POST["g-recaptcha-response"]
-				);
-				if ($resp != null && $resp->success) {
-					$core->poval->validation_rules(array(
-						'id' => 'required|integer',
-						'id_parent' => 'required|integer',
-						'name' => 'required|max_len,100|min_len,3',
-						'email' => 'required|valid_email',
-						'url' => 'max_len,255|valid_url',
-						'comment' => 'required|min_len,10',
-						'seotitle' => 'required'
-					));
-					$core->poval->filter_rules(array(
-						'id' => 'trim|sanitize_numbers',
-						'id_parent' => 'trim',
-						'name' => 'trim|sanitize_string',
-						'email' => 'trim|sanitize_email',
-						'url' => 'trim|sanitize_string',
-						'comment' => 'trim|sanitize_string|basic_tags',
-						'seotitle' => 'trim'
-					));
-					$validated_data = $core->poval->run($_POST);
-					if ($validated_data === false) {
-						$core->poflash->error($lang['front_comment_error_3']);
-					} else {
-						if ($core->posetting[18]['value'] == 'Y') {
-							$active = 'Y';
-						} else {
-							$active = 'N';
-						}
-						$data = array(
-							'id_post' => $_POST['id'],
-							'id_parent' => $_POST['id_parent'],
-							'name' => $_POST['name'],
-							'email' => $_POST['email'],
-							'url' => $_POST['url'],
-							'comment' => $_POST['comment'],
-							'date' => date('Y-m-d'),
-							'time' => date('h:i:s'),
-							'active' => $active
-						);
-						$query = $core->podb->insertInto('comment')->values($data);
-						$query->execute();
-						unset($_POST);
-						$core->poflash->success($lang['front_comment_success']);
-					}
-				} else {
-					$core->poflash->error($lang['front_comment_error_2']);
-				}
-			} else {
-				$core->poflash->error($lang['front_comment_error_1']);
-			}
-		}
-		$query_hits = $core->podb->update('post')
-			->set(array('hits' => $post['hits']+1))
-			->where('id_post', $post['id_post']);
-		$query_hits->execute();
-		$info = array(
-			'page_title' => htmlspecialchars_decode($post['title']),
-			'page_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
-			'page_key' => $post['tag'],
-			'social_mod' => $lang['front_post_title'],
-			'social_name' => $core->posetting[0]['value'],
-			'social_url' => $core->posetting[1]['value'].'/'.$post['id_post'].'-'.$post['seotitle'],
-			'social_title' => htmlspecialchars_decode($post['title']),
-			'social_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
-			'social_img' => $core->posetting[1]['value'].'/'.DIR_CON.'/uploads/'.$post['picture'],
-			'page' => '1'
-		);
-		$adddata = array_merge($info, $lang);
-		$templates->addData(
-			$adddata
-		);
-		echo $templates->render('detailpost', compact('post','lang'));
-	} else {
-		$info = array(
-			'page_title' => $lang['front_post_not_found'],
-			'page_desc' => $core->posetting[2]['value'],
-			'page_key' => $core->posetting[3]['value'],
-			'social_mod' => $lang['front_post_title'],
-			'social_name' => $core->posetting[0]['value'],
-			'social_url' => $core->posetting[1]['value'],
-			'social_title' => $lang['front_post_not_found'],
-			'social_desc' => $core->posetting[2]['value'],
-			'social_img' => $core->posetting[1]['value'].'/'.DIR_INC.'/images/favicon.png'
-		);
-		$adddata = array_merge($info, $lang);
-		$templates->addData(
-			$adddata
-		);
-		echo $templates->render('404', compact('lang'));
-	}
-});
-
-/**
- * Router untuk menampilkan request halaman post dengan nomor halaman.
- *
- * Router for display request in post page with pagination.
- *
- * $id = integer
- * $seotitle = string
- * $page = integer
- *
- * Added in v.2.0.1
-*/
-$router->match('GET|POST', '/'.SLUG_PERMALINK.'-(\d+)-([a-z0-9_-]+)/page/(\d+)', function($id, $seotitle, $page) use ($core, $templates) {
-	$lang = $core->setlang('post', WEB_LANG);
-	$post = $core->podb->from('post')
-		->select(array('post_description.title', 'post_description.content'))
-		->leftJoin('post_description ON post_description.id_post = post.id_post')
-		->where('post.id_post', $id)
-		->where('post_description.id_language', WEB_LANG_ID)
-		->where('post.active', 'Y')
-		->where('post.publishdate < ?', date('Y-m-d H:i:s'))
-		->limit(1)
-		->fetch();
-	if ($post) {
-		if (!empty($_POST)) {
-			require_once(DIR_INC.'/core/vendor/recaptcha/recaptchalib.php');
-			$secret = $core->posetting[22]['value'];
-			$recaptcha = new PoReCaptcha($secret);
-			if (!empty($_POST["g-recaptcha-response"])) {
-				$resp = $recaptcha->verifyResponse(
-					$_SERVER["REMOTE_ADDR"],
-					$_POST["g-recaptcha-response"]
-				);
-				if ($resp != null && $resp->success) {
-					$core->poval->validation_rules(array(
-						'id' => 'required|integer',
-						'id_parent' => 'required|integer',
-						'name' => 'required|max_len,100|min_len,3',
-						'email' => 'required|valid_email',
-						'url' => 'max_len,255|valid_url',
-						'comment' => 'required|min_len,10',
-						'seotitle' => 'required'
-					));
-					$core->poval->filter_rules(array(
-						'id' => 'trim|sanitize_numbers',
-						'id_parent' => 'trim',
-						'name' => 'trim|sanitize_string',
-						'email' => 'trim|sanitize_email',
-						'url' => 'trim|sanitize_string',
-						'comment' => 'trim|sanitize_string|basic_tags',
-						'seotitle' => 'trim'
-					));
-					$validated_data = $core->poval->run($_POST);
-					if ($validated_data === false) {
-						$core->poflash->error($lang['front_comment_error_3']);
-					} else {
-						if ($core->posetting[18]['value'] == 'Y') {
-							$active = 'Y';
-						} else {
-							$active = 'N';
-						}
-						$data = array(
-							'id_post' => $_POST['id'],
-							'id_parent' => $_POST['id_parent'],
-							'name' => $_POST['name'],
-							'email' => $_POST['email'],
-							'url' => $_POST['url'],
-							'comment' => $_POST['comment'],
-							'date' => date('Y-m-d'),
-							'time' => date('h:i:s'),
-							'active' => $active
-						);
-						$query = $core->podb->insertInto('comment')->values($data);
-						$query->execute();
-						unset($_POST);
-						$core->poflash->success($lang['front_comment_success']);
-					}
-				} else {
-					$core->poflash->error($lang['front_comment_error_2']);
-				}
-			} else {
-				$core->poflash->error($lang['front_comment_error_1']);
-			}
-		}
-		$query_hits = $core->podb->update('post')
-			->set(array('hits' => $post['hits']+1))
-			->where('id_post', $post['id_post']);
-		$query_hits->execute();
-		$info = array(
-			'page_title' => htmlspecialchars_decode($post['title']),
-			'page_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
-			'page_key' => $post['tag'],
-			'social_mod' => $lang['front_post_title'],
-			'social_name' => $core->posetting[0]['value'],
-			'social_url' => $core->posetting[1]['value'].'/'.$post['id_post'].'-'.$post['seotitle'],
-			'social_title' => htmlspecialchars_decode($post['title']),
-			'social_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
-			'social_img' => $core->posetting[1]['value'].'/'.DIR_CON.'/uploads/'.$post['picture'],
-			'page' => $page
-		);
-		$adddata = array_merge($info, $lang);
-		$templates->addData(
-			$adddata
-		);
-		echo $templates->render('detailpost', compact('post','lang'));
-	} else {
-		$info = array(
-			'page_title' => $lang['front_post_not_found'],
-			'page_desc' => $core->posetting[2]['value'],
-			'page_key' => $core->posetting[3]['value'],
-			'social_mod' => $lang['front_post_title'],
-			'social_name' => $core->posetting[0]['value'],
-			'social_url' => $core->posetting[1]['value'],
-			'social_title' => $lang['front_post_not_found'],
-			'social_desc' => $core->posetting[2]['value'],
-			'social_img' => $core->posetting[1]['value'].'/'.DIR_INC.'/images/favicon.png'
-		);
-		$adddata = array_merge($info, $lang);
-		$templates->addData(
-			$adddata
-		);
-		echo $templates->render('404', compact('lang'));
-	}
-});
-
-$uriforpost = explode('/', $_SERVER['REQUEST_URI']);
-$uriexistpost = $core->podb->from('post')->select(array('post_description.title', 'post_description.content'))->leftJoin('post_description ON post_description.id_post = post.id_post')->where('post.seotitle', end($uriforpost))->where('post_description.id_language', WEB_LANG_ID)->where('post.active', 'Y')->where('post.publishdate < ?', date('Y-m-d H:i:s'))->limit(1)->fetch();
-if ($uriexistpost) {
-	/**
-	 * Router untuk menampilkan request halaman post.
-	 *
-	 * Router for display request in post page.
-	 *
-	 * $seotitle = string [a-z0-9_-]
-	 *
-	 * Added in v.2.0.1
-	*/
-	$router->match('GET|POST', '/([a-z0-9_-]+)', function($seotitle) use ($core, $templates) {
-		if (!empty($_POST['search'])) {
-			$query_seo = $core->postring->seo_title($core->postring->valid($_POST['search'], 'xss'));
-			header('location:'.BASE_URL.'/search/'.$query_seo);
-		} else {
+if (PERMALINK == 'slug/post-title') {
+	if (SLUG_PERMALINK == 'detailpost') {
+		/**
+		 * Router untuk menampilkan request halaman post.
+		 *
+		 * Router for display request in post page.
+		 *
+		 * $seotitle = string [a-z0-9_-]
+		*/
+		$router->match('GET|POST', '/detailpost/([a-z0-9_-]+)', function($seotitle) use ($core, $templates) {
 			$lang = $core->setlang('post', WEB_LANG);
 			$post = $core->podb->from('post')
 				->select(array('post_description.title', 'post_description.content'))
@@ -1590,7 +105,7 @@ if ($uriexistpost) {
 					'page_key' => $post['tag'],
 					'social_mod' => $lang['front_post_title'],
 					'social_name' => $core->posetting[0]['value'],
-					'social_url' => $core->posetting[1]['value'].'/'.$post['seotitle'],
+					'social_url' => $core->posetting[1]['value'].'/detailpost/'.$post['seotitle'],
 					'social_title' => htmlspecialchars_decode($post['title']),
 					'social_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
 					'social_img' => $core->posetting[1]['value'].'/'.DIR_CON.'/uploads/'.$post['picture'],
@@ -1619,25 +134,388 @@ if ($uriexistpost) {
 				);
 				echo $templates->render('404', compact('lang'));
 			}
-		}
-	});
-}
+		});
 
-/**
- * Router untuk menampilkan request halaman post dengan nomor halaman.
- *
- * Router for display request in post page with pagination.
- *
- * $seotitle = string [a-z0-9_-]
- * $page = integer
- *
- * Added in v.2.0.1
-*/
-$router->match('GET|POST', '/([a-z0-9_-]+)/page/(\d+)', function($seotitle, $page) use ($core, $templates) {
-	if (!empty($_POST['search'])) {
-		$query_seo = $core->postring->seo_title($core->postring->valid($_POST['search'], 'xss'));
-		header('location:'.BASE_URL.'/search/'.$query_seo);
+		/**
+		 * Router untuk menampilkan request halaman post dengan nomor halaman.
+		 *
+		 * Router for display request in post page with pagination.
+		 *
+		 * $seotitle = string [a-z0-9_-]
+		 * $page = integer
+		*/
+		$router->match('GET|POST', '/detailpost/([a-z0-9_-]+)/page/(\d+)', function($seotitle, $page) use ($core, $templates) {
+			$lang = $core->setlang('post', WEB_LANG);
+			$post = $core->podb->from('post')
+				->select(array('post_description.title', 'post_description.content'))
+				->leftJoin('post_description ON post_description.id_post = post.id_post')
+				->where('post.seotitle', $seotitle)
+				->where('post_description.id_language', WEB_LANG_ID)
+				->where('post.active', 'Y')
+				->where('post.publishdate < ?', date('Y-m-d H:i:s'))
+				->limit(1)
+				->fetch();
+			if ($post) {
+				if (!empty($_POST)) {
+					require_once(DIR_INC.'/core/vendor/recaptcha/recaptchalib.php');
+					$secret = $core->posetting[22]['value'];
+					$recaptcha = new PoReCaptcha($secret);
+					if (!empty($_POST["g-recaptcha-response"])) {
+						$resp = $recaptcha->verifyResponse(
+							$_SERVER["REMOTE_ADDR"],
+							$_POST["g-recaptcha-response"]
+						);
+						if ($resp != null && $resp->success) {
+							$core->poval->validation_rules(array(
+								'id' => 'required|integer',
+								'id_parent' => 'required|integer',
+								'name' => 'required|max_len,100|min_len,3',
+								'email' => 'required|valid_email',
+								'url' => 'max_len,255|valid_url',
+								'comment' => 'required|min_len,10',
+								'seotitle' => 'required'
+							));
+							$core->poval->filter_rules(array(
+								'id' => 'trim|sanitize_numbers',
+								'id_parent' => 'trim',
+								'name' => 'trim|sanitize_string',
+								'email' => 'trim|sanitize_email',
+								'url' => 'trim|sanitize_string',
+								'comment' => 'trim|sanitize_string|basic_tags',
+								'seotitle' => 'trim'
+							));
+							$validated_data = $core->poval->run($_POST);
+							if ($validated_data === false) {
+								$core->poflash->error($lang['front_comment_error_3']);
+							} else {
+								if ($core->posetting[18]['value'] == 'Y') {
+									$active = 'Y';
+								} else {
+									$active = 'N';
+								}
+								$data = array(
+									'id_post' => $_POST['id'],
+									'id_parent' => $_POST['id_parent'],
+									'name' => $_POST['name'],
+									'email' => $_POST['email'],
+									'url' => $_POST['url'],
+									'comment' => $_POST['comment'],
+									'date' => date('Y-m-d'),
+									'time' => date('h:i:s'),
+									'active' => $active
+								);
+								$query = $core->podb->insertInto('comment')->values($data);
+								$query->execute();
+								unset($_POST);
+								$core->poflash->success($lang['front_comment_success']);
+							}
+						} else {
+							$core->poflash->error($lang['front_comment_error_2']);
+						}
+					} else {
+						$core->poflash->error($lang['front_comment_error_1']);
+					}
+				}
+				$query_hits = $core->podb->update('post')
+					->set(array('hits' => $post['hits']+1))
+					->where('id_post', $post['id_post']);
+				$query_hits->execute();
+				$info = array(
+					'page_title' => htmlspecialchars_decode($post['title']),
+					'page_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
+					'page_key' => $post['tag'],
+					'social_mod' => $lang['front_post_title'],
+					'social_name' => $core->posetting[0]['value'],
+					'social_url' => $core->posetting[1]['value'].'/detailpost/'.$post['seotitle'],
+					'social_title' => htmlspecialchars_decode($post['title']),
+					'social_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
+					'social_img' => $core->posetting[1]['value'].'/'.DIR_CON.'/uploads/'.$post['picture'],
+					'page' => $page
+				);
+				$adddata = array_merge($info, $lang);
+				$templates->addData(
+					$adddata
+				);
+				echo $templates->render('detailpost', compact('post','lang'));
+			} else {
+				$info = array(
+					'page_title' => $lang['front_post_not_found'],
+					'page_desc' => $core->posetting[2]['value'],
+					'page_key' => $core->posetting[3]['value'],
+					'social_mod' => $lang['front_post_title'],
+					'social_name' => $core->posetting[0]['value'],
+					'social_url' => $core->posetting[1]['value'],
+					'social_title' => $lang['front_post_not_found'],
+					'social_desc' => $core->posetting[2]['value'],
+					'social_img' => $core->posetting[1]['value'].'/'.DIR_INC.'/images/favicon.png'
+				);
+				$adddata = array_merge($info, $lang);
+				$templates->addData(
+					$adddata
+				);
+				echo $templates->render('404', compact('lang'));
+			}
+		});
 	} else {
+		/**
+		 * Router untuk menampilkan request halaman post.
+		 *
+		 * Router for display request in post page.
+		 *
+		 * $seotitle = string [a-z0-9_-]
+		 *
+		 * Added in v.2.0.1
+		*/
+		$router->match('GET|POST', '/'.SLUG_PERMALINK.'/([a-z0-9_-]+)', function($seotitle) use ($core, $templates) {
+			$lang = $core->setlang('post', WEB_LANG);
+			$post = $core->podb->from('post')
+				->select(array('post_description.title', 'post_description.content'))
+				->leftJoin('post_description ON post_description.id_post = post.id_post')
+				->where('post.seotitle', $seotitle)
+				->where('post_description.id_language', WEB_LANG_ID)
+				->where('post.active', 'Y')
+				->where('post.publishdate < ?', date('Y-m-d H:i:s'))
+				->limit(1)
+				->fetch();
+			if ($post) {
+				if (!empty($_POST)) {
+					require_once(DIR_INC.'/core/vendor/recaptcha/recaptchalib.php');
+					$secret = $core->posetting[22]['value'];
+					$recaptcha = new PoReCaptcha($secret);
+					if (!empty($_POST["g-recaptcha-response"])) {
+						$resp = $recaptcha->verifyResponse(
+							$_SERVER["REMOTE_ADDR"],
+							$_POST["g-recaptcha-response"]
+						);
+						if ($resp != null && $resp->success) {
+							$core->poval->validation_rules(array(
+								'id' => 'required|integer',
+								'id_parent' => 'required|integer',
+								'name' => 'required|max_len,100|min_len,3',
+								'email' => 'required|valid_email',
+								'url' => 'max_len,255|valid_url',
+								'comment' => 'required|min_len,10',
+								'seotitle' => 'required'
+							));
+							$core->poval->filter_rules(array(
+								'id' => 'trim|sanitize_numbers',
+								'id_parent' => 'trim',
+								'name' => 'trim|sanitize_string',
+								'email' => 'trim|sanitize_email',
+								'url' => 'trim|sanitize_string',
+								'comment' => 'trim|sanitize_string|basic_tags',
+								'seotitle' => 'trim'
+							));
+							$validated_data = $core->poval->run($_POST);
+							if ($validated_data === false) {
+								$core->poflash->error($lang['front_comment_error_3']);
+							} else {
+								if ($core->posetting[18]['value'] == 'Y') {
+									$active = 'Y';
+								} else {
+									$active = 'N';
+								}
+								$data = array(
+									'id_post' => $_POST['id'],
+									'id_parent' => $_POST['id_parent'],
+									'name' => $_POST['name'],
+									'email' => $_POST['email'],
+									'url' => $_POST['url'],
+									'comment' => $_POST['comment'],
+									'date' => date('Y-m-d'),
+									'time' => date('h:i:s'),
+									'active' => $active
+								);
+								$query = $core->podb->insertInto('comment')->values($data);
+								$query->execute();
+								unset($_POST);
+								$core->poflash->success($lang['front_comment_success']);
+							}
+						} else {
+							$core->poflash->error($lang['front_comment_error_2']);
+						}
+					} else {
+						$core->poflash->error($lang['front_comment_error_1']);
+					}
+				}
+				$query_hits = $core->podb->update('post')
+					->set(array('hits' => $post['hits']+1))
+					->where('id_post', $post['id_post']);
+				$query_hits->execute();
+				$info = array(
+					'page_title' => htmlspecialchars_decode($post['title']),
+					'page_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
+					'page_key' => $post['tag'],
+					'social_mod' => $lang['front_post_title'],
+					'social_name' => $core->posetting[0]['value'],
+					'social_url' => $core->posetting[1]['value'].'/'.SLUG_PERMALINK.'/'.$post['seotitle'],
+					'social_title' => htmlspecialchars_decode($post['title']),
+					'social_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
+					'social_img' => $core->posetting[1]['value'].'/'.DIR_CON.'/uploads/'.$post['picture'],
+					'page' => '1'
+				);
+				$adddata = array_merge($info, $lang);
+				$templates->addData(
+					$adddata
+				);
+				echo $templates->render('detailpost', compact('post','lang'));
+			} else {
+				$info = array(
+					'page_title' => $lang['front_post_not_found'],
+					'page_desc' => $core->posetting[2]['value'],
+					'page_key' => $core->posetting[3]['value'],
+					'social_mod' => $lang['front_post_title'],
+					'social_name' => $core->posetting[0]['value'],
+					'social_url' => $core->posetting[1]['value'],
+					'social_title' => $lang['front_post_not_found'],
+					'social_desc' => $core->posetting[2]['value'],
+					'social_img' => $core->posetting[1]['value'].'/'.DIR_INC.'/images/favicon.png'
+				);
+				$adddata = array_merge($info, $lang);
+				$templates->addData(
+					$adddata
+				);
+				echo $templates->render('404', compact('lang'));
+			}
+		});
+
+		/**
+		 * Router untuk menampilkan request halaman post dengan nomor halaman.
+		 *
+		 * Router for display request in post page with pagination.
+		 *
+		 * $seotitle = string [a-z0-9_-]
+		 * $page = integer
+		 *
+		 * Added in v.2.0.1
+		*/
+		$router->match('GET|POST', '/'.SLUG_PERMALINK.'/([a-z0-9_-]+)/page/(\d+)', function($seotitle, $page) use ($core, $templates) {
+			$lang = $core->setlang('post', WEB_LANG);
+			$post = $core->podb->from('post')
+				->select(array('post_description.title', 'post_description.content'))
+				->leftJoin('post_description ON post_description.id_post = post.id_post')
+				->where('post.seotitle', $seotitle)
+				->where('post_description.id_language', WEB_LANG_ID)
+				->where('post.active', 'Y')
+				->where('post.publishdate < ?', date('Y-m-d H:i:s'))
+				->limit(1)
+				->fetch();
+			if ($post) {
+				if (!empty($_POST)) {
+					require_once(DIR_INC.'/core/vendor/recaptcha/recaptchalib.php');
+					$secret = $core->posetting[22]['value'];
+					$recaptcha = new PoReCaptcha($secret);
+					if (!empty($_POST["g-recaptcha-response"])) {
+						$resp = $recaptcha->verifyResponse(
+							$_SERVER["REMOTE_ADDR"],
+							$_POST["g-recaptcha-response"]
+						);
+						if ($resp != null && $resp->success) {
+							$core->poval->validation_rules(array(
+								'id' => 'required|integer',
+								'id_parent' => 'required|integer',
+								'name' => 'required|max_len,100|min_len,3',
+								'email' => 'required|valid_email',
+								'url' => 'max_len,255|valid_url',
+								'comment' => 'required|min_len,10',
+								'seotitle' => 'required'
+							));
+							$core->poval->filter_rules(array(
+								'id' => 'trim|sanitize_numbers',
+								'id_parent' => 'trim',
+								'name' => 'trim|sanitize_string',
+								'email' => 'trim|sanitize_email',
+								'url' => 'trim|sanitize_string',
+								'comment' => 'trim|sanitize_string|basic_tags',
+								'seotitle' => 'trim'
+							));
+							$validated_data = $core->poval->run($_POST);
+							if ($validated_data === false) {
+								$core->poflash->error($lang['front_comment_error_3']);
+							} else {
+								if ($core->posetting[18]['value'] == 'Y') {
+									$active = 'Y';
+								} else {
+									$active = 'N';
+								}
+								$data = array(
+									'id_post' => $_POST['id'],
+									'id_parent' => $_POST['id_parent'],
+									'name' => $_POST['name'],
+									'email' => $_POST['email'],
+									'url' => $_POST['url'],
+									'comment' => $_POST['comment'],
+									'date' => date('Y-m-d'),
+									'time' => date('h:i:s'),
+									'active' => $active
+								);
+								$query = $core->podb->insertInto('comment')->values($data);
+								$query->execute();
+								unset($_POST);
+								$core->poflash->success($lang['front_comment_success']);
+							}
+						} else {
+							$core->poflash->error($lang['front_comment_error_2']);
+						}
+					} else {
+						$core->poflash->error($lang['front_comment_error_1']);
+					}
+				}
+				$query_hits = $core->podb->update('post')
+					->set(array('hits' => $post['hits']+1))
+					->where('id_post', $post['id_post']);
+				$query_hits->execute();
+				$info = array(
+					'page_title' => htmlspecialchars_decode($post['title']),
+					'page_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
+					'page_key' => $post['tag'],
+					'social_mod' => $lang['front_post_title'],
+					'social_name' => $core->posetting[0]['value'],
+					'social_url' => $core->posetting[1]['value'].'/'.SLUG_PERMALINK.'/'.$post['seotitle'],
+					'social_title' => htmlspecialchars_decode($post['title']),
+					'social_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
+					'social_img' => $core->posetting[1]['value'].'/'.DIR_CON.'/uploads/'.$post['picture'],
+					'page' => $page
+				);
+				$adddata = array_merge($info, $lang);
+				$templates->addData(
+					$adddata
+				);
+				echo $templates->render('detailpost', compact('post','lang'));
+			} else {
+				$info = array(
+					'page_title' => $lang['front_post_not_found'],
+					'page_desc' => $core->posetting[2]['value'],
+					'page_key' => $core->posetting[3]['value'],
+					'social_mod' => $lang['front_post_title'],
+					'social_name' => $core->posetting[0]['value'],
+					'social_url' => $core->posetting[1]['value'],
+					'social_title' => $lang['front_post_not_found'],
+					'social_desc' => $core->posetting[2]['value'],
+					'social_img' => $core->posetting[1]['value'].'/'.DIR_INC.'/images/favicon.png'
+				);
+				$adddata = array_merge($info, $lang);
+				$templates->addData(
+					$adddata
+				);
+				echo $templates->render('404', compact('lang'));
+			}
+		});
+	}
+} elseif (PERMALINK == 'yyyy/mm/dd/post-title') {
+	/**
+	 * Router untuk menampilkan request halaman post.
+	 *
+	 * Router for display request in post page.
+	 *
+	 * $year = string
+	 * $month = string
+	 * $day = string
+	 * $seotitle = string [a-z0-9_-]
+	 *
+	 * Added in v.2.0.1
+	*/
+	$router->match('GET|POST', '/(\d+)/(\d+)/(\d+)/([a-z0-9_-]+)', function($year, $month, $day, $seotitle) use ($core, $templates) {
 		$lang = $core->setlang('post', WEB_LANG);
 		$post = $core->podb->from('post')
 			->select(array('post_description.title', 'post_description.content'))
@@ -1719,7 +597,382 @@ $router->match('GET|POST', '/([a-z0-9_-]+)/page/(\d+)', function($seotitle, $pag
 				'page_key' => $post['tag'],
 				'social_mod' => $lang['front_post_title'],
 				'social_name' => $core->posetting[0]['value'],
-				'social_url' => $core->posetting[1]['value'].'/'.$post['seotitle'],
+				'social_url' => $core->posetting[1]['value'].'/'.substr($post['date'],0,4).'/'.substr($post['date'],5,2).'/'.substr($post['date'],8,2).'/'.$post['seotitle'],
+				'social_title' => htmlspecialchars_decode($post['title']),
+				'social_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
+				'social_img' => $core->posetting[1]['value'].'/'.DIR_CON.'/uploads/'.$post['picture'],
+				'page' => '1'
+			);
+			$adddata = array_merge($info, $lang);
+			$templates->addData(
+				$adddata
+			);
+			echo $templates->render('detailpost', compact('post','lang'));
+		} else {
+			$info = array(
+				'page_title' => $lang['front_post_not_found'],
+				'page_desc' => $core->posetting[2]['value'],
+				'page_key' => $core->posetting[3]['value'],
+				'social_mod' => $lang['front_post_title'],
+				'social_name' => $core->posetting[0]['value'],
+				'social_url' => $core->posetting[1]['value'],
+				'social_title' => $lang['front_post_not_found'],
+				'social_desc' => $core->posetting[2]['value'],
+				'social_img' => $core->posetting[1]['value'].'/'.DIR_INC.'/images/favicon.png'
+			);
+			$adddata = array_merge($info, $lang);
+			$templates->addData(
+				$adddata
+			);
+			echo $templates->render('404', compact('lang'));
+		}
+	});
+
+	/**
+	 * Router untuk menampilkan request halaman post dengan nomor halaman.
+	 *
+	 * Router for display request in post page with pagination.
+	 *
+	 * $year = string
+	 * $month = string
+	 * $day = string
+	 * $seotitle = string [a-z0-9_-]
+	 * $page = integer
+	 *
+	 * Added in v.2.0.1
+	*/
+	$router->match('GET|POST', '/(\d+)/(\d+)/(\d+)/([a-z0-9_-]+)/page/(\d+)', function($year, $month, $day, $seotitle, $page) use ($core, $templates) {
+		$lang = $core->setlang('post', WEB_LANG);
+		$post = $core->podb->from('post')
+			->select(array('post_description.title', 'post_description.content'))
+			->leftJoin('post_description ON post_description.id_post = post.id_post')
+			->where('post.seotitle', $seotitle)
+			->where('post_description.id_language', WEB_LANG_ID)
+			->where('post.active', 'Y')
+			->where('post.publishdate < ?', date('Y-m-d H:i:s'))
+			->limit(1)
+			->fetch();
+		if ($post) {
+			if (!empty($_POST)) {
+				require_once(DIR_INC.'/core/vendor/recaptcha/recaptchalib.php');
+				$secret = $core->posetting[22]['value'];
+				$recaptcha = new PoReCaptcha($secret);
+				if (!empty($_POST["g-recaptcha-response"])) {
+					$resp = $recaptcha->verifyResponse(
+						$_SERVER["REMOTE_ADDR"],
+						$_POST["g-recaptcha-response"]
+					);
+					if ($resp != null && $resp->success) {
+						$core->poval->validation_rules(array(
+							'id' => 'required|integer',
+							'id_parent' => 'required|integer',
+							'name' => 'required|max_len,100|min_len,3',
+							'email' => 'required|valid_email',
+							'url' => 'max_len,255|valid_url',
+							'comment' => 'required|min_len,10',
+							'seotitle' => 'required'
+						));
+						$core->poval->filter_rules(array(
+							'id' => 'trim|sanitize_numbers',
+							'id_parent' => 'trim',
+							'name' => 'trim|sanitize_string',
+							'email' => 'trim|sanitize_email',
+							'url' => 'trim|sanitize_string',
+							'comment' => 'trim|sanitize_string|basic_tags',
+							'seotitle' => 'trim'
+						));
+						$validated_data = $core->poval->run($_POST);
+						if ($validated_data === false) {
+							$core->poflash->error($lang['front_comment_error_3']);
+						} else {
+							if ($core->posetting[18]['value'] == 'Y') {
+								$active = 'Y';
+							} else {
+								$active = 'N';
+							}
+							$data = array(
+								'id_post' => $_POST['id'],
+								'id_parent' => $_POST['id_parent'],
+								'name' => $_POST['name'],
+								'email' => $_POST['email'],
+								'url' => $_POST['url'],
+								'comment' => $_POST['comment'],
+								'date' => date('Y-m-d'),
+								'time' => date('h:i:s'),
+								'active' => $active
+							);
+							$query = $core->podb->insertInto('comment')->values($data);
+							$query->execute();
+							unset($_POST);
+							$core->poflash->success($lang['front_comment_success']);
+						}
+					} else {
+						$core->poflash->error($lang['front_comment_error_2']);
+					}
+				} else {
+					$core->poflash->error($lang['front_comment_error_1']);
+				}
+			}
+			$query_hits = $core->podb->update('post')
+				->set(array('hits' => $post['hits']+1))
+				->where('id_post', $post['id_post']);
+			$query_hits->execute();
+			$info = array(
+				'page_title' => htmlspecialchars_decode($post['title']),
+				'page_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
+				'page_key' => $post['tag'],
+				'social_mod' => $lang['front_post_title'],
+				'social_name' => $core->posetting[0]['value'],
+				'social_url' => $core->posetting[1]['value'].'/'.substr($post['date'],0,4).'/'.substr($post['date'],5,2).'/'.substr($post['date'],8,2).'/'.$post['seotitle'],
+				'social_title' => htmlspecialchars_decode($post['title']),
+				'social_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
+				'social_img' => $core->posetting[1]['value'].'/'.DIR_CON.'/uploads/'.$post['picture'],
+				'page' => $page
+			);
+			$adddata = array_merge($info, $lang);
+			$templates->addData(
+				$adddata
+			);
+			echo $templates->render('detailpost', compact('post','lang'));
+		} else {
+			$info = array(
+				'page_title' => $lang['front_post_not_found'],
+				'page_desc' => $core->posetting[2]['value'],
+				'page_key' => $core->posetting[3]['value'],
+				'social_mod' => $lang['front_post_title'],
+				'social_name' => $core->posetting[0]['value'],
+				'social_url' => $core->posetting[1]['value'],
+				'social_title' => $lang['front_post_not_found'],
+				'social_desc' => $core->posetting[2]['value'],
+				'social_img' => $core->posetting[1]['value'].'/'.DIR_INC.'/images/favicon.png'
+			);
+			$adddata = array_merge($info, $lang);
+			$templates->addData(
+				$adddata
+			);
+		echo $templates->render('404', compact('lang'));
+		}
+	});
+} elseif (PERMALINK == 'yyyy/mm/post-title') {
+	/**
+	 * Router untuk menampilkan request halaman post.
+	 *
+	 * Router for display request in post page.
+	 *
+	 * $year = string
+	 * $month = string
+	 * $seotitle = string [a-z0-9_-]
+	 *
+	 * Added in v.2.0.1
+	*/
+	$router->match('GET|POST', '/(\d+)/(\d+)/([a-z0-9_-]+)', function($year, $month, $seotitle) use ($core, $templates) {
+		$lang = $core->setlang('post', WEB_LANG);
+		$post = $core->podb->from('post')
+			->select(array('post_description.title', 'post_description.content'))
+			->leftJoin('post_description ON post_description.id_post = post.id_post')
+			->where('post.seotitle', $seotitle)
+			->where('post_description.id_language', WEB_LANG_ID)
+			->where('post.active', 'Y')
+			->where('post.publishdate < ?', date('Y-m-d H:i:s'))
+			->limit(1)
+			->fetch();
+		if ($post) {
+			if (!empty($_POST)) {
+				require_once(DIR_INC.'/core/vendor/recaptcha/recaptchalib.php');
+				$secret = $core->posetting[22]['value'];
+				$recaptcha = new PoReCaptcha($secret);
+				if (!empty($_POST["g-recaptcha-response"])) {
+					$resp = $recaptcha->verifyResponse(
+						$_SERVER["REMOTE_ADDR"],
+						$_POST["g-recaptcha-response"]
+					);
+					if ($resp != null && $resp->success) {
+						$core->poval->validation_rules(array(
+							'id' => 'required|integer',
+							'id_parent' => 'required|integer',
+							'name' => 'required|max_len,100|min_len,3',
+							'email' => 'required|valid_email',
+							'url' => 'max_len,255|valid_url',
+							'comment' => 'required|min_len,10',
+							'seotitle' => 'required'
+						));
+						$core->poval->filter_rules(array(
+							'id' => 'trim|sanitize_numbers',
+							'id_parent' => 'trim',
+							'name' => 'trim|sanitize_string',
+							'email' => 'trim|sanitize_email',
+							'url' => 'trim|sanitize_string',
+							'comment' => 'trim|sanitize_string|basic_tags',
+							'seotitle' => 'trim'
+						));
+						$validated_data = $core->poval->run($_POST);
+						if ($validated_data === false) {
+							$core->poflash->error($lang['front_comment_error_3']);
+						} else {
+							if ($core->posetting[18]['value'] == 'Y') {
+								$active = 'Y';
+							} else {
+								$active = 'N';
+							}
+							$data = array(
+								'id_post' => $_POST['id'],
+								'id_parent' => $_POST['id_parent'],
+								'name' => $_POST['name'],
+								'email' => $_POST['email'],
+								'url' => $_POST['url'],
+								'comment' => $_POST['comment'],
+								'date' => date('Y-m-d'),
+								'time' => date('h:i:s'),
+								'active' => $active
+							);
+							$query = $core->podb->insertInto('comment')->values($data);
+							$query->execute();
+							unset($_POST);
+							$core->poflash->success($lang['front_comment_success']);
+						}
+					} else {
+						$core->poflash->error($lang['front_comment_error_2']);
+					}
+				} else {
+					$core->poflash->error($lang['front_comment_error_1']);
+				}
+			}
+			$query_hits = $core->podb->update('post')
+				->set(array('hits' => $post['hits']+1))
+				->where('id_post', $post['id_post']);
+			$query_hits->execute();
+			$info = array(
+				'page_title' => htmlspecialchars_decode($post['title']),
+				'page_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
+				'page_key' => $post['tag'],
+				'social_mod' => $lang['front_post_title'],
+				'social_name' => $core->posetting[0]['value'],
+				'social_url' => $core->posetting[1]['value'].'/'.substr($post['date'],0,4).'/'.substr($post['date'],5,2).'/'.$post['seotitle'],
+				'social_title' => htmlspecialchars_decode($post['title']),
+				'social_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
+				'social_img' => $core->posetting[1]['value'].'/'.DIR_CON.'/uploads/'.$post['picture'],
+				'page' => '1'
+			);
+			$adddata = array_merge($info, $lang);
+			$templates->addData(
+				$adddata
+			);
+			echo $templates->render('detailpost', compact('post','lang'));
+		} else {
+			$info = array(
+				'page_title' => $lang['front_post_not_found'],
+				'page_desc' => $core->posetting[2]['value'],
+				'page_key' => $core->posetting[3]['value'],
+				'social_mod' => $lang['front_post_title'],
+				'social_name' => $core->posetting[0]['value'],
+				'social_url' => $core->posetting[1]['value'],
+				'social_title' => $lang['front_post_not_found'],
+				'social_desc' => $core->posetting[2]['value'],
+				'social_img' => $core->posetting[1]['value'].'/'.DIR_INC.'/images/favicon.png'
+			);
+			$adddata = array_merge($info, $lang);
+			$templates->addData(
+				$adddata
+			);
+			echo $templates->render('404', compact('lang'));
+		}
+	});
+
+	/**
+	 * Router untuk menampilkan request halaman post dengan nomor halaman.
+	 *
+	 * Router for display request in post page with pagination.
+	 *
+	 * $year = string
+	 * $month = string
+	 * $seotitle = string [a-z0-9_-]
+	 * $page = integer
+	 *
+	 * Added in v.2.0.1
+	*/
+	$router->match('GET|POST', '/(\d+)/(\d+)/([a-z0-9_-]+)/page/(\d+)', function($year, $month, $seotitle, $page) use ($core, $templates) {
+		$lang = $core->setlang('post', WEB_LANG);
+		$post = $core->podb->from('post')
+			->select(array('post_description.title', 'post_description.content'))
+			->leftJoin('post_description ON post_description.id_post = post.id_post')
+			->where('post.seotitle', $seotitle)
+			->where('post_description.id_language', WEB_LANG_ID)
+			->where('post.active', 'Y')
+			->where('post.publishdate < ?', date('Y-m-d H:i:s'))
+			->limit(1)
+			->fetch();
+		if ($post) {
+			if (!empty($_POST)) {
+				require_once(DIR_INC.'/core/vendor/recaptcha/recaptchalib.php');
+				$secret = $core->posetting[22]['value'];
+				$recaptcha = new PoReCaptcha($secret);
+				if (!empty($_POST["g-recaptcha-response"])) {
+					$resp = $recaptcha->verifyResponse(
+						$_SERVER["REMOTE_ADDR"],
+						$_POST["g-recaptcha-response"]
+					);
+					if ($resp != null && $resp->success) {
+						$core->poval->validation_rules(array(
+							'id' => 'required|integer',
+							'id_parent' => 'required|integer',
+							'name' => 'required|max_len,100|min_len,3',
+							'email' => 'required|valid_email',
+							'url' => 'max_len,255|valid_url',
+							'comment' => 'required|min_len,10',
+							'seotitle' => 'required'
+						));
+						$core->poval->filter_rules(array(
+							'id' => 'trim|sanitize_numbers',
+							'id_parent' => 'trim',
+							'name' => 'trim|sanitize_string',
+							'email' => 'trim|sanitize_email',
+							'url' => 'trim|sanitize_string',
+							'comment' => 'trim|sanitize_string|basic_tags',
+							'seotitle' => 'trim'
+						));
+						$validated_data = $core->poval->run($_POST);
+						if ($validated_data === false) {
+							$core->poflash->error($lang['front_comment_error_3']);
+						} else {
+							if ($core->posetting[18]['value'] == 'Y') {
+								$active = 'Y';
+							} else {
+								$active = 'N';
+							}
+							$data = array(
+								'id_post' => $_POST['id'],
+								'id_parent' => $_POST['id_parent'],
+								'name' => $_POST['name'],
+								'email' => $_POST['email'],
+								'url' => $_POST['url'],
+								'comment' => $_POST['comment'],
+								'date' => date('Y-m-d'),
+								'time' => date('h:i:s'),
+								'active' => $active
+							);
+							$query = $core->podb->insertInto('comment')->values($data);
+							$query->execute();
+							unset($_POST);
+							$core->poflash->success($lang['front_comment_success']);
+						}
+					} else {
+						$core->poflash->error($lang['front_comment_error_2']);
+					}
+				} else {
+					$core->poflash->error($lang['front_comment_error_1']);
+				}
+			}
+			$query_hits = $core->podb->update('post')
+				->set(array('hits' => $post['hits']+1))
+				->where('id_post', $post['id_post']);
+			$query_hits->execute();
+			$info = array(
+				'page_title' => htmlspecialchars_decode($post['title']),
+				'page_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
+				'page_key' => $post['tag'],
+				'social_mod' => $lang['front_post_title'],
+				'social_name' => $core->posetting[0]['value'],
+				'social_url' => $core->posetting[1]['value'].'/'.substr($post['date'],0,4).'/'.substr($post['date'],5,2).'/'.$post['seotitle'],
 				'social_title' => htmlspecialchars_decode($post['title']),
 				'social_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
 				'social_img' => $core->posetting[1]['value'].'/'.DIR_CON.'/uploads/'.$post['picture'],
@@ -1748,8 +1001,759 @@ $router->match('GET|POST', '/([a-z0-9_-]+)/page/(\d+)', function($seotitle, $pag
 			);
 			echo $templates->render('404', compact('lang'));
 		}
+	});
+} elseif (PERMALINK == 'archives/post-id') {
+	/**
+	 * Router untuk menampilkan request halaman post.
+	 *
+	 * Router for display request in post page.
+	 *
+	 * $id = integer
+	 *
+	 * Added in v.2.0.1
+	*/
+	$router->match('GET|POST', '/archives/(\d+)', function($id) use ($core, $templates) {
+		$lang = $core->setlang('post', WEB_LANG);
+		$post = $core->podb->from('post')
+			->select(array('post_description.title', 'post_description.content'))
+			->leftJoin('post_description ON post_description.id_post = post.id_post')
+			->where('post.id_post', $id)
+			->where('post_description.id_language', WEB_LANG_ID)
+			->where('post.active', 'Y')
+			->where('post.publishdate < ?', date('Y-m-d H:i:s'))
+			->limit(1)
+			->fetch();
+		if ($post) {
+			if (!empty($_POST)) {
+				require_once(DIR_INC.'/core/vendor/recaptcha/recaptchalib.php');
+				$secret = $core->posetting[22]['value'];
+				$recaptcha = new PoReCaptcha($secret);
+				if (!empty($_POST["g-recaptcha-response"])) {
+					$resp = $recaptcha->verifyResponse(
+						$_SERVER["REMOTE_ADDR"],
+						$_POST["g-recaptcha-response"]
+					);
+					if ($resp != null && $resp->success) {
+						$core->poval->validation_rules(array(
+							'id' => 'required|integer',
+							'id_parent' => 'required|integer',
+							'name' => 'required|max_len,100|min_len,3',
+							'email' => 'required|valid_email',
+							'url' => 'max_len,255|valid_url',
+							'comment' => 'required|min_len,10',
+							'seotitle' => 'required'
+						));
+						$core->poval->filter_rules(array(
+							'id' => 'trim|sanitize_numbers',
+							'id_parent' => 'trim',
+							'name' => 'trim|sanitize_string',
+							'email' => 'trim|sanitize_email',
+							'url' => 'trim|sanitize_string',
+							'comment' => 'trim|sanitize_string|basic_tags',
+							'seotitle' => 'trim'
+						));
+						$validated_data = $core->poval->run($_POST);
+						if ($validated_data === false) {
+							$core->poflash->error($lang['front_comment_error_3']);
+						} else {
+							if ($core->posetting[18]['value'] == 'Y') {
+								$active = 'Y';
+							} else {
+								$active = 'N';
+							}
+							$data = array(
+								'id_post' => $_POST['id'],
+								'id_parent' => $_POST['id_parent'],
+								'name' => $_POST['name'],
+								'email' => $_POST['email'],
+								'url' => $_POST['url'],
+								'comment' => $_POST['comment'],
+								'date' => date('Y-m-d'),
+								'time' => date('h:i:s'),
+								'active' => $active
+							);
+							$query = $core->podb->insertInto('comment')->values($data);
+							$query->execute();
+							unset($_POST);
+							$core->poflash->success($lang['front_comment_success']);
+						}
+					} else {
+						$core->poflash->error($lang['front_comment_error_2']);
+					}
+				} else {
+					$core->poflash->error($lang['front_comment_error_1']);
+				}
+			}
+			$query_hits = $core->podb->update('post')
+				->set(array('hits' => $post['hits']+1))
+				->where('id_post', $post['id_post']);
+			$query_hits->execute();
+			$info = array(
+				'page_title' => htmlspecialchars_decode($post['title']),
+				'page_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
+				'page_key' => $post['tag'],
+				'social_mod' => $lang['front_post_title'],
+				'social_name' => $core->posetting[0]['value'],
+				'social_url' => $core->posetting[1]['value'].'/archives/'.$post['id_post'],
+				'social_title' => htmlspecialchars_decode($post['title']),
+				'social_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
+				'social_img' => $core->posetting[1]['value'].'/'.DIR_CON.'/uploads/'.$post['picture'],
+				'page' => '1'
+			);
+			$adddata = array_merge($info, $lang);
+			$templates->addData(
+				$adddata
+			);
+			echo $templates->render('detailpost', compact('post','lang'));
+		} else {
+			$info = array(
+				'page_title' => $lang['front_post_not_found'],
+				'page_desc' => $core->posetting[2]['value'],
+				'page_key' => $core->posetting[3]['value'],
+				'social_mod' => $lang['front_post_title'],
+				'social_name' => $core->posetting[0]['value'],
+				'social_url' => $core->posetting[1]['value'],
+				'social_title' => $lang['front_post_not_found'],
+				'social_desc' => $core->posetting[2]['value'],
+				'social_img' => $core->posetting[1]['value'].'/'.DIR_INC.'/images/favicon.png'
+			);
+			$adddata = array_merge($info, $lang);
+			$templates->addData(
+				$adddata
+			);
+			echo $templates->render('404', compact('lang'));
+		}
+	});
+
+	/**
+	 * Router untuk menampilkan request halaman post dengan nomor halaman.
+	 *
+	 * Router for display request in post page with pagination.
+	 *
+	 * $id = integer
+	 * $page = integer
+	 *
+	 * Added in v.2.0.1
+	*/
+	$router->match('GET|POST', '/archives/(\d+)/page/(\d+)', function($id, $page) use ($core, $templates) {
+		$lang = $core->setlang('post', WEB_LANG);
+		$post = $core->podb->from('post')
+			->select(array('post_description.title', 'post_description.content'))
+			->leftJoin('post_description ON post_description.id_post = post.id_post')
+			->where('post.id_post', $id)
+			->where('post_description.id_language', WEB_LANG_ID)
+			->where('post.active', 'Y')
+			->where('post.publishdate < ?', date('Y-m-d H:i:s'))
+			->limit(1)
+			->fetch();
+		if ($post) {
+			if (!empty($_POST)) {
+				require_once(DIR_INC.'/core/vendor/recaptcha/recaptchalib.php');
+				$secret = $core->posetting[22]['value'];
+				$recaptcha = new PoReCaptcha($secret);
+				if (!empty($_POST["g-recaptcha-response"])) {
+					$resp = $recaptcha->verifyResponse(
+						$_SERVER["REMOTE_ADDR"],
+						$_POST["g-recaptcha-response"]
+					);
+					if ($resp != null && $resp->success) {
+						$core->poval->validation_rules(array(
+							'id' => 'required|integer',
+							'id_parent' => 'required|integer',
+							'name' => 'required|max_len,100|min_len,3',
+							'email' => 'required|valid_email',
+							'url' => 'max_len,255|valid_url',
+							'comment' => 'required|min_len,10',
+							'seotitle' => 'required'
+						));
+						$core->poval->filter_rules(array(
+							'id' => 'trim|sanitize_numbers',
+							'id_parent' => 'trim',
+							'name' => 'trim|sanitize_string',
+							'email' => 'trim|sanitize_email',
+							'url' => 'trim|sanitize_string',
+							'comment' => 'trim|sanitize_string|basic_tags',
+							'seotitle' => 'trim'
+						));
+						$validated_data = $core->poval->run($_POST);
+						if ($validated_data === false) {
+							$core->poflash->error($lang['front_comment_error_3']);
+						} else {
+							if ($core->posetting[18]['value'] == 'Y') {
+								$active = 'Y';
+							} else {
+								$active = 'N';
+							}
+							$data = array(
+								'id_post' => $_POST['id'],
+								'id_parent' => $_POST['id_parent'],
+								'name' => $_POST['name'],
+								'email' => $_POST['email'],
+								'url' => $_POST['url'],
+								'comment' => $_POST['comment'],
+								'date' => date('Y-m-d'),
+								'time' => date('h:i:s'),
+								'active' => $active
+							);
+							$query = $core->podb->insertInto('comment')->values($data);
+							$query->execute();
+							unset($_POST);
+							$core->poflash->success($lang['front_comment_success']);
+						}
+					} else {
+						$core->poflash->error($lang['front_comment_error_2']);
+					}
+				} else {
+					$core->poflash->error($lang['front_comment_error_1']);
+				}
+			}
+			$query_hits = $core->podb->update('post')
+				->set(array('hits' => $post['hits']+1))
+				->where('id_post', $post['id_post']);
+			$query_hits->execute();
+			$info = array(
+				'page_title' => htmlspecialchars_decode($post['title']),
+				'page_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
+				'page_key' => $post['tag'],
+				'social_mod' => $lang['front_post_title'],
+				'social_name' => $core->posetting[0]['value'],
+				'social_url' => $core->posetting[1]['value'].'/archives/'.$post['id_post'],
+				'social_title' => htmlspecialchars_decode($post['title']),
+				'social_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
+				'social_img' => $core->posetting[1]['value'].'/'.DIR_CON.'/uploads/'.$post['picture'],
+				'page' => $page
+			);
+			$adddata = array_merge($info, $lang);
+			$templates->addData(
+				$adddata
+			);
+			echo $templates->render('detailpost', compact('post','lang'));
+		} else {
+			$info = array(
+				'page_title' => $lang['front_post_not_found'],
+				'page_desc' => $core->posetting[2]['value'],
+				'page_key' => $core->posetting[3]['value'],
+				'social_mod' => $lang['front_post_title'],
+				'social_name' => $core->posetting[0]['value'],
+				'social_url' => $core->posetting[1]['value'],
+				'social_title' => $lang['front_post_not_found'],
+				'social_desc' => $core->posetting[2]['value'],
+				'social_img' => $core->posetting[1]['value'].'/'.DIR_INC.'/images/favicon.png'
+			);
+			$adddata = array_merge($info, $lang);
+			$templates->addData(
+				$adddata
+			);
+			echo $templates->render('404', compact('lang'));
+		}
+	});
+} elseif (PERMALINK == 'slug-post-id-post-title') {
+	/**
+	 * Router untuk menampilkan request halaman post.
+	 *
+	 * Router for display request in post page.
+	 *
+	 * $id = integer
+	 * $seotitle = string
+	 *
+	 * Added in v.2.0.1
+	*/
+	$router->match('GET|POST', '/'.SLUG_PERMALINK.'-(\d+)-([a-z0-9_-]+)', function($id, $seotitle) use ($core, $templates) {
+		$lang = $core->setlang('post', WEB_LANG);
+		$post = $core->podb->from('post')
+			->select(array('post_description.title', 'post_description.content'))
+			->leftJoin('post_description ON post_description.id_post = post.id_post')
+			->where('post.id_post', $id)
+			->where('post_description.id_language', WEB_LANG_ID)
+			->where('post.active', 'Y')
+			->where('post.publishdate < ?', date('Y-m-d H:i:s'))
+			->limit(1)
+			->fetch();
+		if ($post) {
+			if (!empty($_POST)) {
+				require_once(DIR_INC.'/core/vendor/recaptcha/recaptchalib.php');
+				$secret = $core->posetting[22]['value'];
+				$recaptcha = new PoReCaptcha($secret);
+				if (!empty($_POST["g-recaptcha-response"])) {
+					$resp = $recaptcha->verifyResponse(
+						$_SERVER["REMOTE_ADDR"],
+						$_POST["g-recaptcha-response"]
+					);
+					if ($resp != null && $resp->success) {
+						$core->poval->validation_rules(array(
+							'id' => 'required|integer',
+							'id_parent' => 'required|integer',
+							'name' => 'required|max_len,100|min_len,3',
+							'email' => 'required|valid_email',
+							'url' => 'max_len,255|valid_url',
+							'comment' => 'required|min_len,10',
+							'seotitle' => 'required'
+						));
+						$core->poval->filter_rules(array(
+							'id' => 'trim|sanitize_numbers',
+							'id_parent' => 'trim',
+							'name' => 'trim|sanitize_string',
+							'email' => 'trim|sanitize_email',
+							'url' => 'trim|sanitize_string',
+							'comment' => 'trim|sanitize_string|basic_tags',
+							'seotitle' => 'trim'
+						));
+						$validated_data = $core->poval->run($_POST);
+						if ($validated_data === false) {
+							$core->poflash->error($lang['front_comment_error_3']);
+						} else {
+							if ($core->posetting[18]['value'] == 'Y') {
+								$active = 'Y';
+							} else {
+								$active = 'N';
+							}
+							$data = array(
+								'id_post' => $_POST['id'],
+								'id_parent' => $_POST['id_parent'],
+								'name' => $_POST['name'],
+								'email' => $_POST['email'],
+								'url' => $_POST['url'],
+								'comment' => $_POST['comment'],
+								'date' => date('Y-m-d'),
+								'time' => date('h:i:s'),
+								'active' => $active
+							);
+							$query = $core->podb->insertInto('comment')->values($data);
+							$query->execute();
+							unset($_POST);
+							$core->poflash->success($lang['front_comment_success']);
+						}
+					} else {
+						$core->poflash->error($lang['front_comment_error_2']);
+					}
+				} else {
+					$core->poflash->error($lang['front_comment_error_1']);
+				}
+			}
+			$query_hits = $core->podb->update('post')
+				->set(array('hits' => $post['hits']+1))
+				->where('id_post', $post['id_post']);
+			$query_hits->execute();
+			$info = array(
+				'page_title' => htmlspecialchars_decode($post['title']),
+				'page_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
+				'page_key' => $post['tag'],
+				'social_mod' => $lang['front_post_title'],
+				'social_name' => $core->posetting[0]['value'],
+				'social_url' => $core->posetting[1]['value'].'/'.$post['id_post'].'-'.$post['seotitle'],
+				'social_title' => htmlspecialchars_decode($post['title']),
+				'social_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
+				'social_img' => $core->posetting[1]['value'].'/'.DIR_CON.'/uploads/'.$post['picture'],
+				'page' => '1'
+			);
+			$adddata = array_merge($info, $lang);
+			$templates->addData(
+				$adddata
+			);
+			echo $templates->render('detailpost', compact('post','lang'));
+		} else {
+			$info = array(
+				'page_title' => $lang['front_post_not_found'],
+				'page_desc' => $core->posetting[2]['value'],
+				'page_key' => $core->posetting[3]['value'],
+				'social_mod' => $lang['front_post_title'],
+				'social_name' => $core->posetting[0]['value'],
+				'social_url' => $core->posetting[1]['value'],
+				'social_title' => $lang['front_post_not_found'],
+				'social_desc' => $core->posetting[2]['value'],
+				'social_img' => $core->posetting[1]['value'].'/'.DIR_INC.'/images/favicon.png'
+			);
+			$adddata = array_merge($info, $lang);
+			$templates->addData(
+				$adddata
+			);
+			echo $templates->render('404', compact('lang'));
+		}
+	});
+
+	/**
+	 * Router untuk menampilkan request halaman post dengan nomor halaman.
+	 *
+	 * Router for display request in post page with pagination.
+	 *
+	 * $id = integer
+	 * $seotitle = string
+	 * $page = integer
+	 *
+	 * Added in v.2.0.1
+	*/
+	$router->match('GET|POST', '/'.SLUG_PERMALINK.'-(\d+)-([a-z0-9_-]+)/page/(\d+)', function($id, $seotitle, $page) use ($core, $templates) {
+		$lang = $core->setlang('post', WEB_LANG);
+		$post = $core->podb->from('post')
+			->select(array('post_description.title', 'post_description.content'))
+			->leftJoin('post_description ON post_description.id_post = post.id_post')
+			->where('post.id_post', $id)
+			->where('post_description.id_language', WEB_LANG_ID)
+			->where('post.active', 'Y')
+			->where('post.publishdate < ?', date('Y-m-d H:i:s'))
+			->limit(1)
+			->fetch();
+		if ($post) {
+			if (!empty($_POST)) {
+				require_once(DIR_INC.'/core/vendor/recaptcha/recaptchalib.php');
+				$secret = $core->posetting[22]['value'];
+				$recaptcha = new PoReCaptcha($secret);
+				if (!empty($_POST["g-recaptcha-response"])) {
+					$resp = $recaptcha->verifyResponse(
+						$_SERVER["REMOTE_ADDR"],
+						$_POST["g-recaptcha-response"]
+					);
+					if ($resp != null && $resp->success) {
+						$core->poval->validation_rules(array(
+							'id' => 'required|integer',
+							'id_parent' => 'required|integer',
+							'name' => 'required|max_len,100|min_len,3',
+							'email' => 'required|valid_email',
+							'url' => 'max_len,255|valid_url',
+							'comment' => 'required|min_len,10',
+							'seotitle' => 'required'
+						));
+						$core->poval->filter_rules(array(
+							'id' => 'trim|sanitize_numbers',
+							'id_parent' => 'trim',
+							'name' => 'trim|sanitize_string',
+							'email' => 'trim|sanitize_email',
+							'url' => 'trim|sanitize_string',
+							'comment' => 'trim|sanitize_string|basic_tags',
+							'seotitle' => 'trim'
+						));
+						$validated_data = $core->poval->run($_POST);
+						if ($validated_data === false) {
+							$core->poflash->error($lang['front_comment_error_3']);
+						} else {
+							if ($core->posetting[18]['value'] == 'Y') {
+								$active = 'Y';
+							} else {
+								$active = 'N';
+							}
+							$data = array(
+								'id_post' => $_POST['id'],
+								'id_parent' => $_POST['id_parent'],
+								'name' => $_POST['name'],
+								'email' => $_POST['email'],
+								'url' => $_POST['url'],
+								'comment' => $_POST['comment'],
+								'date' => date('Y-m-d'),
+								'time' => date('h:i:s'),
+								'active' => $active
+							);
+							$query = $core->podb->insertInto('comment')->values($data);
+							$query->execute();
+							unset($_POST);
+							$core->poflash->success($lang['front_comment_success']);
+						}
+					} else {
+						$core->poflash->error($lang['front_comment_error_2']);
+					}
+				} else {
+					$core->poflash->error($lang['front_comment_error_1']);
+				}
+			}
+			$query_hits = $core->podb->update('post')
+				->set(array('hits' => $post['hits']+1))
+				->where('id_post', $post['id_post']);
+			$query_hits->execute();
+			$info = array(
+				'page_title' => htmlspecialchars_decode($post['title']),
+				'page_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
+				'page_key' => $post['tag'],
+				'social_mod' => $lang['front_post_title'],
+				'social_name' => $core->posetting[0]['value'],
+				'social_url' => $core->posetting[1]['value'].'/'.$post['id_post'].'-'.$post['seotitle'],
+				'social_title' => htmlspecialchars_decode($post['title']),
+				'social_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
+				'social_img' => $core->posetting[1]['value'].'/'.DIR_CON.'/uploads/'.$post['picture'],
+				'page' => $page
+			);
+			$adddata = array_merge($info, $lang);
+			$templates->addData(
+				$adddata
+			);
+			echo $templates->render('detailpost', compact('post','lang'));
+		} else {
+			$info = array(
+				'page_title' => $lang['front_post_not_found'],
+				'page_desc' => $core->posetting[2]['value'],
+				'page_key' => $core->posetting[3]['value'],
+				'social_mod' => $lang['front_post_title'],
+				'social_name' => $core->posetting[0]['value'],
+				'social_url' => $core->posetting[1]['value'],
+				'social_title' => $lang['front_post_not_found'],
+				'social_desc' => $core->posetting[2]['value'],
+				'social_img' => $core->posetting[1]['value'].'/'.DIR_INC.'/images/favicon.png'
+			);
+			$adddata = array_merge($info, $lang);
+			$templates->addData(
+				$adddata
+			);
+			echo $templates->render('404', compact('lang'));
+		}
+	});
+} elseif (PERMALINK == 'post-title') {
+	$uriforpost = explode('/', $_SERVER['REQUEST_URI']);
+	$uriexistpost = $core->podb->from('post')->select(array('post_description.title', 'post_description.content'))->leftJoin('post_description ON post_description.id_post = post.id_post')->where('post.seotitle', end($uriforpost))->where('post_description.id_language', WEB_LANG_ID)->where('post.active', 'Y')->where('post.publishdate < ?', date('Y-m-d H:i:s'))->limit(1)->fetch();
+	if ($uriexistpost) {
+		/**
+		 * Router untuk menampilkan request halaman post.
+		 *
+		 * Router for display request in post page.
+		 *
+		 * $seotitle = string [a-z0-9_-]
+		 *
+		 * Added in v.2.0.1
+		*/
+		$router->match('GET|POST', '/([a-z0-9_-]+)', function($seotitle) use ($core, $templates) {
+			if (!empty($_POST['search'])) {
+				$query_seo = $core->postring->seo_title($core->postring->valid($_POST['search'], 'xss'));
+				header('location:'.BASE_URL.'/search/'.$query_seo);
+			} else {
+				$lang = $core->setlang('post', WEB_LANG);
+				$post = $core->podb->from('post')
+					->select(array('post_description.title', 'post_description.content'))
+					->leftJoin('post_description ON post_description.id_post = post.id_post')
+					->where('post.seotitle', $seotitle)
+					->where('post_description.id_language', WEB_LANG_ID)
+					->where('post.active', 'Y')
+					->where('post.publishdate < ?', date('Y-m-d H:i:s'))
+					->limit(1)
+					->fetch();
+				if ($post) {
+					if (!empty($_POST)) {
+						require_once(DIR_INC.'/core/vendor/recaptcha/recaptchalib.php');
+						$secret = $core->posetting[22]['value'];
+						$recaptcha = new PoReCaptcha($secret);
+						if (!empty($_POST["g-recaptcha-response"])) {
+							$resp = $recaptcha->verifyResponse(
+								$_SERVER["REMOTE_ADDR"],
+								$_POST["g-recaptcha-response"]
+							);
+							if ($resp != null && $resp->success) {
+								$core->poval->validation_rules(array(
+									'id' => 'required|integer',
+									'id_parent' => 'required|integer',
+									'name' => 'required|max_len,100|min_len,3',
+									'email' => 'required|valid_email',
+									'url' => 'max_len,255|valid_url',
+									'comment' => 'required|min_len,10',
+									'seotitle' => 'required'
+								));
+								$core->poval->filter_rules(array(
+									'id' => 'trim|sanitize_numbers',
+									'id_parent' => 'trim',
+									'name' => 'trim|sanitize_string',
+									'email' => 'trim|sanitize_email',
+									'url' => 'trim|sanitize_string',
+									'comment' => 'trim|sanitize_string|basic_tags',
+									'seotitle' => 'trim'
+								));
+								$validated_data = $core->poval->run($_POST);
+								if ($validated_data === false) {
+									$core->poflash->error($lang['front_comment_error_3']);
+								} else {
+									if ($core->posetting[18]['value'] == 'Y') {
+										$active = 'Y';
+									} else {
+										$active = 'N';
+									}
+									$data = array(
+										'id_post' => $_POST['id'],
+										'id_parent' => $_POST['id_parent'],
+										'name' => $_POST['name'],
+										'email' => $_POST['email'],
+										'url' => $_POST['url'],
+										'comment' => $_POST['comment'],
+										'date' => date('Y-m-d'),
+										'time' => date('h:i:s'),
+										'active' => $active
+									);
+									$query = $core->podb->insertInto('comment')->values($data);
+									$query->execute();
+									unset($_POST);
+									$core->poflash->success($lang['front_comment_success']);
+								}
+							} else {
+								$core->poflash->error($lang['front_comment_error_2']);
+							}
+						} else {
+							$core->poflash->error($lang['front_comment_error_1']);
+						}
+					}
+					$query_hits = $core->podb->update('post')
+						->set(array('hits' => $post['hits']+1))
+						->where('id_post', $post['id_post']);
+					$query_hits->execute();
+					$info = array(
+						'page_title' => htmlspecialchars_decode($post['title']),
+						'page_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
+						'page_key' => $post['tag'],
+						'social_mod' => $lang['front_post_title'],
+						'social_name' => $core->posetting[0]['value'],
+						'social_url' => $core->posetting[1]['value'].'/'.$post['seotitle'],
+						'social_title' => htmlspecialchars_decode($post['title']),
+						'social_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
+						'social_img' => $core->posetting[1]['value'].'/'.DIR_CON.'/uploads/'.$post['picture'],
+						'page' => '1'
+					);
+					$adddata = array_merge($info, $lang);
+					$templates->addData(
+						$adddata
+					);
+					echo $templates->render('detailpost', compact('post','lang'));
+				} else {
+					$info = array(
+						'page_title' => $lang['front_post_not_found'],
+						'page_desc' => $core->posetting[2]['value'],
+						'page_key' => $core->posetting[3]['value'],
+						'social_mod' => $lang['front_post_title'],
+						'social_name' => $core->posetting[0]['value'],
+						'social_url' => $core->posetting[1]['value'],
+						'social_title' => $lang['front_post_not_found'],
+						'social_desc' => $core->posetting[2]['value'],
+						'social_img' => $core->posetting[1]['value'].'/'.DIR_INC.'/images/favicon.png'
+					);
+					$adddata = array_merge($info, $lang);
+					$templates->addData(
+						$adddata
+					);
+					echo $templates->render('404', compact('lang'));
+				}
+			}
+		});
+
+		/**
+		 * Router untuk menampilkan request halaman post dengan nomor halaman.
+		 *
+		 * Router for display request in post page with pagination.
+		 *
+		 * $seotitle = string [a-z0-9_-]
+		 * $page = integer
+		 *
+		 * Added in v.2.0.1
+		*/
+		$router->match('GET|POST', '/([a-z0-9_-]+)/page/(\d+)', function($seotitle, $page) use ($core, $templates) {
+			if (!empty($_POST['search'])) {
+				$query_seo = $core->postring->seo_title($core->postring->valid($_POST['search'], 'xss'));
+				header('location:'.BASE_URL.'/search/'.$query_seo);
+			} else {
+				$lang = $core->setlang('post', WEB_LANG);
+				$post = $core->podb->from('post')
+					->select(array('post_description.title', 'post_description.content'))
+					->leftJoin('post_description ON post_description.id_post = post.id_post')
+					->where('post.seotitle', $seotitle)
+					->where('post_description.id_language', WEB_LANG_ID)
+					->where('post.active', 'Y')
+					->where('post.publishdate < ?', date('Y-m-d H:i:s'))
+					->limit(1)
+					->fetch();
+				if ($post) {
+					if (!empty($_POST)) {
+						require_once(DIR_INC.'/core/vendor/recaptcha/recaptchalib.php');
+						$secret = $core->posetting[22]['value'];
+						$recaptcha = new PoReCaptcha($secret);
+						if (!empty($_POST["g-recaptcha-response"])) {
+							$resp = $recaptcha->verifyResponse(
+								$_SERVER["REMOTE_ADDR"],
+								$_POST["g-recaptcha-response"]
+							);
+							if ($resp != null && $resp->success) {
+								$core->poval->validation_rules(array(
+									'id' => 'required|integer',
+									'id_parent' => 'required|integer',
+									'name' => 'required|max_len,100|min_len,3',
+									'email' => 'required|valid_email',
+									'url' => 'max_len,255|valid_url',
+									'comment' => 'required|min_len,10',
+									'seotitle' => 'required'
+								));
+								$core->poval->filter_rules(array(
+									'id' => 'trim|sanitize_numbers',
+									'id_parent' => 'trim',
+									'name' => 'trim|sanitize_string',
+									'email' => 'trim|sanitize_email',
+									'url' => 'trim|sanitize_string',
+									'comment' => 'trim|sanitize_string|basic_tags',
+									'seotitle' => 'trim'
+								));
+								$validated_data = $core->poval->run($_POST);
+								if ($validated_data === false) {
+									$core->poflash->error($lang['front_comment_error_3']);
+								} else {
+									if ($core->posetting[18]['value'] == 'Y') {
+										$active = 'Y';
+									} else {
+										$active = 'N';
+									}
+									$data = array(
+										'id_post' => $_POST['id'],
+										'id_parent' => $_POST['id_parent'],
+										'name' => $_POST['name'],
+										'email' => $_POST['email'],
+										'url' => $_POST['url'],
+										'comment' => $_POST['comment'],
+										'date' => date('Y-m-d'),
+										'time' => date('h:i:s'),
+										'active' => $active
+									);
+									$query = $core->podb->insertInto('comment')->values($data);
+									$query->execute();
+									unset($_POST);
+									$core->poflash->success($lang['front_comment_success']);
+								}
+							} else {
+								$core->poflash->error($lang['front_comment_error_2']);
+							}
+						} else {
+							$core->poflash->error($lang['front_comment_error_1']);
+						}
+					}
+					$query_hits = $core->podb->update('post')
+						->set(array('hits' => $post['hits']+1))
+						->where('id_post', $post['id_post']);
+					$query_hits->execute();
+					$info = array(
+						'page_title' => htmlspecialchars_decode($post['title']),
+						'page_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
+						'page_key' => $post['tag'],
+						'social_mod' => $lang['front_post_title'],
+						'social_name' => $core->posetting[0]['value'],
+						'social_url' => $core->posetting[1]['value'].'/'.$post['seotitle'],
+						'social_title' => htmlspecialchars_decode($post['title']),
+						'social_desc' => $core->postring->cuthighlight('post', $post['content'], '150'),
+						'social_img' => $core->posetting[1]['value'].'/'.DIR_CON.'/uploads/'.$post['picture'],
+						'page' => $page
+					);
+					$adddata = array_merge($info, $lang);
+					$templates->addData(
+						$adddata
+					);
+					echo $templates->render('detailpost', compact('post','lang'));
+				} else {
+					$info = array(
+						'page_title' => $lang['front_post_not_found'],
+						'page_desc' => $core->posetting[2]['value'],
+						'page_key' => $core->posetting[3]['value'],
+						'social_mod' => $lang['front_post_title'],
+						'social_name' => $core->posetting[0]['value'],
+						'social_url' => $core->posetting[1]['value'],
+						'social_title' => $lang['front_post_not_found'],
+						'social_desc' => $core->posetting[2]['value'],
+						'social_img' => $core->posetting[1]['value'].'/'.DIR_INC.'/images/favicon.png'
+					);
+					$adddata = array_merge($info, $lang);
+					$templates->addData(
+						$adddata
+					);
+					echo $templates->render('404', compact('lang'));
+				}
+			}
+		});
 	}
-});
+}
 
 /**
  * Router untuk menampilkan request halaman pencarian.
