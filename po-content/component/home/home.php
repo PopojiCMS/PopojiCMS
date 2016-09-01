@@ -384,13 +384,13 @@ $router->match('GET|POST', '/member/register', function() use ($core, $templates
 										$core->pomail->Port = $core->posetting[27]['value'];
 										$core->pomail->SMTPAuth = true;
 										$core->pomail->SMTPSecure = 'ssl';
-										$core->pomail->IsHTML(true);
 										$core->pomail->Username = $core->posetting[25]['value'];;
 										$core->pomail->Password = $core->posetting[26]['value'];
 										$core->pomail->setFrom($core->posetting[5]['value'], $core->posetting[0]['value']);
 										$core->pomail->addAddress($email, $username);
+										$core->pomail->IsHTML(true);
 										$core->pomail->Subject = $subject;
-										$core->pomail->msgHTML($message);
+										$core->pomail->Body = $message;
 										$core->pomail->send();
 									}
 									unset($_POST);
@@ -570,13 +570,13 @@ $router->match('GET|POST', '/member/forgot', function() use ($core, $templates) 
 							$core->pomail->Port = $core->posetting[27]['value'];
 							$core->pomail->SMTPAuth = true;
 							$core->pomail->SMTPSecure = 'ssl';
-							$core->pomail->IsHTML(true);
 							$core->pomail->Username = $core->posetting[25]['value'];;
 							$core->pomail->Password = $core->posetting[26]['value'];
 							$core->pomail->setFrom($core->posetting[5]['value'], $core->posetting[0]['value']);
 							$core->pomail->addAddress($user['email'], $nama_lengkap);
+							$core->pomail->IsHTML(true);
 							$core->pomail->Subject = $subject;
-							$core->pomail->msgHTML($message);
+							$core->pomail->Body = $message;
 							$core->pomail->send();
 						}
 						$alertmsg = '<div class="alert alert-info">'.$lang['front_member_notif_9'].'<a class="close" data-dismiss="alert" href="#" aria-hidden="true">&times;</a></div>';

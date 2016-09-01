@@ -270,13 +270,13 @@ class contact extends PoCore
 				$this->pomail->Port = $this->posetting[27]['value'];
 				$this->pomail->SMTPAuth = true;
 				$this->pomail->SMTPSecure = 'ssl';
-				$this->pomail->IsHTML(true);
 				$this->pomail->Username = $this->posetting[25]['value'];;
 				$this->pomail->Password = $this->posetting[26]['value'];
 				$this->pomail->setFrom($this->posetting[5]['value'], $this->posetting[0]['value']);
 				$this->pomail->addAddress($this->postring->valid($_POST['email'], 'xss'), $this->postring->valid($_POST['name'], 'xss'));
+				$this->pomail->IsHTML(true);
 				$this->pomail->Subject = $this->postring->valid($_POST['subject'], 'xss');
-				$this->pomail->msgHTML($this->postring->valid($_POST['message'], 'xss'));
+				$this->pomail->Body = $_POST['message'];
 				if ($this->pomail->send()) {
 					$this->poflash->success($GLOBALS['_']['contact_message_1'], 'admin.php?mod=contact');
 				} else {

@@ -1554,13 +1554,13 @@ class Post extends PoCore
 					$this->pomail->Port = $this->posetting[27]['value'];
 					$this->pomail->SMTPAuth = true;
 					$this->pomail->SMTPSecure = 'ssl';
-					$this->pomail->IsHTML(true);
 					$this->pomail->Username = $this->posetting[25]['value'];;
 					$this->pomail->Password = $this->posetting[26]['value'];
 					$this->pomail->setFrom($this->posetting[5]['value'], $this->posetting[0]['value']);
 					$this->pomail->addAddress($subscribe['email']);
+					$this->pomail->IsHTML(true);
 					$this->pomail->Subject = 'Website Update - '.$paglang['title'];
-					$this->pomail->msgHTML($message);
+					$this->pomail->Body = $message;
 					$this->pomail->send();
 				}
 			}
