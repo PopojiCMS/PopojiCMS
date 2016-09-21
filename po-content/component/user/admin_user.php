@@ -197,6 +197,8 @@ class User extends PoCore
 						'nama_lengkap' => $_POST['nama_lengkap'],
 						'email' => $_POST['email'],
 						'no_telp' => $_POST['no_telp'],
+						'bio' => '',
+						'picture' => '',
 						'level' => $_POST['level'],
 						'tgl_daftar' => date('Ymd'),
 						'id_session' => md5($_POST['password'])
