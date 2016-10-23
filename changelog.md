@@ -1,0 +1,169 @@
+# Changelog PopojiCMS
+
+### Build Version 2.0.1 (07 Agustus 2016) :
+- Perbaikan pemanggilan library utama pada core.php
+- Penambahan pilihan timezone pada proses instalasi.
+- Penambahan requirement php extention fileinfo pada proses instalasi.
+- Penambahan option penggunaan vQmod pada config.php
+- Penambahan option timezone pada config.php
+- Perbaikan publish date yang bermasalah dengan menyamakan waktu sistem dan database.
+- Perbaikan modal window tinymce menjadi responsive.
+- Perbaikan masalah pada component library dan filemanager.
+- Penambahan rss feed pada frontend.
+- Penambahan snipped post populer per kategori.
+- Perbaikan engine dynamic menu.
+- Perbaikan masalah pengiriman email notifikasi.
+- Perbaikan plugin javascript time pada component post.
+- Perbaikan component user pada masalah edit data.
+- Penambahan option permalink pada url post.
+- Penambahan info date dan hits pada component tabel post.
+- Perbaikan design halaman login member.
+- Penambahan halaman profile member.
+- Penambahan halaman detail statistik visitor.
+
+### Build Version 2.0.0 (07 Juni 2016) :
+- Perubahan keseluruhan engine dari native ke struktur MVC tetapi tetap dengan rasa native.
+- Penambahan tag pada bagian frontend.
+- Penambahan komentar sehingga sudah mendukung struktur tree (parent-child).
+- Penambahan data konfigurasi persub pada bagian pengaturan engine.
+- Pergantian wajah theme chingsy.
+- Telah mendukung 100% engine multi bahasa.
+- Galeri pada frontend sudah dibuat peralbum.
+- Penambahan gambar galeri pada component post.
+- Penambahan schedule post.
+- Penambahan kategori sehingga sudah mendukung struktur tree (parent-child).
+- Setiap post sudah mendukung multi kategori.
+- Perbaikan sistem pencarian post pada frontend.
+- Perbaikan component pustaka sehingga semua file yang diupload akan termanage dari sini.
+- Penambahan konfigurasi pada engine theme.
+- Penambahan istilah widget pada component.
+- Perbaikan level pengguna yang lebih dinamis.
+- Penambahan menu admin yang bisa diganti lewat component menu manager.
+- Penambahan engine ternama vqmod.
+- Support semua database yang bisa dijalankan dengan PDO.
+- Penambahan dashboard member terpisah.
+- Penambahan picture description pada post.
+
+### Build Version 1.3.0 (09 Februari 2015) :
+- Tahun baru, wajah baru.
+- Perbaikan engine menu yang terjadi error double class ketika digenerate.
+- Menghilangkan fitur voice recognizer (sementara) yang tidak support lagi di chrome yang baru.
+- Update engine filemanager terbaru sesuai update dari pihak ketiga.
+- Penyesuain element html dengan W3C Standards.
+- Rilis CoGen v.1.0.0 yaitu tool untuk meng-generate component otomatis tanpa perlu menulis script lagi.
+- Penambahan social media meta tag sehingga setiap post akan lebih spesifik terbaca ketika share link di social media.
+- Perbaikan fungsi extract file zip.
+- Penambahan fast menu untuk tambah baru data di component-component.
+- Penambahan permalink dan publish date pada component post dan pages.
+- Perbaikan filtering post pada back-end sehingga semua user yang berlevel admin dapat melihat semua post dari user yang lain.
+- Penambahan action reply pada component contact.
+- Penambahan plugin jquery untuk progres form yang ada di login, register, activation dan recover.
+- Penambahan tipe login password yaitu login dengan pattern seperti pada android.
+- Penambahan image medium untuk setiap image yg diupload (po_upload/medium/medium_namaimage.extensi).
+- Penambahan sitemap generator dibagian setting/pengaturan po-admin.
+- Pembaharuan template back-end dan frond-end agar bisa dibuka cross browser (termasuk IE).
+- Captcha di komentar sudah diganti dengan new reCaptcha dari google.
+- Perbaikan maintenance template.
+- Penambahan fitur headline dan publish time pada component post.
+- Perbaikan pada editor tinymce.
+- Perbaikan security yang ada pada tiap component.
+
+### Build Version 1.2.5 (12 Agustus 2014) :
+- Perbaikan fitur theme editor menggunakan script Code Mirror, menjadikan editor theme lebih powerfull lagi.
+- Penambahan helper pada theme editor, sehingga memudahkan developer untuk membuat themenya sendiri.
+- Penambahan fitur Speech Recognition pada component post sehingga menulis tidak perlu lagi mengetikan keyboard tetapi cukup dengan berbicara pada microphone saja (Only Google Chrome).
+- Penambahan user registrasi menjadikan PopojiCMS menjadi web multiuser yang dinamis sesuai dengan hak akses tiap user.
+- Penambahan component user akses sehingga secara default hak akses terdiri dari admin, user dan member, yang nantinya bisa ditambahkan sendiri hak akses sesuai kebutuhan end user.
+- Penambahan component user role dimana component ini dapat mengatur secara dinamis hak akses masing-masing content yang ada di halaman administrator sesuai dengan user akses tertentu.
+- Perbaikan .htaccess dimana telah diatur slug url baru yang lebih SEO Friendly lagi, hal ini untuk menanggapi permintaan dari kebanyakan end user yang menginginkan slug url yang lebih baik.
+- Perbaikan 2 theme default mengikuti slug url baru serta perbaikan fitur pagging yang lebih dinamis lagi.
+- Perbaikan pada title, meta descriptions, meta keywords untuk hasil SEO yang lebih baik lagi.
+
+### Build Version 1.2.4 (7 Juni 2014) :
+- Perbaikan pada menu engine, dimana sekarang sudah bisa support multi class sampai 3 class ke bawah.
+- Perbaikan pada .htaccess baik pada frond-end ataupun pada back-end.
+- Perbaikan setiap inputan pada frond-end tidak lagi menggunakan ajax tetapi melalui pemprosesan php murni, hal ini untuk mempermudah developing theme nantinya.
+- Penambahan fitur pagging dimana sekarang bisa dipilih untuk pagging berupa kombinasi number atau hanya tombol prev dan next saja.
+- Perbaikan penulisan coding pada komponen galeri dan user.
+- Perbaikan pada komponen post dimana sekarang untuk user yang tidak memiliki hak akses admin hanya bisa melihat dan mengedit konten yang ditulis oleh dirinya sendiri.
+
+### Build Version 1.2.3 (1 April 2014) :
+- Peleburan PopojiCMS menjadi versi 1 bahasa saja.
+- Perubahan menyeluruh pada struktur theme backend dengan menggunakan theme ProUI.
+- Penyempurnaan engine theme frond-end, selain tampilan baru, skinnya sudah bisa diganti-ganti.
+- Mode maintenance yang bisa diatur lewat backend.
+- Sistem file caching untuk mempercepat loading website.
+- .httacess gzip mode untuk mengkompresi file web menjadi plain text untuk mempercepat loading website.
+- Penggunaan natural bootstrap yang memudahkan developer bermain dengan designnya.
+- Penambahan sistem notifikasi untuk komentar dan kontak yang masuk dan belum terbaca.
+- Pada backend semua datatable telah menggunakan ajax-json sehingga data lebih cepat ditampilkan.
+- Upload data untuk image post telah menggunakan filemanager 1 atap, sehingga lebih mudah dalam pengoprasiannya.
+- Text editor dijadikan default newtinymce yang tampilannya sudah disesuaikan dengan design.
+- Penggantian konten post dengan konten yang lebih baru.
+
+### Build Version 1.2.2 (27 Januari 2014) :
+- Pergantian logo PopojiCMS baik favicon maupun logo pengenal diganti dengan logo yang baru.
+- Pelucuran PopojiCMS versi 1 bahasa, slim and simple.
+- Rilis PopojiCMSOAuth v.1.0, untuk facebook dan twitter connect.
+- Penambahan multi delete item pada component : post, pages, category, tags, media, contact, comment, gallery.
+- Penambahan javascript di file functions.js (po-admin/js/files/functions.js) untuk mendukung multi delete item.
+- Penambahan function cuthighlight(), tgl_indo(), tgl_eng() di file po-library/po-function.php.
+- Penambahan fitur lupa password akun pada halaman administrator.
+- Penambahan fitur timezone pada component setting.
+- Penambahan paging php pada frond-end sebagai option lain jquery paging sebelumnya.
+
+### Build Version 1.2.1 (04 Desember 2013) :
+- Perbaikan theme editor pada versi sebelumnya yang ternyata terjadi kesalahan target link.
+- Perbaikan edit user yang terjadi error pada script session_register().
+
+### Build Version 1.2.0 (07 November 2013) :
+- Perubahan besar pada engine theme front-end, mempermudah implementasi template baru.
+- Perbaikan security dan error pada versi sebelumnya.
+
+### Build Version 1.1.5 (14 Oktober 2013) :
+- Perbaikan pada recaptcha di theme chingsy, diganti menggunakan theme clean karena terjadi error pada beberapa tampilan browser.
+- Perbaikan pada script pencarian di theme chingsy.
+- Pemindahan classmenu.php ke direktori library dan di rename menjadi po-classmenu.php.
+- Penambahan editor baru yaitu newtinymce menggantikan editor lama cleditor.
+
+### Build Version 1.1.4 (28 September 2013) :
+- Perbaikan theme pada instalation page.
+- Penambahan inputan username dan password default pada saat instalasi.
+- Perbaikan component post, karena terjadi error pada beberapa web hosting disaat input dan update artikel.
+- Perbaikan file meta-desc.php.
+- Perbaikan component edit theme, dengan menambahkan line number pada textarea.
+
+### Build Version 1.1.3 (12 September 2013) :
+- Penyempurnaan dalam modul instalasi.
+- Penambahan component Menu Manager untuk memudahkan user dalam pembuatan menu dinamis dan telah diterapkan pada theme default chingsy.
+- Perbaikan dynamic title pada file title.php.
+- Perbaikan dynamic description pada file meta-desc.php.
+- Perbaikan bugs pada component category, gallery, pages, post dan user.
+- Penambahan field baru pada component user untuk gambar profil dan profil biografi agar di front-end bisa ditampilkan info dari penulis artikel.
+- Perbaikan file database PopojiCMS.
+
+### Build Version 1.1.2 (24 Agustus 2013) :
+- Perubahan besar pada template backend PopojiCMS (admin page), dimana template semula metro diganti dengan template baru universal sehingga bisa dipakai untuk project apapun.
+- Component theme telah disempurnakan dengan ditambahkannya edit file theme langsung tanpa perlu masuk ke CPanel lagi untuk mengubah script theme.
+- Penambahan One Click and Restore DB, untuk memudahkan user dalam backup dan restore database sehingga tidak perlu menggunakan phpmyadmin lagi.
+
+### Build Version 1.1.1 (21 Juli 2013) :
+- Penambahan satu field id pada masing-masing tabel yang ada di component post, category dan pages, untuk memudahkan user melihat id suatu content yang akan ditampilkan pada tema.
+- Pada component setting, sudah ditambahkan switch editor sehingga user dapat mengganti text editor sesuai keinginannya. Adapun text editor yang disediakan adalah redactor (default), cleditor serta gabungan tinymce dan fckeditor.
+
+### Build Version 1.1.0 (08 Juli 2013) :
+- Penyempurnaan sistem, bersama diluncurkannya paket develop PopojiCMS.
+
+### Build Version 1.0.5 (03 Juli 2013) :
+- Perbaikan plugin FB dan Twitter share dikarena plugin yang lama memakan bandwidth yang cukup besar.
+- File comment.php diganti nama menjadi po-postcom.php dikarenakan ada hosting yang tidak mengijinkan pemakaian nama comment.php.
+- Penambahan script "error_reporting(0);" pada file title.php, meta-desc.php dan meta-key.php dikarenakan terdapat bugs "path disclosures" jika file tersebut dieksekusi.
+
+### Build Version 1.0.4 (25 Juni 2013) :
+- Perbaikan error pada versi php 5.3.x keatas.
+
+### Build Version 1.0.3 (21 Juni 2013) :
+- Perbaikan pada file meta-desc.php dan meta-key.php.
+
+### Build Version 1.0.2 (10 Juni 2013) :
+- Perbaikan statistik untuk traffic web pada halaman frontend.
