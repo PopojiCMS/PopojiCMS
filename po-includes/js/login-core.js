@@ -31,7 +31,7 @@ $(function() {
 		var dataString = 'username='+ username;
 		$.ajax({
 			type: "POST",
-			url: WEB_URL+"/"+DIR_ADM+"/route.php?mod=login&act=searchlocktype",
+			url: WEB_URL+DIR_ADM+"/route.php?mod=login&act=searchlocktype",
 			data: dataString,
 			cache: false,
 			success: function(data){

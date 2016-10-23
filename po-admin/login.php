@@ -49,7 +49,7 @@ class Login extends PoCore
 		?>
 		<h1>Log In Panel</h1>
 		<?=$errormsg;?>
-		<form role="form" action="route.php?mod=login&act=proclogin" method="post" id="form-login" autocomplete="off">
+		<form role="form" action="<?=WEB_URL.DIR_ADM;?>/route.php?mod=login&act=proclogin" method="post" id="form-login" autocomplete="off">
 			<div class="form-group">
 				<label for="login-username" class="sr-only">Username</label>
 				<input type="text" name="username" id="login-username" class="form-control" placeholder="Username">
