@@ -632,7 +632,8 @@ class Post implements ExtensionInterface
 				}
 			}
 		}
-		return $this->arrayOrderBy($post, 'id_post', SORT_DESC);
+		$lastarr = $this->arrayOrderBy($post, 'id_post', SORT_DESC);
+		return array_unique($lastarr, SORT_REGULAR);
     }
 
 	/**
