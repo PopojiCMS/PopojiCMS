@@ -134,7 +134,8 @@ class Post implements ExtensionInterface
 				$post[] = $this->getPostById($cat['id_post'], $lang);
 			}
 		}
-		return $this->arrayOrderBy($post, 'id_post', SORT_DESC);
+		$lastarr = $this->arrayOrderBy($post, 'id_post', SORT_DESC);
+		return array_unique($lastarr, SORT_REGULAR);
     }
 
 	/**
@@ -190,6 +191,7 @@ class Post implements ExtensionInterface
 		} else {
 			$popular = $this->arrayOrderBy($post, 'hits', SORT_DESC);
 		}
+		$popular = array_unique($popular, SORT_REGULAR);
         return array_slice($popular,0,$limit);
     }
 
