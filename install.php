@@ -130,13 +130,14 @@ EOS;
 	$confDB['db_port'] = array(
 		'name' => "Database host port number",
 		'ex' => "3306",
+		'def' => @$_POST['db_port'],
 		'desc' => "Leave 3306 for default or specify MySQL Database host port number.",
-		'def' => "",
 		'check' => ''
 	);
 	$confDB['db_sock'] = array(
 		'name' => "Database socket path",
 		'ex' => "/tmp/mysql50.sock",
+		'def' => @$_POST['db_sock'],
 		'desc' => "Leave blank or specify MySQL Database socket path.",
 		'def' => "",
 		'check' => ''
@@ -144,18 +145,21 @@ EOS;
 	$confDB['db_name'] = array(
 	    'name' => "Database name",
 	    'ex' => "YourDatabaseName",
+	    'def' => @$_POST['db_name'],
 	    'desc' => "Your MySQL database name here.",
 	    'check' => 'return strlen($arg0) >= 1 ? true : false;'
 	);
 	$confDB['db_user'] = array(
 		'name' => "Database user",
 		'ex' => "YourName",
+		'def' => @$_POST['db_user'],
 		'desc' => "Your MySQL database read/write user name here.",
 		'check' => 'return strlen($arg0) >= 1 ? true : false;'
 	);
 	$confDB['db_password'] = array(
 		'name' => "Database password",
 		'ex' => "YourPassword",
+	    'def' => @$_POST['db_password'],
 		'desc' => "Your MySQL database password here.",
 		'check' => 'return strlen($arg0) >= 0 ? true : false;'
 	);
@@ -164,11 +168,13 @@ EOS;
 	$confGeneral['site_title'] = array(
 		'name' => "Site Title",
 		'ex' => "The Best Community",
+	    'def' => @$_POST['site_title'],
 		'desc' => "Name of your site.",
 		'check' => 'return strlen($arg0) >= 1 ? true : false;'
 	);
 	$confGeneral['site_desc'] = array(
 		'name' => "Site Description",
+	    'def' => @$_POST['site_desc'],
 		'ex' => "The place to find new friends, communicate and have fun.",
 		'desc' => "Meta description of your site.",
 		'check' => 'return strlen($arg0) >= 1 ? true : false;'
@@ -176,12 +182,14 @@ EOS;
 	$confGeneral['site_email'] = array(
 		'name' => "Site E-mail",
 		'ex' => "your@email.here",
+	    'def' => @$_POST['site_email'],
 		'desc' => "Your site e-mail.",
 		'check' => 'return strlen($arg0) > 0 AND strstr($arg0,"@") ? true : false;'
 	);
 	$confGeneral['site_user'] = array(
 		'name' => "Site Username",
 		'ex' => "admin",
+	    'def' => @$_POST['site_user'],
 		'desc' => "Username for login to administrator page, please just write letters and numbers (lowercase).",
 		'check' => 'return strlen($arg0) >= 1 ? true : false;'
 	);
