@@ -112,10 +112,10 @@ class PoCore
 		 * Initialize all class from popojicms and vendor to variabel
 		 *
 		*/
-		$this->pdo = new PDO(DATABASE_DRIVER.":host=".DATABASE_HOST.";dbname=".DATABASE_NAME."", DATABASE_USER, DATABASE_PASS, array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"));
+		$this->pdo = new PDO(DATABASE_DRIVER.":host=".DATABASE_HOST.":".DATABASE_PORT.";dbname=".DATABASE_NAME."", DATABASE_USER, DATABASE_PASS, array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"));
 		$this->pdo->exec("SET time_zone='$timeoffset';");
 		$this->podb = new FluentPDO($this->pdo);
-		$this->poconnect = array('user' => DATABASE_USER, 'pass' => DATABASE_PASS, 'db' => DATABASE_NAME, 'host' => DATABASE_HOST);
+		$this->poconnect = array('user' => DATABASE_USER, 'pass' => DATABASE_PASS, 'db' => DATABASE_NAME, 'host' => DATABASE_HOST.":".DATABASE_PORT);
 		$this->porequest = new PoRequest();
 		$this->poval = new GUMP();
 		$this->pohtml = new PoHtml();

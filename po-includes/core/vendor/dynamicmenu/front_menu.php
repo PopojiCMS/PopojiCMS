@@ -30,7 +30,7 @@ class FrontMenu
 	*/
 	public function __construct()
 	{
-		$this->pdo = new PDO("mysql:host=".DATABASE_HOST.";dbname=".DATABASE_NAME."", DATABASE_USER, DATABASE_PASS);
+		$this->pdo = new PDO("mysql:host=".":".DATABASE_PORT..";dbname=".DATABASE_NAME."", DATABASE_USER, DATABASE_PASS);
 		$this->podb = new FluentPDO($this->pdo);
 	}
 
