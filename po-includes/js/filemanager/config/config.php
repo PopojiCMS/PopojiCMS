@@ -1,5 +1,5 @@
 <?php
-session_start();
+if (session_id() == '') session_start();
 if (empty($_SESSION['namauser']) AND empty($_SESSION['passuser']) AND $_SESSION['login'] == 0) {
 	header('location:../index.html');
 } else {
@@ -11,7 +11,14 @@ if (isset($_GET['path'])) {
 }
 
 include_once "../../".$addDir."core/core.php";
+
 mb_internal_encoding('UTF-8');
+mb_http_output('UTF-8');
+mb_http_input('UTF-8');
+mb_language('uni');
+mb_regex_encoding('UTF-8');
+ob_start('mb_output_handler');
+date_default_timezone_set('Asia/Jakarta');
 
 $pocore = new PoCore();
 $medium_size = explode('x', $pocore->posetting[12]['value']);
@@ -47,6 +54,8 @@ define('USE_ACCESS_KEYS', false); // TRUE or FALSE
 |--------------------------------------------------------------------------
 */
 
+define('DEBUG_ERROR_MESSAGE', true); // TRUE or FALSE
+
 /*
 |--------------------------------------------------------------------------
 | Path configuration
@@ -70,10 +79,9 @@ $config = array(
 	| DON'T TOUCH (base url (only domain) of site).
 	|--------------------------------------------------------------------------
 	|
-	| without final /
+	| without final / (DON'T TOUCH)
 	|
 	*/
-
 	'base_url' => ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && ! in_array(strtolower($_SERVER['HTTPS']), array( 'off', 'no' ))) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'],
 
 	/*
@@ -85,7 +93,6 @@ $config = array(
 	|
 	*/
 	'upload_dir' => $strlink_po.'/po-content/uploads/',
-
 	/*
 	|--------------------------------------------------------------------------
 	| relative path from filemanager folder to upload folder
@@ -106,6 +113,36 @@ $config = array(
 	|
 	*/
 	'thumbs_base_path' => '../../../po-content/thumbs/',
+
+
+	/*
+	|--------------------------------------------------------------------------
+	| FTP configuration BETA VERSION
+	|--------------------------------------------------------------------------
+	|
+	| If you want enable ftp use write these parametres otherwise leave empty
+	| Remember to set base_url properly to point in the ftp server domain and 
+	| upload dir will be ftp_base_folder + upload_dir so without final /
+	|
+	*/
+	'ftp_host'         => false,
+	'ftp_user'         => "user",
+	'ftp_pass'         => "pass",
+	'ftp_base_folder'  => "base_folder",
+	'ftp_base_url'     => "http://site to ftp root",
+	/* --------------------------------------------------------------------------
+	| path from ftp_base_folder to base of thumbs folder with start and final |
+	|--------------------------------------------------------------------------*/
+	'ftp_thumbs_dir' => '../../../po-content/thumbs/',
+	'ftp_ssl' => false,
+	'ftp_port' => 21,
+
+
+	// 'ftp_host'         => "s108707.gridserver.com",
+	// 'ftp_user'         => "test@responsivefilemanager.com",
+	// 'ftp_pass'         => "Test.1234",
+	// 'ftp_base_folder'  => "/domains/responsivefilemanager.com/html",
+
 
 	/*
 	|--------------------------------------------------------------------------
@@ -141,13 +178,31 @@ $config = array(
 
 	/*
 	|--------------------------------------------------------------------------
+	| Maximum size of all files in source folder
+	|--------------------------------------------------------------------------
+	|
+	| in Megabytes
+	|
+	*/
+	'MaxSizeTotal' => false,
+
+	/*
+	|--------------------------------------------------------------------------
 	| Maximum upload size
 	|--------------------------------------------------------------------------
 	|
 	| in Megabytes
 	|
 	*/
-	'MaxSizeUpload' => 100,
+	'MaxSizeUpload' => 20,
+
+	/*
+	|--------------------------------------------------------------------------
+	| File and Folder permission
+	|--------------------------------------------------------------------------
+	|
+	*/
+	'fileFolderPermission' => 0775,
 
 
 	/*
@@ -169,22 +224,31 @@ $config = array(
 	'icon_theme' => "ico",
 
 
+	//Show or not total size in filemanager (is possible to greatly increase the calculations)
+	'show_total_size'						=> false,
 	//Show or not show folder size in list view feature in filemanager (is possible, if there is a large folder, to greatly increase the calculations)
-	'show_folder_size'                        => true,
+	'show_folder_size'						=> true,
 	//Show or not show sorting feature in filemanager
-	'show_sorting_bar'                        => true,
+	'show_sorting_bar'						=> true,
+	//Show or not show filters button in filemanager
+	'show_filter_buttons'                   => true,
+	//Show or not language selection feature in filemanager
+	'show_language_selection'				=> true,
 	//active or deactive the transliteration (mean convert all strange characters in A..Za..z0..9 characters)
-	'transliteration'                         => false,
+	'transliteration'						=> false,
 	//convert all spaces on files name and folders name with $replace_with variable
-	'convert_spaces'                          => true,
+	'convert_spaces'						=> true,
 	//convert all spaces on files name and folders name this value
-	'replace_with'                            => "_",
+	'replace_with'							=> "_",
 	//convert to lowercase the files and folders name
-	'lower_case'                              => true,
+	'lower_case'							=> true,
+
+	//Add ?484899493349 (time value) to returned images to prevent cache
+	'add_time_to_img'                       => false,
 
 	// -1: There is no lazy loading at all, 0: Always lazy-load images, 0+: The minimum number of the files in a directory
 	// when lazy loading should be turned on.
-	'lazy_loading_file_number_threshold'      => 0,
+	'lazy_loading_file_number_threshold'	=> 30,
 
 
 	//*******************************************
@@ -203,7 +267,7 @@ $config = array(
 	#            2 / landscape = keep aspect set width;
 	#            3 / auto = auto;
 	#            4 / crop= resize and crop;
-	 */
+	*/
 
 	//Automatic resizing //
 	// If you set $image_resizing to TRUE the script converts all uploaded images exactly to image_resizing_width x image_resizing_height dimension
@@ -216,6 +280,30 @@ $config = array(
 	'image_resizing_override'                 => false,
 	// If set to TRUE then you can specify bigger images than $image_max_width & height otherwise if image_resizing is
 	// bigger than $image_max_width or height then it will be converted to those values
+
+
+	//******************
+	//
+	// WATERMARK IMAGE
+	// 
+	//Watermark url or false
+	'image_watermark'                          => false,
+	# Could be a pre-determined position such as:
+	#           tl = top left,
+	#           t  = top (middle),
+	#           tr = top right,
+	#           l  = left,
+	#           m  = middle,
+	#           r  = right,
+	#           bl = bottom left,
+	#           b  = bottom (middle),
+	#           br = bottom right
+	#           Or, it could be a co-ordinate position such as: 50x100
+	'image_watermark_position'                 => 'br',
+	# padding: If using a pre-determined position you can
+	#         adjust the padding from the edges by passing an amount
+	#         in pixels. If using co-ordinates, this value is ignored.
+	'image_watermark_padding'                 => 0,
 
 	//******************
 	// Default layout setting
@@ -250,7 +338,7 @@ $config = array(
 	'create_text_files'                       => false, // only create files with exts. defined in $editable_text_file_exts
 
 	// you can preview these type of files if $preview_text_files is true
-	'previewable_text_file_exts'              => array( 'txt', 'log', 'xml', 'html', 'css', 'htm', 'js' ),
+	'previewable_text_file_exts'              => array( "bsh", "c","css", "cc", "cpp", "cs", "csh", "cyc", "cv", "htm", "html", "java", "js", "m", "mxml", "perl", "pl", "pm", "py", "rb", "sh", "xhtml", "xml","xsl" ),
 	'previewable_text_file_exts_no_prettify'  => array( 'txt', 'log' ),
 
 	// you can edit these type of files if $edit_text_files is true (only text based files)
@@ -279,15 +367,15 @@ $config = array(
 	//Allowed extensions (lowercase insert)
 	//**********************
 	'ext_img'                                 => array( 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'svg' ), //Images
-	'ext_file'                                => array( 'doc', 'docx', 'rtf', 'pdf', 'xls', 'xlsx', 'txt', 'csv', 'html', 'xhtml', 'psd', 'sql', 'log', 'fla', 'xml', 'ade', 'adp', 'mdb', 'accdb', 'ppt', 'pptx', 'odt', 'ots', 'ott', 'odb', 'odg', 'otp', 'otg', 'odf', 'ods', 'odp', 'css', 'ai' ), //Files
+	'ext_file'                                => array( 'doc', 'docx', 'rtf', 'pdf', 'xls', 'xlsx', 'txt', 'csv', 'html', 'xhtml', 'psd', 'sql', 'log', 'fla', 'xml', 'ade', 'adp', 'mdb', 'accdb', 'ppt', 'pptx', 'odt', 'ots', 'ott', 'odb', 'odg', 'otp', 'otg', 'odf', 'ods', 'odp', 'css', 'ai', 'kmz','dwg', 'dxf', 'hpgl', 'plt', 'spl', 'step', 'stp', 'iges', 'igs', 'sat', 'cgm'), //Files
 	'ext_video'                               => array( 'mov', 'mpeg', 'm4v', 'mp4', 'avi', 'mpg', 'wma', "flv", "webm" ), //Video
-	'ext_music'                               => array( 'mp3', 'm4a', 'ac3', 'aiff', 'mid', 'ogg', 'wav' ), //Audio
+	'ext_music'                               => array( 'mp3', 'mpga', 'm4a', 'ac3', 'aiff', 'mid', 'ogg', 'wav' ), //Audio
 	'ext_misc'                                => array( 'zip', 'rar', 'gz', 'tar', 'iso', 'dmg' ), //Archives
 
 	/******************
-	 * AVIARY config
-	 *******************/
-	'aviary_active'                           => false,
+	* AVIARY config
+	*******************/
+	'aviary_active'                           => true,
 	'aviary_apiKey'                           => "2444282ef4344e3dacdedc7a78f8877d",
 	'aviary_language'                         => "en",
 	'aviary_theme'                            => "light",
@@ -304,13 +392,18 @@ $config = array(
 	// Hidden files and folders
 	//**********************
 	// set the names of any folders you want hidden (eg "hidden_folder1", "hidden_folder2" ) Remember all folders with these names will be hidden (you can set any exceptions in config.php files on folders)
-	'hidden_folders'                          => array('medium'),
+	'hidden_folders'                          => array( 'medium' ),
 	// set the names of any files you want hidden. Remember these names will be hidden in all folders (eg "this_document.pdf", "that_image.jpg" )
 	'hidden_files'                            => array( 'index.html' ),
 
 	/*******************
-	 * JAVA upload
-	 *******************/
+	* URL upload
+	*******************/
+	'url_upload'                             => true,
+
+	/*******************
+	* JAVA upload
+	*******************/
 	'java_upload'                             => true,
 	'JAVAMaxSizeUpload'                       => 200, //Gb
 
@@ -339,7 +432,7 @@ $config = array(
 	#                          2 / landscape = keep aspect set width;
 	#                          3 / auto = auto;
 	#                          4 / crop= resize and crop;
-	 */
+	*/
 	'fixed_image_creation_option'             => array( 'crop', 'auto' ), //set the type of the crop
 
 
@@ -360,7 +453,7 @@ $config = array(
 	#                          2 / landscape = keep aspect set width;
 	#                          3 / auto = auto;
 	#                          4 / crop= resize and crop;
-	 */
+	*/
 	'relative_image_creation_option'          => array( 'auto' ), //set the type of the crop
 
 
@@ -392,3 +485,4 @@ return array_merge(
 	)
 );
 }
+?>
