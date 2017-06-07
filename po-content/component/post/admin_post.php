@@ -351,7 +351,7 @@ class Post extends PoCore
 								<?=$this->pohtml->inputText(array('type' => 'text', 'label' => $GLOBALS['_']['post_date'], 'name' => 'publishdate', 'id' => 'publishdate', 'value' => date('Y-m-d'), 'mandatory' => true, 'options' => 'required'));?>
 							</div>
 							<div class="col-md-6">
-								<?=$this->pohtml->inputText(array('type' => 'text', 'label' => $GLOBALS['_']['post_time'], 'name' => 'publishtime', 'id' => 'publishtime', 'value' => date('h:i:s'), 'mandatory' => true, 'options' => 'required'));?>
+								<?=$this->pohtml->inputText(array('type' => 'text', 'label' => $GLOBALS['_']['post_time'], 'name' => 'publishtime', 'id' => 'publishtime', 'value' => date('H:i:s'), 'mandatory' => true, 'options' => 'required'));?>
 							</div>
 						</div>
 						<div class="row">
