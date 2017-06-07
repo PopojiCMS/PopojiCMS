@@ -1496,7 +1496,7 @@ if (PERMALINK == 'slug/post-title') {
 	});
 } elseif (PERMALINK == 'post-title') {
 	$uriforpost = explode('/', $_SERVER['REQUEST_URI']);
-	$uriexistpost = $core->podb->from('post')->select(array('post_description.title', 'post_description.content'))->leftJoin('post_description ON post_description.id_post = post.id_post')->where('post.seotitle', end($uriforpost))->where('post_description.id_language', WEB_LANG_ID)->where('post.active', 'Y')->where('post.publishdate < ?', date('Y-m-d H:i:s'))->limit(1)->fetch();
+	$uriexistpost = $core->podb->from('post')->select(array('post_description.title', 'post_description.content'))->leftJoin('post_description ON post_description.id_post = post.id_post')->where('post.seotitle', $uriforpost[2])->where('post_description.id_language', WEB_LANG_ID)->where('post.active', 'Y')->where('post.publishdate < ?', date('Y-m-d H:i:s'))->limit(1)->fetch();
 	if ($uriexistpost) {
 		/**
 		 * Router untuk menampilkan request halaman post.
