@@ -250,7 +250,7 @@ if ($_SESSION['login'] == 0) {
 				fontsize_formats: "8px 10px 12px 14px 18px 24px 36px",
 				relative_urls: false,
 				remove_script_host: false,
-				external_filemanager_path: "<?=WEB_URL.DIR_INC;?>/js/filemanager/",
+				external_filemanager_path: "../<?=DIR_INC;?>/js/filemanager/",
 				filemanager_title: "File Manager",
 				external_plugins: {
 					"filemanager" : "<?=WEB_URL.DIR_INC;?>/js/filemanager/plugin.min.js"
@@ -284,7 +284,7 @@ if ($_SESSION['login'] == 0) {
 			fontsize_formats: "8px 10px 12px 14px 18px 24px 36px",
 			relative_urls: false,
 			remove_script_host: false,
-			external_filemanager_path: "<?=WEB_URL.DIR_INC;?>/js/filemanager/",
+			external_filemanager_path: "../<?=DIR_INC;?>/js/filemanager/",
 			filemanager_title: "File Manager",
 			external_plugins: {
 				"filemanager" : "<?=WEB_URL.DIR_INC;?>/js/filemanager/plugin.min.js"
