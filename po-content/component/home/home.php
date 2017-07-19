@@ -37,7 +37,7 @@ $router->match('GET|POST', '/', function() use ($core, $templates) {
 	$templates->addData(
 		$adddata
 	);
-	echo $templates->render('welcome', compact('lang'));
+	echo $templates->render('home', compact('lang'));
 });
 
 /**
