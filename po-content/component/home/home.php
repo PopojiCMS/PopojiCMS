@@ -37,6 +37,32 @@ $router->match('GET|POST', '/', function() use ($core, $templates) {
 	$templates->addData(
 		$adddata
 	);
+	echo $templates->render('welcome', compact('lang'));
+});
+
+/**
+ * Router untuk menampilkan request halaman beranda.
+ *
+ * Router for display request in home page.
+ *
+*/
+$router->match('GET|POST', '/home', function() use ($core, $templates) {
+	$lang = $core->setlang('home', WEB_LANG);
+	$info = array(
+		'page_title' => $core->posetting[0]['value'],
+		'page_desc' => $core->posetting[2]['value'],
+		'page_key' => $core->posetting[3]['value'],
+		'social_mod' => $lang['front_home'],
+		'social_name' => $core->posetting[0]['value'],
+		'social_url' => $core->posetting[1]['value'],
+		'social_title' => $core->posetting[0]['value'],
+		'social_desc' => $core->posetting[2]['value'],
+		'social_img' => $core->posetting[1]['value'].'/'.DIR_INC.'/images/favicon.png'
+	);
+	$adddata = array_merge($info, $lang);
+	$templates->addData(
+		$adddata
+	);
 	echo $templates->render('home', compact('lang'));
 });
 
@@ -318,6 +344,9 @@ $router->match('GET|POST', '/member/register', function() use ($core, $templates
 										'password' => md5($_POST['password']),
 										'nama_lengkap' => ucfirst(strtolower($_POST['username'])),
 										'email' => $_POST['email'],
+										'no_telp' => '',
+										'bio' => '',
+										'picture' => '',
 										'level' => '4',
 										'tgl_daftar' => date('Ymd'),
 										'block' => 'Y',
@@ -753,6 +782,9 @@ $router->match('GET|POST', '/member/login/twitter', function() use ($core, $temp
 				'password' => '',
 				'nama_lengkap' => $twusername,
 				'email' => '',
+				'no_telp' => '',
+				'bio' => '',
+				'picture' => '',
 				'level' => '4',
 				'tgl_daftar' => date('Ymd'),
 				'block' => 'Y',
