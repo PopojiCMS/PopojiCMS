@@ -4,7 +4,7 @@
  * - PopojiCMS Core
  *
  * - File : core.php
- * - Version : 1.1
+ * - Version : 1.2
  * - Author : Jenuar Dalapang
  * - License : MIT License
  *
@@ -112,7 +112,8 @@ class PoCore
 		 * Initialize all class from popojicms and vendor to variabel
 		 *
 		*/
-		$this->pdo = new PDO(DATABASE_DRIVER.":host=".DATABASE_HOST.";dbname=".DATABASE_NAME."", DATABASE_USER, DATABASE_PASS, array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"));
+		$this->pdo = null;
+		$this->pdo = new PDO(DATABASE_DRIVER.":host=".DATABASE_HOST.";dbname=".DATABASE_NAME."", DATABASE_USER, DATABASE_PASS, array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8", PDO::ATTR_PERSISTENT => true));
 		$this->pdo->exec("SET time_zone='$timeoffset';");
 		$this->podb = new FluentPDO($this->pdo);
 		$this->poconnect = array('user' => DATABASE_USER, 'pass' => DATABASE_PASS, 'db' => DATABASE_NAME, 'host' => DATABASE_HOST);
