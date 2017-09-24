@@ -1577,9 +1577,9 @@ class Post extends PoCore
 	public function generate_checkbox($id, $type, $id_post = null)
 	{
 		if ($type == 'add') {
-			return $this->generate_child($id, "0");
+			return $this->generate_child($id, 0);
 		} else {
-			return $this->generate_child_update($id, $id_post, "0");
+			return $this->generate_child_update($id, $id_post, 0);
 		}
 	}
 
@@ -1608,16 +1608,16 @@ class Post extends PoCore
 			$i++;
 			foreach ($catfuns as $catfun) {
 				$explus = $exp + 20;
-				$child = $this->generate_child($catfun['id_category'], $explus."px");
+				$child = $this->generate_child($catfun['id_category'], $explus);
 				$html .= "\n\t".$indent."";
 				if ($child) {
 					$i--;
-					$html .= "<li><input type=\"checkbox\" name=\"id_category[]\" value='".$catfun['id_category']."' style='margin-left:".$exp.";' /> ";
+					$html .= "<li><input type=\"checkbox\" name=\"id_category[]\" value='".$catfun['id_category']."' style='margin-left:".$exp."px;' /> ";
 					$html .= $catfun['title'];
 					$html .= $child;
 					$html .= "\n\t".$indent."";
 				} else {
-					$html .= "<li><input type=\"checkbox\" name=\"id_category[]\" value='".$catfun['id_category']."' style='margin-left:".$exp.";' /> ";
+					$html .= "<li><input type=\"checkbox\" name=\"id_category[]\" value='".$catfun['id_category']."' style='margin-left:".$exp."px;' /> ";
 					$html .= $catfun['title'];
 				}
 				$html .= '</li>';
@@ -1666,16 +1666,16 @@ class Post extends PoCore
 					$checked = '';
 				}
 				$explus = $exp + 20;
-				$child = $this->generate_child_update($catfun['id_category'], $id_post, $explus."px");
+				$child = $this->generate_child_update($catfun['id_category'], $id_post, $explus);
 				$html .= "\n\t".$indent."";
 				if ($child) {
 					$i--;
-					$html .= "<li><input type=\"checkbox\" name=\"id_category[]\" value='".$catfun['id_category']."' style='margin-left:".$exp.";' ".$checked." /> ";
+					$html .= "<li><input type=\"checkbox\" name=\"id_category[]\" value='".$catfun['id_category']."' style='margin-left:".$exp."px;' ".$checked." /> ";
 					$html .= $catfun['title'];
 					$html .= $child;
 					$html .= "\n\t".$indent."";
 				} else {
-					$html .= "<li><input type=\"checkbox\" name=\"id_category[]\" value='".$catfun['id_category']."' style='margin-left:".$exp.";' ".$checked." /> ";
+					$html .= "<li><input type=\"checkbox\" name=\"id_category[]\" value='".$catfun['id_category']."' style='margin-left:".$exp."px;' ".$checked." /> ";
 					$html .= $catfun['title'];
 				}
 				$html .= '</li>';
