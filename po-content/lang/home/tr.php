@@ -6,7 +6,6 @@
  * - File : tr.php
  * - Version : 1.1
  * - Author : Jenuar Dalapang
- * - Developed by: Yohanes Guntur
  * - License : MIT License
  *
 */
