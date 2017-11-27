@@ -28,12 +28,12 @@ SET time_zone = "+00:00";
 -- Table structure for table `album`
 --
 
-DROP TABLE IF EXISTS `album`;
 CREATE TABLE `album` (
   `id_album` int(5) NOT NULL,
   `title` varchar(255) NOT NULL,
   `seotitle` varchar(255) NOT NULL,
-  `active` enum('Y','N') NOT NULL DEFAULT 'Y'
+  `active` enum('Y','N') NOT NULL DEFAULT 'Y',
+  PRIMARY KEY (`id_album`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -50,13 +50,13 @@ INSERT INTO `album` (`id_album`, `title`, `seotitle`, `active`) VALUES
 -- Table structure for table `category`
 --
 
-DROP TABLE IF EXISTS `category`;
 CREATE TABLE `category` (
   `id_category` int(5) NOT NULL,
   `id_parent` int(5) NOT NULL DEFAULT '0',
   `seotitle` varchar(255) NOT NULL,
   `picture` varchar(255) NOT NULL,
-  `active` enum('Y','N') NOT NULL DEFAULT 'Y'
+  `active` enum('Y','N') NOT NULL DEFAULT 'Y',
+  PRIMARY KEY (`id_category`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -75,12 +75,12 @@ INSERT INTO `category` (`id_category`, `id_parent`, `seotitle`, `picture`, `acti
 -- Table structure for table `category_description`
 --
 
-DROP TABLE IF EXISTS `category_description`;
 CREATE TABLE `category_description` (
   `id_category_description` int(5) NOT NULL,
   `id_category` int(5) NOT NULL,
   `id_language` int(5) NOT NULL DEFAULT '1',
-  `title` varchar(255) NOT NULL
+  `title` varchar(255) NOT NULL,
+  PRIMARY KEY (`id_category_description`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -107,7 +107,6 @@ INSERT INTO `category_description` (`id_category_description`, `id_category`, `i
 -- Table structure for table `comment`
 --
 
-DROP TABLE IF EXISTS `comment`;
 CREATE TABLE `comment` (
   `id_comment` int(5) NOT NULL,
   `id_parent` int(5) NOT NULL DEFAULT '0',
@@ -119,7 +118,8 @@ CREATE TABLE `comment` (
   `date` date NOT NULL,
   `time` time NOT NULL,
   `active` enum('Y','N') NOT NULL DEFAULT 'N',
-  `status` enum('Y','N') NOT NULL DEFAULT 'N'
+  `status` enum('Y','N') NOT NULL DEFAULT 'N',
+  PRIMARY KEY (`id_comment`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -135,13 +135,13 @@ INSERT INTO `comment` (`id_comment`, `id_parent`, `id_post`, `name`, `email`, `u
 -- Table structure for table `component`
 --
 
-DROP TABLE IF EXISTS `component`;
 CREATE TABLE `component` (
   `id_component` int(5) NOT NULL,
   `component` varchar(100) NOT NULL,
   `type` enum('component','widget') NOT NULL DEFAULT 'component',
   `datetime` datetime NOT NULL,
-  `active` enum('Y','N') NOT NULL DEFAULT 'Y'
+  `active` enum('Y','N') NOT NULL DEFAULT 'Y',
+  PRIMARY KEY (`id_component`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -158,14 +158,14 @@ INSERT INTO `component` (`id_component`, `component`, `type`, `datetime`, `activ
 -- Table structure for table `contact`
 --
 
-DROP TABLE IF EXISTS `contact`;
 CREATE TABLE `contact` (
   `id_contact` int(5) NOT NULL,
   `name` varchar(100) NOT NULL,
   `email` varchar(100) NOT NULL,
   `subject` varchar(255) NOT NULL,
   `message` text NOT NULL,
-  `status` enum('Y','N') NOT NULL DEFAULT 'N'
+  `status` enum('Y','N') NOT NULL DEFAULT 'N',
+  PRIMARY KEY (`id_contact`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -174,13 +174,13 @@ CREATE TABLE `contact` (
 -- Table structure for table `gallery`
 --
 
-DROP TABLE IF EXISTS `gallery`;
 CREATE TABLE `gallery` (
   `id_gallery` int(5) NOT NULL,
   `id_album` int(5) NOT NULL,
   `title` varchar(255) NOT NULL,
   `content` text NOT NULL,
-  `picture` varchar(255) NOT NULL
+  `picture` varchar(255) NOT NULL,
+  PRIMARY KEY (`id_gallery`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -203,12 +203,12 @@ INSERT INTO `gallery` (`id_gallery`, `id_album`, `title`, `content`, `picture`) 
 -- Table structure for table `language`
 --
 
-DROP TABLE IF EXISTS `language`;
 CREATE TABLE `language` (
   `id_language` int(5) NOT NULL,
   `title` varchar(50) NOT NULL,
   `code` varchar(3) NOT NULL,
-  `active` enum('Y','N') NOT NULL DEFAULT 'Y'
+  `active` enum('Y','N') NOT NULL DEFAULT 'Y',
+  PRIMARY KEY (`id_language`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -226,7 +226,6 @@ INSERT INTO `language` (`id_language`, `title`, `code`, `active`) VALUES
 -- Table structure for table `menu`
 --
 
-DROP TABLE IF EXISTS `menu`;
 CREATE TABLE `menu` (
   `id` tinyint(3) UNSIGNED NOT NULL,
   `parent_id` tinyint(3) UNSIGNED NOT NULL DEFAULT '0',
@@ -236,7 +235,8 @@ CREATE TABLE `menu` (
   `position` tinyint(3) UNSIGNED NOT NULL DEFAULT '0',
   `group_id` tinyint(3) UNSIGNED NOT NULL DEFAULT '1',
   `active` enum('Y','N') NOT NULL DEFAULT 'Y',
-  `target` varchar(10) NOT NULL DEFAULT 'none'
+  `target` varchar(10) NOT NULL DEFAULT 'none',
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -284,7 +284,7 @@ INSERT INTO `menu` (`id`, `parent_id`, `title`, `url`, `class`, `position`, `gro
 (57, 0, 'Contact', 'contact', '', 49, 2, 'Y', 'none'),
 (58, 0, 'Tentang Kami', 'pages/tentang-kami', '', 2, 3, 'Y', 'none'),
 (59, 58, 'Layanan', 'pages/layanan', '', 1, 3, 'Y', 'none'),
-(60, 0, 'Indonesiaku', 'category/indonesiaku', '', 50, 3, 'Y', 'none'),
+(60, 0, 'Indonesiaku', 'category/my-indonesia', '', 50, 3, 'Y', 'none'),
 (61, 0, 'Motivasi', 'category/motivasi', '', 50, 3, 'Y', 'none'),
 (62, 0, 'Hubungan', 'category/hubungan', '', 50, 3, 'Y', 'none'),
 (63, 0, 'Sukses', 'category/sukses', '', 50, 3, 'Y', 'none'),
@@ -297,7 +297,7 @@ INSERT INTO `menu` (`id`, `parent_id`, `title`, `url`, `class`, `position`, `gro
 (70, 0, 'Galerisi', 'album', '', 8, 4, 'Y', 'none'),
 (71, 0, 'Indonesiaku', 'category/indonesiaku', '', 3, 4, 'Y', 'none'),
 (72, 0, 'Ana sayfa', './', 'fa fa-home', 1, 5, 'Y', 'none'),
-(73, 0, 'Hakk&#305;m&#305;zda', 'pages/tentang-kami', '', 73, 5, 'Y', 'none'),
+(73, 0, 'Hakk&#305;m&#305;zda', 'pages/about-us', '', 73, 5, 'Y', 'none'),
 (74, 0, '&#x130;leti&#x15F;im', 'contact', '', 73, 5, 'Y', 'none'),
 (75, 0, 'Motivasyon', 'category/motivasi', '', 4, 4, 'Y', 'none'),
 (76, 0, '&#x130;li&#x15F;ki', 'category/hubungan', '', 5, 4, 'Y', 'none'),
@@ -309,10 +309,10 @@ INSERT INTO `menu` (`id`, `parent_id`, `title`, `url`, `class`, `position`, `gro
 -- Table structure for table `menu_group`
 --
 
-DROP TABLE IF EXISTS `menu_group`;
 CREATE TABLE `menu_group` (
   `id` smallint(5) UNSIGNED NOT NULL,
-  `title` varchar(255) NOT NULL
+  `title` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -332,7 +332,6 @@ INSERT INTO `menu_group` (`id`, `title`) VALUES
 -- Table structure for table `oauth`
 --
 
-DROP TABLE IF EXISTS `oauth`;
 CREATE TABLE `oauth` (
   `id_oauth` int(5) NOT NULL,
   `oauth_type` varchar(10) NOT NULL,
@@ -342,7 +341,8 @@ CREATE TABLE `oauth` (
   `oauth_user` varchar(100) NOT NULL,
   `oauth_token1` text NOT NULL,
   `oauth_token2` text NOT NULL,
-  `oauth_fbtype` varchar(10) NOT NULL
+  `oauth_fbtype` varchar(10) NOT NULL,
+  PRIMARY KEY (`id_oauth`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -359,12 +359,12 @@ INSERT INTO `oauth` (`id_oauth`, `oauth_type`, `oauth_key`, `oauth_secret`, `oau
 -- Table structure for table `pages`
 --
 
-DROP TABLE IF EXISTS `pages`;
 CREATE TABLE `pages` (
   `id_pages` int(5) NOT NULL,
   `seotitle` varchar(255) NOT NULL,
   `picture` varchar(255) NOT NULL,
-  `active` enum('Y','N') NOT NULL DEFAULT 'Y'
+  `active` enum('Y','N') NOT NULL DEFAULT 'Y',
+  PRIMARY KEY (`id_pages`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -381,13 +381,13 @@ INSERT INTO `pages` (`id_pages`, `seotitle`, `picture`, `active`) VALUES
 -- Table structure for table `pages_description`
 --
 
-DROP TABLE IF EXISTS `pages_description`;
 CREATE TABLE `pages_description` (
   `id_pages_description` int(5) NOT NULL,
   `id_pages` int(5) NOT NULL,
   `id_language` int(5) NOT NULL DEFAULT '1',
   `title` varchar(255) NOT NULL,
-  `content` text NOT NULL
+  `content` text NOT NULL,
+  PRIMARY KEY (`id_pages_description`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -408,7 +408,6 @@ INSERT INTO `pages_description` (`id_pages_description`, `id_pages`, `id_languag
 -- Table structure for table `post`
 --
 
-DROP TABLE IF EXISTS `post`;
 CREATE TABLE `post` (
   `id_post` int(5) NOT NULL,
   `seotitle` varchar(255) NOT NULL,
@@ -422,7 +421,8 @@ CREATE TABLE `post` (
   `comment` enum('Y','N') NOT NULL DEFAULT 'Y',
   `picture` varchar(255) NOT NULL,
   `picture_description` varchar(255) NOT NULL,
-  `hits` int(10) NOT NULL DEFAULT '1'
+  `hits` int(10) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id_post`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -445,11 +445,11 @@ INSERT INTO `post` (`id_post`, `seotitle`, `tag`, `date`, `time`, `publishdate`,
 -- Table structure for table `post_category`
 --
 
-DROP TABLE IF EXISTS `post_category`;
 CREATE TABLE `post_category` (
   `id_post_category` int(5) NOT NULL,
   `id_post` int(5) NOT NULL,
-  `id_category` int(5) NOT NULL
+  `id_category` int(5) NOT NULL,
+  PRIMARY KEY (`id_post_category`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -472,13 +472,13 @@ INSERT INTO `post_category` (`id_post_category`, `id_post`, `id_category`) VALUE
 -- Table structure for table `post_description`
 --
 
-DROP TABLE IF EXISTS `post_description`;
 CREATE TABLE `post_description` (
   `id_post_description` int(5) NOT NULL,
   `id_post` int(5) NOT NULL,
   `id_language` int(5) NOT NULL DEFAULT '1',
   `title` varchar(255) NOT NULL,
-  `content` text NOT NULL
+  `content` text NOT NULL,
+  PRIMARY KEY (`id_post_description`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -520,11 +520,11 @@ INSERT INTO `post_description` (`id_post_description`, `id_post`, `id_language`,
 -- Table structure for table `post_gallery`
 --
 
-DROP TABLE IF EXISTS `post_gallery`;
 CREATE TABLE `post_gallery` (
   `id_post_gallery` int(5) NOT NULL,
   `id_post` int(5) NOT NULL DEFAULT '0',
-  `picture` varchar(255) NOT NULL
+  `picture` varchar(255) NOT NULL,
+  PRIMARY KEY (`id_post_gallery`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -533,12 +533,12 @@ CREATE TABLE `post_gallery` (
 -- Table structure for table `setting`
 --
 
-DROP TABLE IF EXISTS `setting`;
 CREATE TABLE `setting` (
   `id_setting` int(5) NOT NULL,
   `groups` varchar(50) NOT NULL,
   `options` varchar(100) NOT NULL,
-  `value` text NOT NULL
+  `value` text NOT NULL,
+  PRIMARY KEY (`id_setting`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -547,7 +547,7 @@ CREATE TABLE `setting` (
 
 INSERT INTO `setting` (`id_setting`, `groups`, `options`, `value`) VALUES
 (1, 'general', 'web_name', 'Storagesus Web development and images storage'),
-(2, 'general', 'web_url', 'http://localhost/storagesus2'),
+(2, 'general', 'web_url', 'https://www.storagesus.com/lang-tr'),
 (3, 'general', 'web_meta', 'Storagesus Web development and images storage'),
 (4, 'general', 'web_keyword', 'popojicms buat sendiri rasa webmu'),
 (5, 'general', 'web_owner', 'PopojiCMS'),
@@ -583,11 +583,11 @@ INSERT INTO `setting` (`id_setting`, `groups`, `options`, `value`) VALUES
 -- Table structure for table `subscribe`
 --
 
-DROP TABLE IF EXISTS `subscribe`;
 CREATE TABLE `subscribe` (
   `id_subscribe` int(5) NOT NULL,
   `email` varchar(100) NOT NULL,
-  `name` varchar(255) NOT NULL
+  `name` varchar(255) NOT NULL,
+  PRIMARY KEY (`id_subscribe`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -596,12 +596,12 @@ CREATE TABLE `subscribe` (
 -- Table structure for table `tag`
 --
 
-DROP TABLE IF EXISTS `tag`;
 CREATE TABLE `tag` (
   `id_tag` int(5) NOT NULL,
   `title` varchar(100) NOT NULL,
   `tag_seo` varchar(100) NOT NULL,
-  `count` int(5) NOT NULL
+  `count` int(5) NOT NULL,
+  PRIMARY KEY (`id_tag`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -635,13 +635,13 @@ INSERT INTO `tag` (`id_tag`, `title`, `tag_seo`, `count`) VALUES
 -- Table structure for table `theme`
 --
 
-DROP TABLE IF EXISTS `theme`;
 CREATE TABLE `theme` (
   `id_theme` int(5) NOT NULL,
   `title` varchar(50) NOT NULL,
   `author` varchar(50) NOT NULL,
   `folder` varchar(20) NOT NULL,
-  `active` enum('Y','N') NOT NULL DEFAULT 'N'
+  `active` enum('Y','N') NOT NULL DEFAULT 'N',
+  PRIMARY KEY (`id_theme`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -657,7 +657,6 @@ INSERT INTO `theme` (`id_theme`, `title`, `author`, `folder`, `active`) VALUES
 -- Table structure for table `traffic`
 --
 
-DROP TABLE IF EXISTS `traffic`;
 CREATE TABLE `traffic` (
   `ip` varchar(20) NOT NULL DEFAULT '',
   `browser` varchar(255) NOT NULL,
@@ -677,7 +676,8 @@ CREATE TABLE `traffic` (
 INSERT INTO `traffic` (`ip`, `browser`, `os`, `platform`, `country`, `city`, `date`, `hits`, `online`) VALUES
 ('::1', 'Firefox', 'Mozilla/5.0 (Windows NT 6.1; rv:56.0) Gecko/20100101 Firefox/56.0', 'Windows', '', '', '2017-10-03', 1, '1507092776'),
 ('::1', 'Firefox', 'Mozilla/5.0 (Windows NT 6.1; rv:56.0) Gecko/20100101 Firefox/56.0', 'Windows', '', '', '2017-10-04', 47, '1507201043'),
-('::1', 'Firefox', 'Mozilla/5.0 (Windows NT 6.1; rv:56.0) Gecko/20100101 Firefox/56.0', 'Windows', '', '', '2017-10-05', 101, '1507253805');
+('::1', 'Firefox', 'Mozilla/5.0 (Windows NT 6.1; rv:56.0) Gecko/20100101 Firefox/56.0', 'Windows', '', '', '2017-10-05', 101, '1507253805'),
+('118.137.13.76', 'Firefox', 'Mozilla/5.0 (Windows NT 6.1; rv:57.0) Gecko/20100101 Firefox/57.0', 'Windows', '', '', '2017-11-27', 2, '1511813758');
 
 -- --------------------------------------------------------
 
@@ -685,7 +685,6 @@ INSERT INTO `traffic` (`ip`, `browser`, `os`, `platform`, `country`, `city`, `da
 -- Table structure for table `users`
 --
 
-DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
   `id_user` int(5) NOT NULL,
   `username` varchar(50) NOT NULL,
@@ -700,7 +699,8 @@ CREATE TABLE `users` (
   `id_session` varchar(100) NOT NULL,
   `tgl_daftar` date NOT NULL,
   `forget_key` varchar(100) DEFAULT NULL,
-  `locktype` varchar(1) NOT NULL DEFAULT '0'
+  `locktype` varchar(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -708,7 +708,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id_user`, `username`, `password`, `nama_lengkap`, `email`, `no_telp`, `bio`, `picture`, `level`, `block`, `id_session`, `tgl_daftar`, `forget_key`, `locktype`) VALUES
-(1, 'admin', 'c93ccd78b2076528346216b3b2f701e6', 'Super Administrator', 'admin@storagesus.com', '000-0000-0000', 'No matter how exciting or significant a person''s life is, a poorly written biography will make it seem like a snore. On the other hand, a good biographer can draw insight from an ordinary life-because they recognize that even the most exciting life is an ordinary life! After all, a biography isn''t supposed to be a collection of facts assembled in chronological order; it''s the biographer''s interpretation of how that life was different and important.', '', '1', 'N', '1ig087ssqbg62cf0shqm6t8ek5', '2017-10-03', NULL, '0');
+(1, 'admin', 'c93ccd78b2076528346216b3b2f701e6', 'Super Administrator', 'admin@storagesus.com', '000-0000-0000', 'No matter how exciting or significant a person\'s life is, a poorly written biography will make it seem like a snore. On the other hand, a good biographer can draw insight from an ordinary life-because they recognize that even the most exciting life is an ordinary life! After all, a biography isn\'t supposed to be a collection of facts assembled in chronological order; it\'s the biographer\'s interpretation of how that life was different and important.', '', '1', 'N', '1ig087ssqbg62cf0shqm6t8ek5', '2017-10-03', NULL, '0');
 
 -- --------------------------------------------------------
 
@@ -716,13 +716,13 @@ INSERT INTO `users` (`id_user`, `username`, `password`, `nama_lengkap`, `email`,
 -- Table structure for table `user_level`
 --
 
-DROP TABLE IF EXISTS `user_level`;
 CREATE TABLE `user_level` (
   `id_level` int(5) NOT NULL,
   `level` varchar(255) NOT NULL,
   `title` varchar(255) NOT NULL,
   `role` text NOT NULL,
-  `menu` int(5) NOT NULL DEFAULT '1'
+  `menu` int(5) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id_level`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -730,10 +730,10 @@ CREATE TABLE `user_level` (
 --
 
 INSERT INTO `user_level` (`id_level`, `level`, `title`, `role`, `menu`) VALUES
-(1, 'superadmin', 'Super Administrator', '[{"component":"category","create":"1","read":"1","update":"1","delete":"1"},{"component":"comment","create":"1","read":"1","update":"1","delete":"1"},{"component":"component","create":"1","read":"1","update":"1","delete":"1"},{"component":"contact","create":"1","read":"1","update":"1","delete":"1"},{"component":"gallery","create":"1","read":"1","update":"1","delete":"1"},{"component":"home","create":"1","read":"1","update":"1","delete":"1"},{"component":"library","create":"1","read":"1","update":"1","delete":"1"},{"component":"menumanager","create":"1","read":"1","update":"1","delete":"1"},{"component":"oauth","create":"1","read":"1","update":"1","delete":"1"},{"component":"pages","create":"1","read":"1","update":"1","delete":"1"},{"component":"post","create":"1","read":"1","update":"1","delete":"1"},{"component":"setting","create":"1","read":"1","update":"1","delete":"1"},{"component":"tag","create":"1","read":"1","update":"1","delete":"1"},{"component":"theme","create":"1","read":"1","update":"1","delete":"1"},{"component":"user","create":"1","read":"1","update":"1","delete":"1"}]', 1),
-(2, 'admin', 'Administrator', '[{"component":"category","create":"1","read":"1","update":"1","delete":"1"},{"component":"comment","create":"1","read":"1","update":"1","delete":"1"},{"component":"component","create":"1","read":"1","update":"1","delete":"1"},{"component":"contact","create":"1","read":"1","update":"1","delete":"1"},{"component":"gallery","create":"1","read":"1","update":"1","delete":"1"},{"component":"home","create":"1","read":"1","update":"1","delete":"1"},{"component":"library","create":"1","read":"1","update":"1","delete":"1"},{"component":"menumanager","create":"1","read":"1","update":"1","delete":"1"},{"component":"oauth","create":"1","read":"1","update":"1","delete":"1"},{"component":"pages","create":"1","read":"1","update":"1","delete":"1"},{"component":"post","create":"1","read":"1","update":"1","delete":"1"},{"component":"setting","create":"0","read":"1","update":"0","delete":"0"},{"component":"tag","create":"1","read":"1","update":"1","delete":"1"},{"component":"theme","create":"1","read":"1","update":"1","delete":"1"},{"component":"user","create":"1","read":"1","update":"1","delete":"0"}]', 1),
-(3, 'manager', 'Manager', '[{"component":"category","create":"1","read":"1","update":"1","delete":"1"},{"component":"comment","create":"1","read":"1","update":"1","delete":"1"},{"component":"component","create":"1","read":"1","update":"1","delete":"1"},{"component":"contact","create":"1","read":"1","update":"1","delete":"1"},{"component":"gallery","create":"1","read":"1","update":"1","delete":"1"},{"component":"home","create":"1","read":"1","update":"1","delete":"1"},{"component":"library","create":"1","read":"1","update":"1","delete":"1"},{"component":"menumanager","create":"1","read":"1","update":"1","delete":"1"},{"component":"oauth","create":"1","read":"1","update":"1","delete":"1"},{"component":"pages","create":"1","read":"1","update":"1","delete":"1"},{"component":"post","create":"1","read":"1","update":"1","delete":"1"},{"component":"setting","create":"0","read":"0","update":"0","delete":"0"},{"component":"tag","create":"1","read":"1","update":"1","delete":"1"},{"component":"theme","create":"1","read":"1","update":"1","delete":"1"},{"component":"user","create":"1","read":"1","update":"1","delete":"0"}]', 1),
-(4, 'member', 'Member', '[{"component":"category","create":"1","read":"1","update":"1","delete":"1"},{"component":"comment","create":"0","read":"0","update":"0","delete":"0"},{"component":"component","create":"0","read":"0","update":"0","delete":"0"},{"component":"contact","create":"0","read":"0","update":"0","delete":"0"},{"component":"gallery","create":"1","read":"1","update":"1","delete":"1"},{"component":"home","create":"1","read":"1","update":"1","delete":"1"},{"component":"library","create":"0","read":"0","update":"0","delete":"0"},{"component":"menumanager","create":"0","read":"0","update":"0","delete":"0"},{"component":"oauth","create":"0","read":"0","update":"0","delete":"0"},{"component":"pages","create":"1","read":"1","update":"1","delete":"1"},{"component":"post","create":"1","read":"1","update":"1","delete":"1"},{"component":"setting","create":"0","read":"0","update":"0","delete":"0"},{"component":"tag","create":"1","read":"1","update":"1","delete":"1"},{"component":"theme","create":"0","read":"0","update":"0","delete":"0"},{"component":"user","create":"0","read":"1","update":"1","delete":"1"}]', 1);
+(1, 'superadmin', 'Super Administrator', '[{\"component\":\"category\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"comment\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"component\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"contact\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"gallery\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"home\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"library\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"menumanager\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"oauth\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"pages\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"post\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"setting\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"tag\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"theme\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"user\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"}]', 1),
+(2, 'admin', 'Administrator', '[{\"component\":\"category\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"comment\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"component\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"contact\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"gallery\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"home\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"library\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"menumanager\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"oauth\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"pages\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"post\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"setting\",\"create\":\"0\",\"read\":\"1\",\"update\":\"0\",\"delete\":\"0\"},{\"component\":\"tag\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"theme\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"user\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"0\"}]', 1),
+(3, 'manager', 'Manager', '[{\"component\":\"category\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"comment\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"component\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"contact\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"gallery\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"home\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"library\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"menumanager\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"oauth\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"pages\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"post\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"setting\",\"create\":\"0\",\"read\":\"0\",\"update\":\"0\",\"delete\":\"0\"},{\"component\":\"tag\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"theme\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"user\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"0\"}]', 1),
+(4, 'member', 'Member', '[{\"component\":\"category\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"comment\",\"create\":\"0\",\"read\":\"0\",\"update\":\"0\",\"delete\":\"0\"},{\"component\":\"component\",\"create\":\"0\",\"read\":\"0\",\"update\":\"0\",\"delete\":\"0\"},{\"component\":\"contact\",\"create\":\"0\",\"read\":\"0\",\"update\":\"0\",\"delete\":\"0\"},{\"component\":\"gallery\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"home\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"library\",\"create\":\"0\",\"read\":\"0\",\"update\":\"0\",\"delete\":\"0\"},{\"component\":\"menumanager\",\"create\":\"0\",\"read\":\"0\",\"update\":\"0\",\"delete\":\"0\"},{\"component\":\"oauth\",\"create\":\"0\",\"read\":\"0\",\"update\":\"0\",\"delete\":\"0\"},{\"component\":\"pages\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"post\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"setting\",\"create\":\"0\",\"read\":\"0\",\"update\":\"0\",\"delete\":\"0\"},{\"component\":\"tag\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"theme\",\"create\":\"0\",\"read\":\"0\",\"update\":\"0\",\"delete\":\"0\"},{\"component\":\"user\",\"create\":\"0\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"}]', 1);
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
