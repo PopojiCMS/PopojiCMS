@@ -152,7 +152,8 @@ class Tag extends PoCore
 			for($i=0; $i<$total; $i++){
 				$data = array(
 					'title' => $expl[$i],
-					'tag_seo' => $this->postring->seo_title($expl[$i])
+					'tag_seo' => $this->postring->seo_title($expl[$i]),
+					'count' => 0
 				);
 				$query_tag = $this->podb->insertInto('tag')->values($data);
 				$query_tag->execute();
