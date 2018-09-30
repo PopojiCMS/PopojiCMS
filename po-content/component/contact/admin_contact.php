@@ -269,7 +269,7 @@ class contact extends PoCore
 				$this->pomail->Host = $this->posetting[24]['value'];
 				$this->pomail->Port = $this->posetting[27]['value'];
 				$this->pomail->SMTPAuth = true;
-				$this->pomail->SMTPSecure = 'ssl';
+				$this->pomail->SMTPSecure = 'tls';
 				$this->pomail->Username = $this->posetting[25]['value'];;
 				$this->pomail->Password = $this->posetting[26]['value'];
 				$this->pomail->setFrom($this->posetting[5]['value'], $this->posetting[0]['value']);
