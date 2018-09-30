@@ -248,8 +248,20 @@ $config = array(
 
 	// -1: There is no lazy loading at all, 0: Always lazy-load images, 0+: The minimum number of the files in a directory
 	// when lazy loading should be turned on.
-	'lazy_loading_file_number_threshold'	=> 30,
+	'lazy_loading_file_number_threshold'	=> 24,
 
+	/*
+	|--------------------------------------------------------------------------
+	| Load more
+	|--------------------------------------------------------------------------
+	*/
+	// Enable "Load more" functionality
+	'load_more' => true,
+	// Number of files/folders displayed at once
+	// Should be greater than "file_number_limit_js"
+	'load_more_limit' => 24,
+	// Enable auto-loading on scroll
+	'load_more_auto' => 'auto',
 
 	//*******************************************
 	//Images limit and resizing configuration
@@ -314,7 +326,7 @@ $config = array(
 	// YOU CAN ALSO PASS THIS PARAMETERS USING SESSION VAR => $_SESSION['RF']["VIEW"]=
 	//
 	//******************
-	'default_view'                            => 0,
+	'default_view'                            => 2,
 
 	//set if the filename is truncated when overflow first row
 	'ellipsis_title_after_first_row'          => true,
@@ -371,6 +383,7 @@ $config = array(
 	'ext_video'                               => array( 'mov', 'mpeg', 'm4v', 'mp4', 'avi', 'mpg', 'wma', "flv", "webm" ), //Video
 	'ext_music'                               => array( 'mp3', 'mpga', 'm4a', 'ac3', 'aiff', 'mid', 'ogg', 'wav' ), //Audio
 	'ext_misc'                                => array( 'zip', 'rar', 'gz', 'tar', 'iso', 'dmg' ), //Archives
+	'ext_blacklist'							  => false, //['exe','bat','jpg'],
 
 	/******************
 	* AVIARY config
@@ -386,7 +399,7 @@ $config = array(
 	//The filter and sorter are managed through both javascript and php scripts because if you have a lot of
 	//file in a folder the javascript script can't sort all or filter all, so the filemanager switch to php script.
 	//The plugin automatic swich javascript to php when the current folder exceeds the below limit of files number
-	'file_number_limit_js'                    => 500,
+	'file_number_limit_js'                    => 12,
 
 	//**********************
 	// Hidden files and folders
