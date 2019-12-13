@@ -226,9 +226,10 @@ INSERT INTO `language` (`id_language`, `title`, `code`, `active`) VALUES
 -- Table structure for table `menu`
 --
 
-CREATE TABLE `menu` (
-  `id` tinyint(3) UNSIGNED NOT NULL,
-  `parent_id` tinyint(3) UNSIGNED NOT NULL DEFAULT '0',
+DROP TABLE IF EXISTS `menu`;
+CREATE TABLE IF NOT EXISTS `menu` (
+  `id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
+  `parent_id` smallint(5) unsigned NOT NULL DEFAULT '0',
   `title` varchar(255) NOT NULL DEFAULT '',
   `url` varchar(255) NOT NULL DEFAULT '',
   `class` varchar(255) NOT NULL DEFAULT '',
