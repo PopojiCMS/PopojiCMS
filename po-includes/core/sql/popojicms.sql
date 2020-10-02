@@ -28,12 +28,12 @@ SET time_zone = "+00:00";
 -- Table structure for table `album`
 --
 
+DROP TABLE IF EXISTS `album`;
 CREATE TABLE `album` (
   `id_album` int(5) NOT NULL,
   `title` varchar(255) NOT NULL,
   `seotitle` varchar(255) NOT NULL,
-  `active` enum('Y','N') NOT NULL DEFAULT 'Y',
-  PRIMARY KEY (`id_album`)
+  `active` enum('Y','N') NOT NULL DEFAULT 'Y'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -50,13 +50,13 @@ INSERT INTO `album` (`id_album`, `title`, `seotitle`, `active`) VALUES
 -- Table structure for table `category`
 --
 
+DROP TABLE IF EXISTS `category`;
 CREATE TABLE `category` (
   `id_category` int(5) NOT NULL,
   `id_parent` int(5) NOT NULL DEFAULT '0',
   `seotitle` varchar(255) NOT NULL,
   `picture` varchar(255) NOT NULL,
-  `active` enum('Y','N') NOT NULL DEFAULT 'Y',
-  PRIMARY KEY (`id_category`)
+  `active` enum('Y','N') NOT NULL DEFAULT 'Y'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -75,12 +75,12 @@ INSERT INTO `category` (`id_category`, `id_parent`, `seotitle`, `picture`, `acti
 -- Table structure for table `category_description`
 --
 
+DROP TABLE IF EXISTS `category_description`;
 CREATE TABLE `category_description` (
   `id_category_description` int(5) NOT NULL,
   `id_category` int(5) NOT NULL,
   `id_language` int(5) NOT NULL DEFAULT '1',
-  `title` varchar(255) NOT NULL,
-  PRIMARY KEY (`id_category_description`)
+  `title` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -107,6 +107,7 @@ INSERT INTO `category_description` (`id_category_description`, `id_category`, `i
 -- Table structure for table `comment`
 --
 
+DROP TABLE IF EXISTS `comment`;
 CREATE TABLE `comment` (
   `id_comment` int(5) NOT NULL,
   `id_parent` int(5) NOT NULL DEFAULT '0',
@@ -118,8 +119,7 @@ CREATE TABLE `comment` (
   `date` date NOT NULL,
   `time` time NOT NULL,
   `active` enum('Y','N') NOT NULL DEFAULT 'N',
-  `status` enum('Y','N') NOT NULL DEFAULT 'N',
-  PRIMARY KEY (`id_comment`)
+  `status` enum('Y','N') NOT NULL DEFAULT 'N'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -135,13 +135,13 @@ INSERT INTO `comment` (`id_comment`, `id_parent`, `id_post`, `name`, `email`, `u
 -- Table structure for table `component`
 --
 
+DROP TABLE IF EXISTS `component`;
 CREATE TABLE `component` (
   `id_component` int(5) NOT NULL,
   `component` varchar(100) NOT NULL,
   `type` enum('component','widget') NOT NULL DEFAULT 'component',
   `datetime` datetime NOT NULL,
-  `active` enum('Y','N') NOT NULL DEFAULT 'Y',
-  PRIMARY KEY (`id_component`)
+  `active` enum('Y','N') NOT NULL DEFAULT 'Y'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -158,14 +158,14 @@ INSERT INTO `component` (`id_component`, `component`, `type`, `datetime`, `activ
 -- Table structure for table `contact`
 --
 
+DROP TABLE IF EXISTS `contact`;
 CREATE TABLE `contact` (
   `id_contact` int(5) NOT NULL,
   `name` varchar(100) NOT NULL,
   `email` varchar(100) NOT NULL,
   `subject` varchar(255) NOT NULL,
   `message` text NOT NULL,
-  `status` enum('Y','N') NOT NULL DEFAULT 'N',
-  PRIMARY KEY (`id_contact`)
+  `status` enum('Y','N') NOT NULL DEFAULT 'N'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -174,13 +174,13 @@ CREATE TABLE `contact` (
 -- Table structure for table `gallery`
 --
 
+DROP TABLE IF EXISTS `gallery`;
 CREATE TABLE `gallery` (
   `id_gallery` int(5) NOT NULL,
   `id_album` int(5) NOT NULL,
   `title` varchar(255) NOT NULL,
   `content` text NOT NULL,
-  `picture` varchar(255) NOT NULL,
-  PRIMARY KEY (`id_gallery`)
+  `picture` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -203,12 +203,12 @@ INSERT INTO `gallery` (`id_gallery`, `id_album`, `title`, `content`, `picture`) 
 -- Table structure for table `language`
 --
 
+DROP TABLE IF EXISTS `language`;
 CREATE TABLE `language` (
   `id_language` int(5) NOT NULL,
   `title` varchar(50) NOT NULL,
   `code` varchar(3) NOT NULL,
-  `active` enum('Y','N') NOT NULL DEFAULT 'Y',
-  PRIMARY KEY (`id_language`)
+  `active` enum('Y','N') NOT NULL DEFAULT 'Y'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -228,7 +228,7 @@ INSERT INTO `language` (`id_language`, `title`, `code`, `active`) VALUES
 
 DROP TABLE IF EXISTS `menu`;
 CREATE TABLE IF NOT EXISTS `menu` (
-  `id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
+  `id` smallint(5) unsigned NOT NULL,
   `parent_id` smallint(5) unsigned NOT NULL DEFAULT '0',
   `title` varchar(255) NOT NULL DEFAULT '',
   `url` varchar(255) NOT NULL DEFAULT '',
@@ -236,8 +236,7 @@ CREATE TABLE IF NOT EXISTS `menu` (
   `position` tinyint(3) UNSIGNED NOT NULL DEFAULT '0',
   `group_id` tinyint(3) UNSIGNED NOT NULL DEFAULT '1',
   `active` enum('Y','N') NOT NULL DEFAULT 'Y',
-  `target` varchar(10) NOT NULL DEFAULT 'none',
-  PRIMARY KEY (`id`)
+  `target` varchar(10) NOT NULL DEFAULT 'none'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -310,10 +309,10 @@ INSERT INTO `menu` (`id`, `parent_id`, `title`, `url`, `class`, `position`, `gro
 -- Table structure for table `menu_group`
 --
 
+DROP TABLE IF EXISTS `menu_group`;
 CREATE TABLE `menu_group` (
   `id` smallint(5) UNSIGNED NOT NULL,
-  `title` varchar(255) NOT NULL,
-  PRIMARY KEY (`id`)
+  `title` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -333,6 +332,7 @@ INSERT INTO `menu_group` (`id`, `title`) VALUES
 -- Table structure for table `oauth`
 --
 
+DROP TABLE IF EXISTS `oauth`;
 CREATE TABLE `oauth` (
   `id_oauth` int(5) NOT NULL,
   `oauth_type` varchar(10) NOT NULL,
@@ -342,8 +342,7 @@ CREATE TABLE `oauth` (
   `oauth_user` varchar(100) NOT NULL,
   `oauth_token1` text NOT NULL,
   `oauth_token2` text NOT NULL,
-  `oauth_fbtype` varchar(10) NOT NULL,
-  PRIMARY KEY (`id_oauth`)
+  `oauth_fbtype` varchar(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -360,12 +359,12 @@ INSERT INTO `oauth` (`id_oauth`, `oauth_type`, `oauth_key`, `oauth_secret`, `oau
 -- Table structure for table `pages`
 --
 
+DROP TABLE IF EXISTS `pages`;
 CREATE TABLE `pages` (
   `id_pages` int(5) NOT NULL,
   `seotitle` varchar(255) NOT NULL,
   `picture` varchar(255) NOT NULL,
-  `active` enum('Y','N') NOT NULL DEFAULT 'Y',
-  PRIMARY KEY (`id_pages`)
+  `active` enum('Y','N') NOT NULL DEFAULT 'Y'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -382,13 +381,13 @@ INSERT INTO `pages` (`id_pages`, `seotitle`, `picture`, `active`) VALUES
 -- Table structure for table `pages_description`
 --
 
+DROP TABLE IF EXISTS `pages_description`;
 CREATE TABLE `pages_description` (
   `id_pages_description` int(5) NOT NULL,
   `id_pages` int(5) NOT NULL,
   `id_language` int(5) NOT NULL DEFAULT '1',
   `title` varchar(255) NOT NULL,
-  `content` text NOT NULL,
-  PRIMARY KEY (`id_pages_description`)
+  `content` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -409,6 +408,7 @@ INSERT INTO `pages_description` (`id_pages_description`, `id_pages`, `id_languag
 -- Table structure for table `post`
 --
 
+DROP TABLE IF EXISTS `post`;
 CREATE TABLE `post` (
   `id_post` int(5) NOT NULL,
   `seotitle` varchar(255) NOT NULL,
@@ -422,8 +422,7 @@ CREATE TABLE `post` (
   `comment` enum('Y','N') NOT NULL DEFAULT 'Y',
   `picture` varchar(255) NOT NULL,
   `picture_description` varchar(255) NOT NULL,
-  `hits` int(10) NOT NULL DEFAULT '1',
-  PRIMARY KEY (`id_post`)
+  `hits` int(10) NOT NULL DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -446,11 +445,11 @@ INSERT INTO `post` (`id_post`, `seotitle`, `tag`, `date`, `time`, `publishdate`,
 -- Table structure for table `post_category`
 --
 
+DROP TABLE IF EXISTS `post_category`;
 CREATE TABLE `post_category` (
   `id_post_category` int(5) NOT NULL,
   `id_post` int(5) NOT NULL,
-  `id_category` int(5) NOT NULL,
-  PRIMARY KEY (`id_post_category`)
+  `id_category` int(5) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -473,13 +472,13 @@ INSERT INTO `post_category` (`id_post_category`, `id_post`, `id_category`) VALUE
 -- Table structure for table `post_description`
 --
 
+DROP TABLE IF EXISTS `post_description`;
 CREATE TABLE `post_description` (
   `id_post_description` int(5) NOT NULL,
   `id_post` int(5) NOT NULL,
   `id_language` int(5) NOT NULL DEFAULT '1',
   `title` varchar(255) NOT NULL,
-  `content` text NOT NULL,
-  PRIMARY KEY (`id_post_description`)
+  `content` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -521,11 +520,11 @@ INSERT INTO `post_description` (`id_post_description`, `id_post`, `id_language`,
 -- Table structure for table `post_gallery`
 --
 
+DROP TABLE IF EXISTS `post_gallery`;
 CREATE TABLE `post_gallery` (
   `id_post_gallery` int(5) NOT NULL,
   `id_post` int(5) NOT NULL DEFAULT '0',
-  `picture` varchar(255) NOT NULL,
-  PRIMARY KEY (`id_post_gallery`)
+  `picture` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -534,12 +533,12 @@ CREATE TABLE `post_gallery` (
 -- Table structure for table `setting`
 --
 
+DROP TABLE IF EXISTS `setting`;
 CREATE TABLE `setting` (
   `id_setting` int(5) NOT NULL,
   `groups` varchar(50) NOT NULL,
   `options` varchar(100) NOT NULL,
-  `value` text NOT NULL,
-  PRIMARY KEY (`id_setting`)
+  `value` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -584,11 +583,11 @@ INSERT INTO `setting` (`id_setting`, `groups`, `options`, `value`) VALUES
 -- Table structure for table `subscribe`
 --
 
+DROP TABLE IF EXISTS `subscribe`;
 CREATE TABLE `subscribe` (
   `id_subscribe` int(5) NOT NULL,
   `email` varchar(100) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  PRIMARY KEY (`id_subscribe`)
+  `name` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -597,12 +596,12 @@ CREATE TABLE `subscribe` (
 -- Table structure for table `tag`
 --
 
+DROP TABLE IF EXISTS `tag`;
 CREATE TABLE `tag` (
   `id_tag` int(5) NOT NULL,
   `title` varchar(100) NOT NULL,
   `tag_seo` varchar(100) NOT NULL,
-  `count` int(5) NOT NULL,
-  PRIMARY KEY (`id_tag`)
+  `count` int(5) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -636,13 +635,13 @@ INSERT INTO `tag` (`id_tag`, `title`, `tag_seo`, `count`) VALUES
 -- Table structure for table `theme`
 --
 
+DROP TABLE IF EXISTS `theme`;
 CREATE TABLE `theme` (
   `id_theme` int(5) NOT NULL,
   `title` varchar(50) NOT NULL,
   `author` varchar(50) NOT NULL,
   `folder` varchar(20) NOT NULL,
-  `active` enum('Y','N') NOT NULL DEFAULT 'N',
-  PRIMARY KEY (`id_theme`)
+  `active` enum('Y','N') NOT NULL DEFAULT 'N'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -658,6 +657,7 @@ INSERT INTO `theme` (`id_theme`, `title`, `author`, `folder`, `active`) VALUES
 -- Table structure for table `traffic`
 --
 
+DROP TABLE IF EXISTS `traffic`;
 CREATE TABLE `traffic` (
   `ip` varchar(20) NOT NULL DEFAULT '',
   `browser` varchar(255) NOT NULL,
@@ -677,8 +677,7 @@ CREATE TABLE `traffic` (
 INSERT INTO `traffic` (`ip`, `browser`, `os`, `platform`, `country`, `city`, `date`, `hits`, `online`) VALUES
 ('::1', 'Firefox', 'Mozilla/5.0 (Windows NT 6.1; rv:56.0) Gecko/20100101 Firefox/56.0', 'Windows', '', '', '2017-10-03', 1, '1507092776'),
 ('::1', 'Firefox', 'Mozilla/5.0 (Windows NT 6.1; rv:56.0) Gecko/20100101 Firefox/56.0', 'Windows', '', '', '2017-10-04', 47, '1507201043'),
-('::1', 'Firefox', 'Mozilla/5.0 (Windows NT 6.1; rv:56.0) Gecko/20100101 Firefox/56.0', 'Windows', '', '', '2017-10-05', 101, '1507253805'),
-('118.137.13.76', 'Firefox', 'Mozilla/5.0 (Windows NT 6.1; rv:57.0) Gecko/20100101 Firefox/57.0', 'Windows', '', '', '2017-11-27', 2, '1511813758');
+('::1', 'Firefox', 'Mozilla/5.0 (Windows NT 6.1; rv:56.0) Gecko/20100101 Firefox/56.0', 'Windows', '', '', '2017-10-05', 101, '1507253805');
 
 -- --------------------------------------------------------
 
@@ -686,6 +685,7 @@ INSERT INTO `traffic` (`ip`, `browser`, `os`, `platform`, `country`, `city`, `da
 -- Table structure for table `users`
 --
 
+DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
   `id_user` int(5) NOT NULL,
   `username` varchar(50) NOT NULL,
@@ -700,8 +700,7 @@ CREATE TABLE `users` (
   `id_session` varchar(100) NOT NULL,
   `tgl_daftar` date NOT NULL,
   `forget_key` varchar(100) DEFAULT NULL,
-  `locktype` varchar(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`username`)
+  `locktype` varchar(1) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -717,13 +716,13 @@ INSERT INTO `users` (`id_user`, `username`, `password`, `nama_lengkap`, `email`,
 -- Table structure for table `user_level`
 --
 
+DROP TABLE IF EXISTS `user_level`;
 CREATE TABLE `user_level` (
   `id_level` int(5) NOT NULL,
   `level` varchar(255) NOT NULL,
   `title` varchar(255) NOT NULL,
   `role` text NOT NULL,
-  `menu` int(5) NOT NULL DEFAULT '1',
-  PRIMARY KEY (`id_level`)
+  `menu` int(5) NOT NULL DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -735,6 +734,285 @@ INSERT INTO `user_level` (`id_level`, `level`, `title`, `role`, `menu`) VALUES
 (2, 'admin', 'Administrator', '[{\"component\":\"category\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"comment\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"component\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"contact\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"gallery\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"home\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"library\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"menumanager\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"oauth\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"pages\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"post\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"setting\",\"create\":\"0\",\"read\":\"1\",\"update\":\"0\",\"delete\":\"0\"},{\"component\":\"tag\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"theme\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"user\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"0\"}]', 1),
 (3, 'manager', 'Manager', '[{\"component\":\"category\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"comment\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"component\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"contact\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"gallery\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"home\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"library\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"menumanager\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"oauth\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"pages\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"post\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"setting\",\"create\":\"0\",\"read\":\"0\",\"update\":\"0\",\"delete\":\"0\"},{\"component\":\"tag\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"theme\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"user\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"0\"}]', 1),
 (4, 'member', 'Member', '[{\"component\":\"category\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"comment\",\"create\":\"0\",\"read\":\"0\",\"update\":\"0\",\"delete\":\"0\"},{\"component\":\"component\",\"create\":\"0\",\"read\":\"0\",\"update\":\"0\",\"delete\":\"0\"},{\"component\":\"contact\",\"create\":\"0\",\"read\":\"0\",\"update\":\"0\",\"delete\":\"0\"},{\"component\":\"gallery\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"home\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"library\",\"create\":\"0\",\"read\":\"0\",\"update\":\"0\",\"delete\":\"0\"},{\"component\":\"menumanager\",\"create\":\"0\",\"read\":\"0\",\"update\":\"0\",\"delete\":\"0\"},{\"component\":\"oauth\",\"create\":\"0\",\"read\":\"0\",\"update\":\"0\",\"delete\":\"0\"},{\"component\":\"pages\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"post\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"setting\",\"create\":\"0\",\"read\":\"0\",\"update\":\"0\",\"delete\":\"0\"},{\"component\":\"tag\",\"create\":\"1\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"},{\"component\":\"theme\",\"create\":\"0\",\"read\":\"0\",\"update\":\"0\",\"delete\":\"0\"},{\"component\":\"user\",\"create\":\"0\",\"read\":\"1\",\"update\":\"1\",\"delete\":\"1\"}]', 1);
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `album`
+--
+ALTER TABLE `album`
+  ADD PRIMARY KEY (`id_album`);
+
+--
+-- Indexes for table `category`
+--
+ALTER TABLE `category`
+  ADD PRIMARY KEY (`id_category`);
+
+--
+-- Indexes for table `category_description`
+--
+ALTER TABLE `category_description`
+  ADD PRIMARY KEY (`id_category_description`);
+
+--
+-- Indexes for table `comment`
+--
+ALTER TABLE `comment`
+  ADD PRIMARY KEY (`id_comment`);
+
+--
+-- Indexes for table `component`
+--
+ALTER TABLE `component`
+  ADD PRIMARY KEY (`id_component`);
+
+--
+-- Indexes for table `contact`
+--
+ALTER TABLE `contact`
+  ADD PRIMARY KEY (`id_contact`);
+
+--
+-- Indexes for table `gallery`
+--
+ALTER TABLE `gallery`
+  ADD PRIMARY KEY (`id_gallery`);
+
+--
+-- Indexes for table `language`
+--
+ALTER TABLE `language`
+  ADD PRIMARY KEY (`id_language`);
+
+--
+-- Indexes for table `menu`
+--
+ALTER TABLE `menu`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `menu_group`
+--
+ALTER TABLE `menu_group`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `oauth`
+--
+ALTER TABLE `oauth`
+  ADD PRIMARY KEY (`id_oauth`);
+
+--
+-- Indexes for table `pages`
+--
+ALTER TABLE `pages`
+  ADD PRIMARY KEY (`id_pages`);
+
+--
+-- Indexes for table `pages_description`
+--
+ALTER TABLE `pages_description`
+  ADD PRIMARY KEY (`id_pages_description`);
+
+--
+-- Indexes for table `post`
+--
+ALTER TABLE `post`
+  ADD PRIMARY KEY (`id_post`);
+
+--
+-- Indexes for table `post_category`
+--
+ALTER TABLE `post_category`
+  ADD PRIMARY KEY (`id_post_category`);
+
+--
+-- Indexes for table `post_description`
+--
+ALTER TABLE `post_description`
+  ADD PRIMARY KEY (`id_post_description`);
+
+--
+-- Indexes for table `post_gallery`
+--
+ALTER TABLE `post_gallery`
+  ADD PRIMARY KEY (`id_post_gallery`);
+
+--
+-- Indexes for table `setting`
+--
+ALTER TABLE `setting`
+  ADD PRIMARY KEY (`id_setting`);
+
+--
+-- Indexes for table `subscribe`
+--
+ALTER TABLE `subscribe`
+  ADD PRIMARY KEY (`id_subscribe`);
+
+--
+-- Indexes for table `tag`
+--
+ALTER TABLE `tag`
+  ADD PRIMARY KEY (`id_tag`);
+
+--
+-- Indexes for table `theme`
+--
+ALTER TABLE `theme`
+  ADD PRIMARY KEY (`id_theme`);
+
+--
+-- Indexes for table `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`username`);
+
+--
+-- Indexes for table `user_level`
+--
+ALTER TABLE `user_level`
+  ADD PRIMARY KEY (`id_level`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `album`
+--
+ALTER TABLE `album`
+  MODIFY `id_album` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `category`
+--
+ALTER TABLE `category`
+  MODIFY `id_category` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT for table `category_description`
+--
+ALTER TABLE `category_description`
+  MODIFY `id_category_description` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- AUTO_INCREMENT for table `comment`
+--
+ALTER TABLE `comment`
+  MODIFY `id_comment` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `component`
+--
+ALTER TABLE `component`
+  MODIFY `id_component` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `contact`
+--
+ALTER TABLE `contact`
+  MODIFY `id_contact` int(5) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `gallery`
+--
+ALTER TABLE `gallery`
+  MODIFY `id_gallery` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+
+--
+-- AUTO_INCREMENT for table `language`
+--
+ALTER TABLE `language`
+  MODIFY `id_language` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `menu`
+--
+ALTER TABLE `menu`
+  MODIFY `id` tinyint(3) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=74;
+
+--
+-- AUTO_INCREMENT for table `menu_group`
+--
+ALTER TABLE `menu_group`
+  MODIFY `id` smallint(5) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `oauth`
+--
+ALTER TABLE `oauth`
+  MODIFY `id_oauth` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `pages`
+--
+ALTER TABLE `pages`
+  MODIFY `id_pages` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+
+--
+-- AUTO_INCREMENT for table `pages_description`
+--
+ALTER TABLE `pages_description`
+  MODIFY `id_pages_description` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+
+--
+-- AUTO_INCREMENT for table `post`
+--
+ALTER TABLE `post`
+  MODIFY `id_post` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- AUTO_INCREMENT for table `post_category`
+--
+ALTER TABLE `post_category`
+  MODIFY `id_post_category` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+
+--
+-- AUTO_INCREMENT for table `post_description`
+--
+ALTER TABLE `post_description`
+  MODIFY `id_post_description` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+
+--
+-- AUTO_INCREMENT for table `post_gallery`
+--
+ALTER TABLE `post_gallery`
+  MODIFY `id_post_gallery` int(5) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `setting`
+--
+ALTER TABLE `setting`
+  MODIFY `id_setting` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+
+--
+-- AUTO_INCREMENT for table `subscribe`
+--
+ALTER TABLE `subscribe`
+  MODIFY `id_subscribe` int(5) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tag`
+--
+ALTER TABLE `tag`
+  MODIFY `id_tag` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+
+--
+-- AUTO_INCREMENT for table `theme`
+--
+ALTER TABLE `theme`
+  MODIFY `id_theme` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT for table `user_level`
+--
+ALTER TABLE `user_level`
+  MODIFY `id_level` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
