@@ -407,6 +407,20 @@ class PoHtml
 	}
 
 	/**
+	 * Fungsi ini digunakan untuk membuat tombol aksi form
+	 *
+	 * This function use for create form action button
+	 *
+	 * $color_btn = string
+	 *
+	*/
+	public function formActionSubmit($color_btn = 'btn-primary' )
+	{
+		$action = "<button type=\"submit\" class=\"btn {$color_btn}\"><i class=\"fa fa-check\"></i> {$GLOBALS['_']['action_5']}</button>\n";
+		return($action);
+	}
+
+	/**
 	 * Fungsi ini digunakan untuk membuat awal dari tabel
 	 * Setiap parameter harus di tulis saat pemanggilan function
 	 *
