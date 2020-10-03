@@ -158,7 +158,15 @@ class Tag extends PoCore
 				$query_tag = $this->podb->insertInto('tag')->values($data);
 				$query_tag->execute();
 			}
-			$this->poflash->success($GLOBALS['_']['tag_message_1'], 'admin.php?mod=tag');
+
+			if($_POST['modal'])
+			{
+				return true;
+			}
+			else
+			{
+				$this->poflash->success($GLOBALS['_']['tag_message_1'], 'admin.php?mod=tag');
+			}
 		}
 		?>
 		<div class="block-content">
