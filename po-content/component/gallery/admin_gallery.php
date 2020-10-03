@@ -189,7 +189,7 @@ class Gallery extends PoCore
 										echo $this->pohtml->inputSelectNoOptEnd();
 									?>
 									<span class="input-group-btn" style="padding-top:25px !important;">
-										<a href="admin.php?mod=gallery&act=addnewalbum" class="btn btn-success"><?=$GLOBALS['_']['addnew'];?></a>
+										<a href="javascript:void(0)" data-toggle="modal" data-target="#modal_album" class="btn btn-success"><?=$GLOBALS['_']['addnew'];?></a>
 									</span>
 								</div>
 							</div>
@@ -216,6 +216,25 @@ class Gallery extends PoCore
 							</div>
 						</div>
 					<?=$this->pohtml->formEnd();?>
+				</div>
+			</div>
+			<div class="modal fade" id="modal_album" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h4 class="modal-title" id="myModalLabel"><?= $GLOBALS['_']['gallery_album_addnew'] ?></h4>
+						</div>
+						<?=$this->pohtml->formStart(array('method' => 'post', 'action' => 'javascript:void(0)', 'autocomplete' => 'off', 'options' => 'id="form_album"'));?>
+						<div class="modal-body">
+							<?=$this->pohtml->inputHidden(array('name' => 'modal', 'value' => 1, 'options' => 'id="modal"'));?>
+							<?=$this->pohtml->inputText(array('type' => 'text', 'label' => $GLOBALS['_']['gallery_title'], 'name' => 'title_album', 'id' => 'title_album', 'mandatory' => true, 'options' => 'required'));?>
+						</div>
+						<div class="modal-footer">
+							<?=$this->pohtml->formActionSubmit();?>
+						</div>
+						<?=$this->pohtml->formEnd();?>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -472,7 +491,15 @@ class Gallery extends PoCore
 			);
 			$query_album = $this->podb->insertInto('album')->values($album);
 			$query_album->execute();
-			$this->poflash->success($GLOBALS['_']['gallery_album_message_1'], 'admin.php?mod=gallery&act=album');
+
+			if($_POST['modal'])
+			{
+				return true;
+			}
+			else
+			{
+				$this->poflash->success($GLOBALS['_']['gallery_album_message_1'], 'admin.php?mod=gallery&act=album');
+			}
 		}
 		?>
 		<div class="block-content">
@@ -625,6 +652,22 @@ class Gallery extends PoCore
 				$this->poflash->error($GLOBALS['_']['gallery_album_message_6'], 'admin.php?mod=gallery&act=album');
 			}
 		}
+	}
+
+	/**
+	 * Fungsi ini digunakan untuk menghasilkan data album
+	 *
+	 * This function is used to produce album data.
+	 *
+	*/
+	public function fetchalbum()
+	{
+		$album = $this->podb->from('album')
+			->where('active', 'Y')
+			->orderBy('id_album DESC')
+			->fetchAll();
+
+		echo json_encode($album);
 	}
 
 }
