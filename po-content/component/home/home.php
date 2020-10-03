@@ -412,7 +412,7 @@ $router->match('GET|POST', '/member/register', function() use ($core, $templates
 										$core->pomail->Host = $core->posetting[24]['value'];
 										$core->pomail->Port = $core->posetting[27]['value'];
 										$core->pomail->SMTPAuth = true;
-										$core->pomail->SMTPSecure = 'ssl';
+										$core->pomail->SMTPSecure = 'tls';
 										$core->pomail->Username = $core->posetting[25]['value'];;
 										$core->pomail->Password = $core->posetting[26]['value'];
 										$core->pomail->setFrom($core->posetting[5]['value'], $core->posetting[0]['value']);
@@ -598,7 +598,7 @@ $router->match('GET|POST', '/member/forgot', function() use ($core, $templates) 
 							$core->pomail->Host = $core->posetting[24]['value'];
 							$core->pomail->Port = $core->posetting[27]['value'];
 							$core->pomail->SMTPAuth = true;
-							$core->pomail->SMTPSecure = 'ssl';
+							$core->pomail->SMTPSecure = 'tls';
 							$core->pomail->Username = $core->posetting[25]['value'];;
 							$core->pomail->Password = $core->posetting[26]['value'];
 							$core->pomail->setFrom($core->posetting[5]['value'], $core->posetting[0]['value']);
