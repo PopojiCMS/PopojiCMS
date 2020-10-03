@@ -268,7 +268,7 @@ class Login extends PoCore
 					$this->pomail->Host = $this->posetting[24]['value'];
 					$this->pomail->Port = $this->posetting[27]['value'];
 					$this->pomail->SMTPAuth = true;
-					$this->pomail->SMTPSecure = 'ssl';
+					$this->pomail->SMTPSecure = 'tls';
 					$this->pomail->Username = $this->posetting[25]['value'];;
 					$this->pomail->Password = $this->posetting[26]['value'];
 					$this->pomail->setFrom($this->posetting[5]['value'], $this->posetting[0]['value']);
@@ -306,7 +306,7 @@ class Login extends PoCore
 					->where('forget_key', $forgetkey)
 					->limit(1)
 					->fetch();
-				if ($user['blokir'] == 'N'){
+				if ($user['blokir'] != 'N'){
 					$newcode = "123456";
 					$pass = md5($newcode);
 					$data = array(
