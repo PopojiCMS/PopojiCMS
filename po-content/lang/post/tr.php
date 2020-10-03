@@ -64,3 +64,10 @@ $_['front_post_title'] = 'Post';
 $_['front_post_not_found'] = 'Post bulunamadı';
 $_['front_search_title'] = 'arama';
 $_['front_search_not_found'] = 'arama bulunamadı';
+
+$_['category_addnew'] = 'Kategori Ekle';
+$_['category_title_2'] = 'başlık';
+
+$_['front_tag_title'] = 'Tag';
+$_['tag_addnew'] = 'etiket ekle';
+$_['tag_help'] = 'birden fazla etiket(,) giriş olabilir';

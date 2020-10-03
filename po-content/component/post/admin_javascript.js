@@ -206,8 +206,9 @@ $(document).on("change", ".box-category input[type='checkbox']", function(e){
 });
 
 $(document).ready(function() {
-	$('#category-refresh').on('click', function(){
-		var id = $(this).attr('data-id');
+	function category_refresh()
+	{
+		var id = $('#category-refresh').attr('data-id');
 		$('.box-category').html('<div class="category-load text-success"><i class="fa fa-refresh"></i> Loading...</div>');
 		$.ajax({
 			type: "POST",
@@ -219,6 +220,47 @@ $(document).ready(function() {
 			}
 		});
 		return false;
+	}
+
+	$('#form_kategori').submit(function() {
+		$.ajax({
+			type: "POST",
+			url: "route.php?mod=category&act=addnew",
+			data: $('#form_kategori').serialize(),
+			dataType: 'html',
+			cache: false,
+			success: function(data){
+				$('#modal_kategori').modal('hide');
+				category_refresh();
+			}
+		});
+	});
+
+	$('#modal_kategori').on('hidden.bs.modal', function (e) {
+		$(this)
+			.find("input,textarea,select").val('').end()
+			.find("input[type=checkbox], input[type=radio]").prop("checked", "").end();
+	});
+
+	$('#category-refresh').on('click', function(){
+		category_refresh();
+	});
+
+	$('#form_tag').submit(function() {
+		$.ajax({
+			type: "POST",
+			url: "route.php?mod=tag&act=addnew",
+			data: "modal="+$('#modal').val()+"&tag="+$('#tag_input').val(),
+			dataType: 'html',
+			cache: false,
+			success: function(data){
+				$('#modal_tag').modal('hide');
+			}
+		});
+	});
+
+	$('#modal_tag').on('hidden.bs.modal', function (e) {
+		$('#tag_input').tagsinput('removeAll');
 	});
 });
 

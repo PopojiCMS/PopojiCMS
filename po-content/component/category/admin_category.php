@@ -191,7 +191,15 @@ class Category extends PoCore
 				$query_category_description = $this->podb->insertInto('category_description')->values($category_description);
 				$query_category_description->execute();
 			}
-			$this->poflash->success($GLOBALS['_']['category_message_1'], 'admin.php?mod=category');
+
+			if($_POST['modal'])
+			{
+				return true;
+			}
+			else
+			{
+				$this->poflash->success($GLOBALS['_']['category_message_1'], 'admin.php?mod=category');
+			}
 		}
 		?>
 		<div class="block-content">

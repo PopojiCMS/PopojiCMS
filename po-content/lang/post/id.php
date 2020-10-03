@@ -64,3 +64,10 @@ $_['front_post_title'] = 'Post';
 $_['front_post_not_found'] = 'Post Tidak Ditemukan';
 $_['front_search_title'] = 'Pencarian';
 $_['front_search_not_found'] = 'Pencarian Tidak Ditemukan';
+
+$_['category_addnew'] = 'Tambah Kategori';
+$_['category_title_2'] = 'Judul';
+
+$_['front_tag_title'] = 'Tag';
+$_['tag_addnew'] = 'Tambah Tag';
+$_['tag_help'] = 'Dapat memasukkan lebih dari satu tag (,)';

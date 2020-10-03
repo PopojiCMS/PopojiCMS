@@ -42,6 +42,7 @@ require_once CORE_PATH."/request.php";
 require_once CORE_PATH."/sitemap.php";
 require_once CORE_PATH."/string.php";
 require_once CORE_PATH."/timeout.php";
+require_once CORE_PATH."/curl.php";
 
 /**
  * Memasukkan library dari vendor pihak ketiga
@@ -88,6 +89,7 @@ class PoCore
 	public $potheme;
 	public $porequest;
 	public $popaging;
+	public $pocurl;
 
 	public function __construct()
 	{
@@ -127,6 +129,7 @@ class PoCore
 		$this->popaging = new PoPaging();
 		$this->posetting = $this->podb->from('setting')->fetchAll();
 		$this->potheme = $this->podb->from('theme')->where('active', 'Y')->limit(1)->fetch();
+		$this->pocurl = new PoCurl();
 	}
 
 	/**

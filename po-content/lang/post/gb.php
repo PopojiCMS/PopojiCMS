@@ -64,3 +64,10 @@ $_['front_post_title'] = 'Post';
 $_['front_post_not_found'] = 'Post Not Found';
 $_['front_search_title'] = 'Search';
 $_['front_search_not_found'] = 'Search Not Found';
+
+$_['category_addnew'] = 'Add Category';
+$_['category_title_2'] = 'Title';
+
+$_['front_tag_title'] = 'Tag';
+$_['tag_addnew'] = 'Add Tag';
+$_['tag_help'] = 'Can input more than one tag (,)';
