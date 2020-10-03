@@ -322,7 +322,7 @@ class Post extends PoCore
 										<?=$this->generate_checkbox(0, 'add');?>
 									</div>
 									<div class="category-option">
-										<div class="pull-left"><a href="admin.php?mod=category&act=addnew" target="_blank"><i class="fa fa-plus"></i> <?=$GLOBALS['_']['post_add_category'];?></a></div>
+										<div class="pull-left"><a href="javascript:void(0)" data-toggle="modal" data-target="#modal_kategori"><i class="fa fa-plus"></i> <?=$GLOBALS['_']['post_add_category'];?></a></div>
 										<div class="pull-right"><a href="javascript:void(0)" id="category-refresh" data-id="0"><i class="fa fa-refresh"></i> <?=$GLOBALS['_']['post_refresh_category'];?></a></div>
 									</div>
 								</div>
@@ -332,7 +332,7 @@ class Post extends PoCore
 							<div class="col-md-12">
 								<?=$this->pohtml->inputText(array('type' => 'text', 'label' => $GLOBALS['_']['post_tag'], 'name' => 'tag', 'id' => 'tag', 'mandatory' => false, 'options' => ''));?>
 								<div class="tag-option">
-									<div class="text-left"><a href="admin.php?mod=tag&act=addnew" target="_blank"><i class="fa fa-plus"></i> <?=$GLOBALS['_']['post_add_tag'];?></a></div>
+									<div class="text-left"><a href="javascript:void(0)" data-toggle="modal" data-target="#modal_tag"><i class="fa fa-plus"></i> <?=$GLOBALS['_']['post_add_tag'];?></a></div>
 								</div>
 							</div>
 						</div>
@@ -374,6 +374,81 @@ class Post extends PoCore
 						</div>
 					</div>
 				<?=$this->pohtml->formEnd();?>
+			</div>
+			<div class="modal fade" id="modal_kategori" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h4 class="modal-title" id="myModalLabel"><?= $GLOBALS['_']['category_addnew'] ?></h4>
+						</div>
+						<?=$this->pohtml->formStart(array('method' => 'post', 'action' => 'javascript:void(0)', 'autocomplete' => 'off', 'options' => 'id="form_kategori"'));?>
+						<div class="modal-body">
+							<?=$this->pohtml->inputHidden(array('name' => 'modal', 'value' => 1, 'options' => 'id="modal"'));?>
+							<?=$this->pohtml->inputHidden(array('name' => 'picture', 'value' => '', 'options' => 'id="picture"'));?>
+							<?php
+								$cat_cats = $this->podb->from('category')
+									->select('category_description.title')
+									->leftJoin('category_description ON category_description.id_category = category.id_category')
+									->where('category.id_parent', '0')
+									->where('category_description.id_language', '1')
+									->orderBy('category.id_category ASC')
+									->fetchAll();
+								echo $this->pohtml->inputSelectNoOpt(array('id' => 'id_parent', 'label' => 'Parent', 'name' => 'id_parent', 'mandatory' => true, 'options' => 'required'));
+							?>
+								<option value="0">No Parent</option>
+							<?php
+							foreach($cat_cats as $cat){
+								echo $this->generate_select($cat['id_category'], $cat['title']);
+							}
+								echo $this->pohtml->inputSelectNoOptEnd();
+							?>
+
+							<?php
+								$notab_cat = 1;
+								$noctab_cat = 1;
+								$langs_cat = $this->podb->from('language')->where('active', 'Y')->orderBy('id_language ASC')->fetchAll();
+							?>
+							<div role="tabpanel">
+								<ul class="nav nav-tabs" role="tablist">
+									<?php foreach($langs_cat as $lang) { ?>
+									<li role="presentation"<?php echo ($notab_cat == '1' ? ' class="active"' : ''); ?>><a href="#tab_content_<?=$lang['id_language'];?>" aria-controls="tab_content_<?=$lang['id_language'];?>" role="tab" data-toggle="tab"><img src="../<?=DIR_INC;?>/images/flag/<?=$lang['code'];?>.png" /> <?=$lang['title'];?></a></li>
+									<?php $notab_cat++;} ?>
+								</ul>
+								<div class="tab-content">
+									<?php foreach($langs_cat as $lang) { ?>
+									<div role="tabpanel" class="tab-pane<?php echo ($noctab_cat == '1' ? ' active' : ''); ?>" id="tab_content_<?=$lang['id_language'];?>">
+										<?=$this->pohtml->inputText(array('type' => 'text', 'label' => $GLOBALS['_']['category_title_2'], 'name' => 'category['.$lang['id_language'].'][title]', 'id' => 'title_'.$lang['id_language'], 'mandatory' => true, 'options' => 'required'));?>
+									</div>
+									<?php $noctab_cat++;} ?>
+								</div>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<?=$this->pohtml->formActionSubmit();?>
+						</div>
+						<?=$this->pohtml->formEnd();?>
+					</div>
+				</div>
+			</div>
+			<div class="modal fade" id="modal_tag" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h4 class="modal-title" id="myModalLabel"><?= $GLOBALS['_']['tag_addnew'] ?></h4>
+						</div>
+						<?=$this->pohtml->formStart(array('method' => 'post', 'action' => 'javascript:void(0)', 'autocomplete' => 'off', 'options' => 'id="form_tag"'));?>
+						<div class="modal-body">
+							<?=$this->pohtml->inputHidden(array('name' => 'modal', 'value' => 1, 'options' => 'id="modal"'));?>
+							<?=$this->pohtml->inputText(array('type' => 'text', 'label' => $GLOBALS['_']['front_tag_title'], 'name' => 'tag_input', 'id' => 'tag_input', 'mandatory' => true, 'options' => 'required', 'help' => $GLOBALS['_']['tag_help']));?>
+						</div>
+						<div class="modal-footer">
+							<?=$this->pohtml->formActionSubmit();?>
+						</div>
+						<?=$this->pohtml->formEnd();?>
+					</div>
+				</div>
 			</div>
 		</div>
 		<?php
@@ -571,7 +646,7 @@ class Post extends PoCore
 										<?=$this->generate_checkbox(0, 'update', $current_post['id_post']);?>
 									</div>
 									<div class="category-option">
-										<div class="pull-left"><a href="admin.php?mod=category&act=addnew" target="_blank"><i class="fa fa-plus"></i> <?=$GLOBALS['_']['post_add_category'];?></a></div>
+										<div class="pull-left"><a href="javascript:void(0)" data-toggle="modal" data-target="#modal_kategori"><i class="fa fa-plus"></i> <?=$GLOBALS['_']['post_add_category'];?></a></div>
 										<div class="pull-right"><a href="javascript:void(0)" id="category-refresh" data-id="<?=$current_post['id_post'];?>"><i class="fa fa-refresh"></i> <?=$GLOBALS['_']['post_refresh_category'];?></a></div>
 									</div>
 								</div>
@@ -581,7 +656,7 @@ class Post extends PoCore
 							<div class="col-md-12">
 								<?=$this->pohtml->inputText(array('type' => 'text', 'label' => $GLOBALS['_']['post_tag'], 'name' => 'tag', 'id' => 'tag', 'value' => $current_post['tag'], 'mandatory' => false, 'options' => ''));?>
 								<div class="tag-option">
-									<div class="text-left"><a href="admin.php?mod=tag&act=addnew" target="_blank"><i class="fa fa-plus"></i> <?=$GLOBALS['_']['post_add_tag'];?></a></div>
+									<div class="text-left"><a href="javascript:void(0)" data-toggle="modal" data-target="#modal_tag"><i class="fa fa-plus"></i> <?=$GLOBALS['_']['post_add_tag'];?></a></div>
 								</div>
 							</div>
 						</div>
@@ -674,6 +749,81 @@ class Post extends PoCore
 						</div>
 					</div>
 				<?=$this->pohtml->formEnd();?>
+			</div>
+			<div class="modal fade" id="modal_kategori" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h4 class="modal-title" id="myModalLabel"><?= $GLOBALS['_']['category_addnew'] ?></h4>
+						</div>
+						<?=$this->pohtml->formStart(array('method' => 'post', 'action' => 'javascript:void(0)', 'autocomplete' => 'off', 'options' => 'id="form_kategori"'));?>
+						<div class="modal-body">
+								<?=$this->pohtml->inputHidden(array('name' => 'modal', 'value' => 1, 'options' => 'id="modal"'));?>
+								<?=$this->pohtml->inputHidden(array('name' => 'picture', 'value' => '', 'options' => 'id="picture"'));?>
+								<?php
+									$cat_cats = $this->podb->from('category')
+										->select('category_description.title')
+										->leftJoin('category_description ON category_description.id_category = category.id_category')
+										->where('category.id_parent', '0')
+										->where('category_description.id_language', '1')
+										->orderBy('category.id_category ASC')
+										->fetchAll();
+									echo $this->pohtml->inputSelectNoOpt(array('id' => 'id_parent', 'label' => 'Parent', 'name' => 'id_parent', 'mandatory' => true, 'options' => 'required'));
+								?>
+									<option value="0">No Parent</option>
+								<?php
+								foreach($cat_cats as $cat){
+									echo $this->generate_select($cat['id_category'], $cat['title']);
+								}
+									echo $this->pohtml->inputSelectNoOptEnd();
+								?>
+
+								<?php
+									$notab_cat = 1;
+									$noctab_cat = 1;
+									$langs_cat = $this->podb->from('language')->where('active', 'Y')->orderBy('id_language ASC')->fetchAll();
+								?>
+								<div role="tabpanel">
+									<ul class="nav nav-tabs" role="tablist">
+										<?php foreach($langs_cat as $lang) { ?>
+										<li role="presentation"<?php echo ($notab_cat == '1' ? ' class="active"' : ''); ?>><a href="#tab_content_<?=$lang['id_language'];?>" aria-controls="tab_content_<?=$lang['id_language'];?>" role="tab" data-toggle="tab"><img src="../<?=DIR_INC;?>/images/flag/<?=$lang['code'];?>.png" /> <?=$lang['title'];?></a></li>
+										<?php $notab_cat++;} ?>
+									</ul>
+									<div class="tab-content">
+										<?php foreach($langs_cat as $lang) { ?>
+										<div role="tabpanel" class="tab-pane<?php echo ($noctab_cat == '1' ? ' active' : ''); ?>" id="tab_content_<?=$lang['id_language'];?>">
+											<?=$this->pohtml->inputText(array('type' => 'text', 'label' => $GLOBALS['_']['category_title_2'], 'name' => 'category['.$lang['id_language'].'][title]', 'id' => 'title_'.$lang['id_language'], 'mandatory' => true, 'options' => 'required'));?>
+										</div>
+										<?php $noctab_cat++;} ?>
+									</div>
+								</div>
+						</div>
+						<div class="modal-footer">
+							<?=$this->pohtml->formActionSubmit();?>
+						</div>
+						<?=$this->pohtml->formEnd();?>
+					</div>
+				</div>
+			</div>
+			<div class="modal fade" id="modal_tag" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h4 class="modal-title" id="myModalLabel"><?= $GLOBALS['_']['tag_addnew'] ?></h4>
+						</div>
+						<?=$this->pohtml->formStart(array('method' => 'post', 'action' => 'javascript:void(0)', 'autocomplete' => 'off', 'options' => 'id="form_tag"'));?>
+						<div class="modal-body">
+							<?=$this->pohtml->inputHidden(array('name' => 'modal', 'value' => 1, 'options' => 'id="modal"'));?>
+							<?=$this->pohtml->inputText(array('type' => 'text', 'label' => $GLOBALS['_']['component_name'], 'name' => 'tag_input', 'id' => 'tag_input', 'mandatory' => true, 'options' => 'required', 'help' => $GLOBALS['_']['tag_help']));?>
+						</div>
+						<div class="modal-footer">
+							<?=$this->pohtml->formActionSubmit();?>
+						</div>
+						<?=$this->pohtml->formEnd();?>
+					</div>
+				</div>
 			</div>
 		</div>
 		<div class="block-content">
@@ -1722,6 +1872,61 @@ class Post extends PoCore
 			echo "100";
 			unset($_SESSION['progress_bar']);
 		}
+	}
+
+	/**
+	 * Fungsi ini digunakan untuk menggenerate option pada kotak select.
+	 *
+	 * This function use for generate option in select box.
+	 *
+	*/
+	public function generate_select($id, $label)
+	{
+		$html = "<option value=\"{$id}\" style=\"font-weight:bold;\">{$label}</option>";
+		$html .= $this->generate_option($id, $label, "20px");
+		return ($html);
+	}
+
+	/**
+	 * Fungsi ini digunakan untuk menggenerate option pada kotak select.
+	 *
+	 * This function use for generate option in select box.
+	 *
+	*/
+	public function generate_option($id, $label, $exp)
+	{
+		$i = 1;
+		$html = "";
+		$indent = str_repeat("\t\t", $i);
+		$catfuns = $this->podb->from('category')
+			->select('category_description.title')
+			->leftJoin('category_description ON category_description.id_category = category.id_category')
+			->where('category.id_parent', $id)
+			->where('category_description.id_language', '1')
+			->orderBy('category.id_category ASC')
+			->fetchAll();
+		$catfunnum = $this->podb->from('category')->where('id_parent', $id)->orderBy('id_category ASC')->count();
+		if ($catfunnum > 0) {
+			$html .= "\n\t".$indent."";
+			$i++;
+			foreach ($catfuns as $catfun) {
+				$explus = $exp + 20;
+				$child = $this->generate_option($catfun['id_category'], $catfun['title'], $explus."px");
+				$html .= "\n\t".$indent."";
+				if ($child) {
+					$i--;
+					$html .= "<option value='".$catfun['id_category']."' style='margin-left:".$exp.";'>";
+					$html .= $catfun['title'];
+					$html .= $child;
+					$html .= "\n\t".$indent."";
+				} else {
+					$html .= "<option value='".$catfun['id_category']."' style='margin-left:".$exp.";'>";
+					$html .= $catfun['title'];
+				}
+				$html .= "</option>";
+			}
+		}
+		return ($html);
 	}
 
 }
