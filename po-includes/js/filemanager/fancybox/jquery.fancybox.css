@@ -45,6 +45,7 @@
 }
 
 .fancybox-outer, .fancybox-inner {
+	min-height: 400px;
 	position: relative;
 }
 
